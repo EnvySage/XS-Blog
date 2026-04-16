@@ -1,0 +1,1016 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+    <script async src="https://hm.baidu.com/hm.js?true"></script>
+  <script data-pjax>
+    var _hmt = _hmt || [];
+    _hmt.push(["_trackPageview", location.pathname]);
+  </script>
+
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_a0oqhord1y';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'http://example.com';window.REIMU_CONFIG.relative = '/';</script>
+  <title>
+    软件工程 | 羡笙の窝
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_a0oqhord1y.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/css/loader.css">
+
+    <meta name="description" content="软件工程 概要设计的内容可以包含系统构架、模块划分、系统接口、数据设计4个主要方面的内容,不包括模块内算法设计。 需求分析阶段需完成以下要求： ►确定软件系统的功能需求和非功能需求； ►分析软件系统的数据要求； ►导出系统的逻辑模型； ►修正项目开发计划； ►如有必要，可以开发一个原型系统。  客户特性是指与客户的素质以及开发者和客户定期通信的能力相关的风险； 过程定义是指与软件过程被定义的程度">
+<meta property="og:type" content="article">
+<meta property="og:title" content="软件工程">
+<meta property="og:url" content="http://example.com/2026/04/16/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B/index.html">
+<meta property="og:site_name" content="羡笙の窝">
+<meta property="og:description" content="软件工程 概要设计的内容可以包含系统构架、模块划分、系统接口、数据设计4个主要方面的内容,不包括模块内算法设计。 需求分析阶段需完成以下要求： ►确定软件系统的功能需求和非功能需求； ►分析软件系统的数据要求； ►导出系统的逻辑模型； ►修正项目开发计划； ►如有必要，可以开发一个原型系统。  客户特性是指与客户的素质以及开发者和客户定期通信的能力相关的风险； 过程定义是指与软件过程被定义的程度">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://image-t.chaiding.com/ruankao/6f71d966603fe434c4844503cbb5e692.jpg">
+<meta property="og:image" content="http://example.com/img/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B.png">
+<meta property="article:published_time" content="2026-04-16T14:43:13.439Z">
+<meta property="article:modified_time" content="2026-04-16T16:40:21.076Z">
+<meta property="article:author" content="羡笙">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://image-t.chaiding.com/ruankao/6f71d966603fe434c4844503cbb5e692.jpg">
+    <link rel="alternate" href="/atom.xml" title="羡笙の窝" type="application/atom+xml">
+    <link rel="shortcut icon" href="/images/favicon.ico">
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+      <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/katex@0.16.24/dist/katex.min.css" integrity="sha384-tTgKLjMYmJr94v8qu2PE5MUGSMbyN2xiH266JUB3gpm8vnnJywd1dWSOEfrFz+YI" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+    <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/aplayer@1.10.1/dist/APlayer.min.css" integrity="sha384-tLMkTWh2pfXNWGFlUS0w1TFtRG5xZ9lPWFOooj+vDDLIL+xBGQU/voDBY5XE2lVh" crossorigin="anonymous">
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/images/banner.webp" alt="软件工程">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">软件工程</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content" class="sidebar-left"  >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+      <div id="aplayer" theme="var(--color-link)" data-aos="fade-up"></div>
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B"><span class="toc-text"> 软件工程</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BD%91%E7%BB%9C%E5%B7%A5%E7%A8%8B"><span class="toc-text"> 网络工程</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A8%A1%E5%9D%97%E5%86%85%E8%81%9A"><span class="toc-text"> 模块内聚</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%81%B6%E7%84%B6%E5%86%85%E8%81%9A"><span class="toc-text"> 1. 偶然内聚</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E9%80%BB%E8%BE%91%E5%86%85%E8%81%9A"><span class="toc-text"> 2. 逻辑内聚</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E6%97%B6%E9%97%B4%E5%86%85%E8%81%9A"><span class="toc-text"> 3. 时间内聚</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E8%BF%87%E7%A8%8B%E5%86%85%E8%81%9A"><span class="toc-text"> 4. 过程内聚</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E9%80%9A%E4%BF%A1%E5%86%85%E8%81%9A"><span class="toc-text"> 5. 通信内聚</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-%E9%A1%BA%E5%BA%8F%E5%86%85%E8%81%9A"><span class="toc-text"> 6. 顺序内聚</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-%E5%8A%9F%E8%83%BD%E5%86%85%E8%81%9A"><span class="toc-text"> 7. 功能内聚</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A8%A1%E5%9D%97%E8%80%A6%E5%90%88"><span class="toc-text"> 模块耦合</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F"><span class="toc-text"> 设计模式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E5%88%9B%E5%BB%BA%E5%9E%8B%E6%A8%A1%E5%BC%8F"><span class="toc-text"> 1.创建型模式</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#11-%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8Fsingleton"><span class="toc-text"> 1.1 单例模式（Singleton）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#12-%E5%B7%A5%E5%8E%82%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8Ffactory-method"><span class="toc-text"> 1.2 工厂方法模式（Factory Method）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#13%E6%8A%BD%E8%B1%A1%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8Fabstract-factory"><span class="toc-text"> 1.3抽象工厂模式（Abstract Factory）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#14-%E5%BB%BA%E9%80%A0%E8%80%85%E6%A8%A1%E5%BC%8Fbuilder"><span class="toc-text"> 1.4 建造者模式（Builder）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#15-%E5%8E%9F%E5%9E%8B%E6%A8%A1%E5%BC%8Fprototype"><span class="toc-text"> 1.5 原型模式（Prototype）</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E7%BB%93%E6%9E%84%E5%9E%8B%E6%A8%A1%E5%BC%8F"><span class="toc-text"> 2. 结构型模式</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#21-%E9%80%82%E9%85%8D%E5%99%A8%E6%A8%A1%E5%BC%8Fadapter"><span class="toc-text"> 2.1 适配器模式（Adapter）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#22-%E6%A1%A5%E6%8E%A5%E6%A8%A1%E5%BC%8Fbridge"><span class="toc-text"> 2.2 桥接模式（Bridge）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#23-%E7%BB%84%E5%90%88%E6%A8%A1%E5%BC%8Fcomposite"><span class="toc-text"> 2.3 组合模式（Composite）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#24-%E8%A3%85%E9%A5%B0%E6%A8%A1%E5%BC%8Fdecorator"><span class="toc-text"> 2.4 装饰模式（Decorator）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#25-%E4%BB%A3%E7%90%86%E6%A8%A1%E5%BC%8Fproxy"><span class="toc-text"> 2.5 代理模式（Proxy）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#26-%E5%A4%96%E8%A7%82%E6%A8%A1%E5%BC%8Ffacade"><span class="toc-text"> 2.6 外观模式（Facade）</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#27-%E9%A3%9E%E4%BA%AB%E6%A8%A1%E5%BC%8Fflyweight"><span class="toc-text"> 2.7 飞享模式（Flyweight）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3%E8%A1%8C%E4%B8%BA%E5%9E%8B%E6%A8%A1%E5%BC%8Fbehavioral-patterns"><span class="toc-text"> 3.行为型模式（Behavioral Patterns）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#31-%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8Fstrategy"><span class="toc-text"> 3.1 策略模式（Strategy）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#32-%E6%A8%A1%E6%9D%BF%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8Ftemplate-method"><span class="toc-text"> 3.2 模板方法模式（Template Method）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#33-%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8Fobserver"><span class="toc-text"> 3.3 观察者模式（Observer）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#34-%E8%BF%AD%E4%BB%A3%E5%99%A8%E6%A8%A1%E5%BC%8Fiterator"><span class="toc-text"> 3.4 迭代器模式（Iterator）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#35-%E8%B4%A3%E4%BB%BB%E9%93%BE%E6%A8%A1%E5%BC%8Fchain-of-responsibility"><span class="toc-text"> 3.5 责任链模式（Chain of Responsibility）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#36-%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8Fcommand"><span class="toc-text"> 3.6 命令模式（Command）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#37-%E5%A4%87%E5%BF%98%E5%BD%95%E6%A8%A1%E5%BC%8Fmemento"><span class="toc-text"> 3.7 备忘录模式（Memento）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#38-%E7%8A%B6%E6%80%81%E6%A8%A1%E5%BC%8Fstate"><span class="toc-text"> 3.8 状态模式（State）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#39-%E8%AE%BF%E9%97%AE%E8%80%85%E6%A8%A1%E5%BC%8Fvisitor"><span class="toc-text"> 3.9 访问者模式（Visitor）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#310-%E4%B8%AD%E4%BB%8B%E8%80%85%E6%A8%A1%E5%BC%8Fmediator"><span class="toc-text"> 3.10 中介者模式（Mediator）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#311-%E8%A7%A3%E9%87%8A%E5%99%A8%E6%A8%A1%E5%BC%8Finterpreter"><span class="toc-text"> 3.11 解释器模式（Interpreter）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-text"> 总结</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E5%9E%8B%E6%A8%A1%E5%BC%8Fcreational-patterns"><span class="toc-text"> 创建型模式（Creational Patterns）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%93%E6%9E%84%E5%9E%8B%E6%A8%A1%E5%BC%8Fstructural-patterns"><span class="toc-text"> 结构型模式（Structural Patterns）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A1%8C%E4%B8%BA%E5%9E%8B%E6%A8%A1%E5%BC%8Fbehavioral-patterns"><span class="toc-text"> 行为型模式（Behavioral Patterns）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E6%B5%8B%E8%AF%95"><span class="toc-text"> ·面向对象测试</span></a></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="羡笙" class="lazyload">
+  <div class="sidebar-author-name">羡笙</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">6</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/EnvySage itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-软件工程" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-04-16T14:43:13.439Z" itemprop="datePublished">2026-04-16</time>
+    <time style="display: none;" id="post-update-time">2026-04-17</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="软件工程"><a class="markdownIt-Anchor" href="#软件工程"></a> 软件工程</h1>
+<p>概要设计的内容可以包含系统构架、模块划分、系统接口、数据设计4个主要方面的内容,不包括模块内算法设计。</p>
+<p>需求分析阶段需完成以下要求：<br />
+►确定软件系统的功能需求和非功能需求；<br />
+►分析软件系统的数据要求；<br />
+►导出系统的逻辑模型；<br />
+►修正项目开发计划；<br />
+►如有必要，可以开发一个原型系统。</p>
+<ol>
+<li>客户特性是指与客户的素质以及开发者和客户定期通信的能力相关的风险；</li>
+<li>过程定义是指与软件过程被定义的程度以及它们被开发组织所遵守的程序相关的风险；</li>
+<li>开发环境是指与用以构建产品的工具的可用性及质量相关的风险；</li>
+<li>构建技术是指与待开发软件的复杂性及系统所包含技术的“新奇性”相关的风险。</li>
+</ol>
+<p>软件配置管理是一组管理整个软件生存期各阶段中变更的活动，主要包括变更标识、变更控制和版本控制。</p>
+<p>软件详细设计阶段的主要任务包括：对模块内的数据结构进行设计；对数据库进行物理设计；对每个模块进行详细的算法设计；代码设计、输入/输出设计、用户界面设计等其他设计。</p>
+<p>CMM的5个成熟度等级分别为：</p>
+<ol>
+<li>初始级。初始级是未加定义的随意过程，软件过程的特点是无秩序的，有时甚至是混乱的。软件过程定义几乎处于无章法和步骤可循的状态，软件产品所取得的成功往往依赖于极个别人的努力和机遇。</li>
+<li>可重复级。可重复级是规则化和纪律化的过程，软件过程已建立了基本的项目管理过程，可用于对成本、进度和功能特性进行跟踪。对类似的应用项目，有章可循并能重复以往所取得的成功。</li>
+<li>已定义级。已定义级是标准的和一致的过程，用于管理的和工程的软件过程均已文档化、标准化，并形成了整个软件组织的标准软件过程。全部项目均采用与实际情况相吻合的、适当修改后的标准软件过程来进行操作。</li>
+<li>已管理级。已管理级是可预测的过程，软件过程和产品质量有详细的度量标准。软件过程和产品质量得到了定量的认识和控制。</li>
+<li>优化级。优化级是持续改进的过程，通过对来自过程、新概念和新技术等方面的各种有用信息的定量分析，能够不断地、持续性地对过程进行改进。</li>
+</ol>
+<p>CMMI模型分为0-6</p>
+<ol>
+<li>能力等级0指未执行过程，表明过程域的一个或多个特定目标没有被满足；</li>
+<li>能力等级1指过程通过转化可识别的输入工作产品，产生可识别的输出工作产品，关注于过程域的特定目标的完成；</li>
+<li>能力等级2指过程作为已管理的过程制度化，针对单个过程实例的能力；</li>
+<li>能力等级3指过程作为已定义的过程制度化，关注过程的组织级标准化和部署；</li>
+<li>能力等级4指过程作为定量管理的过程制度化；</li>
+<li>能力等级5指过程作为优化的过程制度化，表明过程得到很好地执行且持续得到改进。</li>
+</ol>
+<ul>
+<li>
+<p>统一过程（UP）的基本特征是“用力驱动，以架构为中心的个受控的迭代式增量开发”。一个UP可分为若干个周期，每个周期的开发过程被分为4个阶段，每个阶段可进行若干次迭代。</p>
+</li>
+<li>
+<p>（1）先启阶段（Inception）：该阶段的主要意图是建立项目的范围和版本，确定业务实现的可能性和项目目标的稳定性。提交结果包括原始的项目需求的业务用例。</p>
+</li>
+<li>
+<p>（2）精化阶段（Elaboration）：该阶段的主要意图是对问题域进行分析，建立系统的需求和架构。确定技术实现的可行性和系统架构的稳定性。提交结果包括系统架构及其相关文档、领域模型、修改后的业务用例和整个项目的开发计划。</p>
+</li>
+<li>
+<p>（3）构建阶段（Construction）：主要意图是增量式地开发一个可以交付用户的软件产品。</p>
+</li>
+<li>
+<p>（4）提交阶段（Transition）：主要意图是将软件产品提交用户。</p>
+</li>
+<li>
+<p>RUP中每个阶段的结束时所产生的里程碑。</p>
+</li>
+<li>
+<p>初启阶段结束时的里程碑是生命周期目标；</p>
+</li>
+<li>
+<p>精化阶段结束时的里程碑是生命周期架构；</p>
+</li>
+<li>
+<p>构建阶段结束时的里程碑是最初运作能力；</p>
+</li>
+<li>
+<p>移交阶段的里程碑是产品发布。</p>
+<p><img src="https://image-t.chaiding.com/ruankao/6f71d966603fe434c4844503cbb5e692.jpg" alt="1.jpg" /></p>
+</li>
+</ul>
+<h1 id="网络工程"><a class="markdownIt-Anchor" href="#网络工程"></a> 网络工程</h1>
+<p><img src="/img/%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B.png" alt="在这里插入图片描述" /></p>
+<h1 id="模块内聚"><a class="markdownIt-Anchor" href="#模块内聚"></a> 模块内聚</h1>
+<h3 id="1-偶然内聚"><a class="markdownIt-Anchor" href="#1-偶然内聚"></a> 1. 偶然内聚</h3>
+<ul>
+<li><strong>定义</strong>：模块内各组成部分之间没有任何关联，仅因为偶然的原因被放在同一个模块中。这种内聚程度最低。</li>
+<li><strong>举例</strong>：一个模块中既包含了计算工资的代码，又包含了打印报表的代码，而这两部分功能完全无关，只是因为开发时被放在了同一个文件中。</li>
+</ul>
+<h3 id="2-逻辑内聚"><a class="markdownIt-Anchor" href="#2-逻辑内聚"></a> 2. 逻辑内聚</h3>
+<ul>
+<li><strong>定义</strong>：模块内各组成部分虽然执行相似的功能，但这些功能属于同一逻辑类别，具体功能由输入参数决定。</li>
+<li><strong>举例</strong>：一个模块用于处理各种图形的绘制，如绘制圆形、正方形、三角形等。虽然这些功能都属于图形绘制，但具体绘制哪种图形取决于输入参数。</li>
+</ul>
+<h3 id="3-时间内聚"><a class="markdownIt-Anchor" href="#3-时间内聚"></a> 3. 时间内聚</h3>
+<ul>
+<li><strong>定义</strong>：模块内各组成部分必须在同一时间内执行，但这些组成部分之间没有逻辑上的关联。</li>
+<li><strong>举例</strong>：一个模块用于初始化软件系统，其中包含了初始化数据库、初始化用户界面、初始化网络连接等多个操作。这些操作虽然在启动时一起执行，但彼此之间没有逻辑上的联系。</li>
+</ul>
+<h3 id="4-过程内聚"><a class="markdownIt-Anchor" href="#4-过程内聚"></a> 4. 过程内聚</h3>
+<ul>
+<li><strong>定义</strong>：模块内各组成部分在逻辑上密切相关，且这些组成部分必须按照特定的顺序执行。</li>
+<li><strong>举例</strong>：一个模块用于处理订单，包括接收订单、验证订单、处理支付、发货等步骤。这些操作在逻辑上密切相关，且必须按照一定的顺序执行。</li>
+</ul>
+<h3 id="5-通信内聚"><a class="markdownIt-Anchor" href="#5-通信内聚"></a> 5. 通信内聚</h3>
+<ul>
+<li><strong>定义</strong>：模块内各组成部分都操作同一数据结构或数据集。</li>
+<li><strong>举例</strong>：一个模块用于处理学生信息，包括添加学生、删除学生、查询学生等操作。这些操作都基于同一个学生信息数据结构。</li>
+</ul>
+<h3 id="6-顺序内聚"><a class="markdownIt-Anchor" href="#6-顺序内聚"></a> 6. 顺序内聚</h3>
+<ul>
+<li><strong>定义</strong>：模块内各组成部分不仅操作同一数据结构，而且一个组成部分的输出是另一个组成部分的输入。</li>
+<li><strong>举例</strong>：一个模块用于处理文本文件，首先读取文件内容，然后对内容进行格式化，最后输出处理后的结果。这些操作不仅基于同一个数据结构（文件内容），而且存在明确的输入输出关系。</li>
+</ul>
+<h3 id="7-功能内聚"><a class="markdownIt-Anchor" href="#7-功能内聚"></a> 7. 功能内聚</h3>
+<ul>
+<li><strong>定义</strong>：模块内所有组成部分都紧密围绕一个单一的功能，共同完成一个明确的任务。这是内聚程度最高的类型。</li>
+<li><strong>举例</strong>：一个模块用于计算圆的面积和周长，所有操作都围绕“圆”这个单一功能展开，输入圆的半径，输出面积和周长。</li>
+</ul>
+<h1 id="模块耦合"><a class="markdownIt-Anchor" href="#模块耦合"></a> 模块耦合</h1>
+<table>
+<thead>
+<tr>
+<th>耦合级别</th>
+<th>描述</th>
+<th>特点</th>
+<th>优点</th>
+<th>缺点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>无耦合</td>
+<td>模块之间没有任何联系</td>
+<td>完全独立</td>
+<td>最理想的耦合状态</td>
+<td>实际开发中很难完全实现</td>
+</tr>
+<tr>
+<td>数据耦合</td>
+<td>模块之间通过参数传递简单数据值</td>
+<td>依赖性弱</td>
+<td>耦合程度低，便于维护和扩展</td>
+<td>数据传递过多可能复杂</td>
+</tr>
+<tr>
+<td>标记耦合</td>
+<td>模块之间通过传递数据结构</td>
+<td>依赖性适中</td>
+<td>可传递复杂数据结构</td>
+<td>数据结构变化影响多个模块</td>
+</tr>
+<tr>
+<td>控制耦合</td>
+<td>模块之间通过传递控制信号</td>
+<td>依赖性强</td>
+<td>灵活控制模块行为</td>
+<td>模块行为相互影响</td>
+</tr>
+<tr>
+<td>外部耦合</td>
+<td>模块之间通过外部环境交互</td>
+<td>依赖性强</td>
+<td>可通过外部环境共享数据</td>
+<td>外部环境变化影响模块行为</td>
+</tr>
+<tr>
+<td>公共耦合</td>
+<td>模块之间通过共享全局变量</td>
+<td>依赖性强</td>
+<td>实现简单，便于数据共享</td>
+<td>全局变量修改影响多个模块</td>
+</tr>
+<tr>
+<td>内容耦合</td>
+<td>模块之间直接访问或修改对方内部数据</td>
+<td>依赖性最强</td>
+<td>实现简单，直接访问内部数据</td>
+<td>模块修改直接影响其他模块</td>
+</tr>
+</tbody>
+</table>
+<h1 id="设计模式"><a class="markdownIt-Anchor" href="#设计模式"></a> 设计模式</h1>
+<h3 id="1创建型模式"><a class="markdownIt-Anchor" href="#1创建型模式"></a> 1.创建型模式</h3>
+<h4 id="11-单例模式singleton"><a class="markdownIt-Anchor" href="#11-单例模式singleton"></a> 1.1 单例模式（Singleton）</h4>
+<ul>
+<li><strong>意图</strong>：确保一个类只有一个实例，并提供一个全局访问点。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Singleton</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Singleton instance;</span><br><span class="line">    <span class="keyword">private</span> <span class="title function_">Singleton</span><span class="params">()</span> &#123;&#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title function_">getInstance</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (instance == <span class="literal">null</span>) &#123;</span><br><span class="line">            instance = <span class="keyword">new</span> <span class="title class_">Singleton</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> instance;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="12-工厂方法模式factory-method"><a class="markdownIt-Anchor" href="#12-工厂方法模式factory-method"></a> 1.2 工厂方法模式（Factory Method）</h4>
+<ul>
+<li>
+<p><strong>意图</strong>：定义一个创建对象的接口，让子类决定实例化哪一个类。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Product</span> &#123;</span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">use</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ConcreteProduct</span> <span class="keyword">implements</span> <span class="title class_">Product</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">use</span><span class="params">()</span> &#123; System.out.println(<span class="string">&quot;Using ConcreteProduct&quot;</span>); &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title class_">Creator</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">abstract</span> Product <span class="title function_">factoryMethod</span><span class="params">()</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">doSomething</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="type">Product</span> <span class="variable">product</span> <span class="operator">=</span> factoryMethod();</span><br><span class="line">        product.use();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ConcreteCreator</span> <span class="keyword">extends</span> <span class="title class_">Creator</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> Product <span class="title function_">factoryMethod</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">ConcreteProduct</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="13抽象工厂模式abstract-factory"><a class="markdownIt-Anchor" href="#13抽象工厂模式abstract-factory"></a> 1.3抽象工厂模式（Abstract Factory）</h4>
+<ul>
+<li><strong>意图</strong>：创建相关或依赖对象的家族，而不需明确指定具体类。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">ProductA</span> &#123; <span class="keyword">void</span> <span class="title function_">useA</span><span class="params">()</span>; &#125;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">ProductB</span> &#123; <span class="keyword">void</span> <span class="title function_">useB</span><span class="params">()</span>; &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ConcreteProductA1</span> <span class="keyword">implements</span> <span class="title class_">ProductA</span> &#123; <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">useA</span><span class="params">()</span> &#123; System.out.println(<span class="string">&quot;Using A1&quot;</span>); &#125; &#125;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ConcreteProductA2</span> <span class="keyword">implements</span> <span class="title class_">ProductA</span> &#123; <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">useA</span><span class="params">()</span> &#123; System.out.println(<span class="string">&quot;Using A2&quot;</span>); &#125; &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ConcreteProductB1</span> <span class="keyword">implements</span> <span class="title class_">ProductB</span> &#123; <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">useB</span><span class="params">()</span> &#123; System.out.println(<span class="string">&quot;Using B1&quot;</span>); &#125; &#125;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ConcreteProductB2</span> <span class="keyword">implements</span> <span class="title class_">ProductB</span> &#123; <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">useB</span><span class="params">()</span> &#123; System.out.println(<span class="string">&quot;Using B2&quot;</span>); &#125; &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">AbstractFactory</span> &#123;</span><br><span class="line">    ProductA <span class="title function_">createProductA</span><span class="params">()</span>;</span><br><span class="line">    ProductB <span class="title function_">createProductB</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ConcreteFactory1</span> <span class="keyword">implements</span> <span class="title class_">AbstractFactory</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> ProductA <span class="title function_">createProductA</span><span class="params">()</span> &#123; <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">ConcreteProductA1</span>(); &#125;</span><br><span class="line">    <span class="keyword">public</span> ProductB <span class="title function_">createProductB</span><span class="params">()</span> &#123; <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">ConcreteProductB1</span>(); &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ConcreteFactory2</span> <span class="keyword">implements</span> <span class="title class_">AbstractFactory</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> ProductA <span class="title function_">createProductA</span><span class="params">()</span> &#123; <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">ConcreteProductA2</span>(); &#125;</span><br><span class="line">    <span class="keyword">public</span> ProductB <span class="title function_">createProductB</span><span class="params">()</span> &#123; <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">ConcreteProductB2</span>(); &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="14-建造者模式builder"><a class="markdownIt-Anchor" href="#14-建造者模式builder"></a> 1.4 建造者模式（Builder）</h4>
+<ul>
+<li><strong>意图</strong>：逐步构建一个复杂的对象。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Product</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> String partA;</span><br><span class="line">    <span class="keyword">private</span> String partB;</span><br><span class="line">    <span class="keyword">private</span> String partC;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setPartA</span><span class="params">(String partA)</span> &#123; <span class="built_in">this</span>.partA = partA; &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setPartB</span><span class="params">(String partB)</span> &#123; <span class="built_in">this</span>.partB = partB; &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setPartC</span><span class="params">(String partC)</span> &#123; <span class="built_in">this</span>.partC = partC; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">show</span><span class="params">()</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;PartA: &quot;</span> + partA);</span><br><span class="line">        System.out.println(<span class="string">&quot;PartB: &quot;</span> + partB);</span><br><span class="line">        System.out.println(<span class="string">&quot;PartC: &quot;</span> + partC);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Builder</span> &#123;</span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">buildPartA</span><span class="params">()</span>;</span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">buildPartB</span><span class="params">()</span>;</span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">buildPartC</span><span class="params">()</span>;</span><br><span class="line">    Product <span class="title function_">getResult</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ConcreteBuilder</span> <span class="keyword">implements</span> <span class="title class_">Builder</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">Product</span> <span class="variable">product</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Product</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">buildPartA</span><span class="params">()</span> &#123; product.setPartA(<span class="string">&quot;PartA&quot;</span>); &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">buildPartB</span><span class="params">()</span> &#123; product.setPartB(<span class="string">&quot;PartB&quot;</span>); &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">buildPartC</span><span class="params">()</span> &#123; product.setPartC(<span class="string">&quot;PartC&quot;</span>); &#125;</span><br><span class="line">    <span class="keyword">public</span> Product <span class="title function_">getResult</span><span class="params">()</span> &#123; <span class="keyword">return</span> product; &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Director</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> Builder builder;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Director</span><span class="params">(Builder builder)</span> &#123; <span class="built_in">this</span>.builder = builder; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">construct</span><span class="params">()</span> &#123;</span><br><span class="line">        builder.buildPartA();</span><br><span class="line">        builder.buildPartB();</span><br><span class="line">        builder.buildPartC();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="15-原型模式prototype"><a class="markdownIt-Anchor" href="#15-原型模式prototype"></a> 1.5 原型模式（Prototype）</h4>
+<ul>
+<li><strong>意图</strong>：通过复制现有实例来创建新实例。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Prototype</span> <span class="keyword">implements</span> <span class="title class_">Cloneable</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> String field;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Prototype</span><span class="params">(String field)</span> &#123; <span class="built_in">this</span>.field = field; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">getField</span><span class="params">()</span> &#123; <span class="keyword">return</span> field; &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setField</span><span class="params">(String field)</span> &#123; <span class="built_in">this</span>.field = field; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> Object <span class="title function_">clone</span><span class="params">()</span> <span class="keyword">throws</span> CloneNotSupportedException &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">super</span>.clone();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="2-结构型模式"><a class="markdownIt-Anchor" href="#2-结构型模式"></a> 2. 结构型模式</h3>
+<h4 id="21-适配器模式adapter"><a class="markdownIt-Anchor" href="#21-适配器模式adapter"></a> 2.1 适配器模式（Adapter）</h4>
+<ul>
+<li><strong>意图</strong>：将一个类的接口转换为另一个接口，以使原本不兼容的类可以协同工作。</li>
+</ul>
+<h4 id="22-桥接模式bridge"><a class="markdownIt-Anchor" href="#22-桥接模式bridge"></a> 2.2 桥接模式（Bridge）</h4>
+<ul>
+<li><strong>意图</strong>：将抽象与实现分离，使它们可以独立变化。</li>
+</ul>
+<h4 id="23-组合模式composite"><a class="markdownIt-Anchor" href="#23-组合模式composite"></a> 2.3 组合模式（Composite）</h4>
+<ul>
+<li><strong>意图</strong>：将对象组合成树形结构，以表示“部分-整体”的层次结构。</li>
+</ul>
+<h4 id="24-装饰模式decorator"><a class="markdownIt-Anchor" href="#24-装饰模式decorator"></a> 2.4 装饰模式（Decorator）</h4>
+<ul>
+<li><strong>意图</strong>：动态地给一个对象添加额外的功能。</li>
+</ul>
+<h4 id="25-代理模式proxy"><a class="markdownIt-Anchor" href="#25-代理模式proxy"></a> 2.5 代理模式（Proxy）</h4>
+<ul>
+<li><strong>意图</strong>：为其他对象提供一种代理以控制对这个对象的访问。</li>
+</ul>
+<h4 id="26-外观模式facade"><a class="markdownIt-Anchor" href="#26-外观模式facade"></a> 2.6 外观模式（Facade）</h4>
+<ul>
+<li><strong>意图</strong>：提供一个统一的高层接口，用于访问子系统中的一群接口。</li>
+</ul>
+<h3 id="27-飞享模式flyweight"><a class="markdownIt-Anchor" href="#27-飞享模式flyweight"></a> 2.7 飞享模式（Flyweight）</h3>
+<ul>
+<li><strong>意图</strong>：通过共享已存在的对象来减少创建对象的数量，从而减少内存占用和提高性能。</li>
+</ul>
+<h2 id="3行为型模式behavioral-patterns"><a class="markdownIt-Anchor" href="#3行为型模式behavioral-patterns"></a> 3.行为型模式（Behavioral Patterns）</h2>
+<h4 id="31-策略模式strategy"><a class="markdownIt-Anchor" href="#31-策略模式strategy"></a> 3.1 策略模式（Strategy）</h4>
+<ul>
+<li><strong>意图</strong>：定义一系列算法，将每个算法封装起来，并使它们可以互换。</li>
+</ul>
+<h4 id="32-模板方法模式template-method"><a class="markdownIt-Anchor" href="#32-模板方法模式template-method"></a> 3.2 模板方法模式（Template Method）</h4>
+<ul>
+<li><strong>意图</strong>：定义一个操作中的算法骨架，将一些步骤延迟到子类中实现</li>
+</ul>
+<h4 id="33-观察者模式observer"><a class="markdownIt-Anchor" href="#33-观察者模式observer"></a> 3.3 观察者模式（Observer）</h4>
+<ul>
+<li><strong>意图</strong>：定义对象间的一种一对多的依赖关系，以便当一个对象的状态发生改变时，所有依赖于它的对象都得到通知并自动更新</li>
+</ul>
+<h4 id="34-迭代器模式iterator"><a class="markdownIt-Anchor" href="#34-迭代器模式iterator"></a> 3.4 迭代器模式（Iterator）</h4>
+<ul>
+<li><strong>意图</strong>：提供一种顺序访问一个聚合对象中各个元素的方法，而不暴露其内部的表示</li>
+</ul>
+<h4 id="35-责任链模式chain-of-responsibility"><a class="markdownIt-Anchor" href="#35-责任链模式chain-of-responsibility"></a> 3.5 责任链模式（Chain of Responsibility）</h4>
+<ul>
+<li><strong>意图</strong>：使多个对象都有机会处理请求，从而避免请求的发送者和接收者之间的耦合关系。</li>
+</ul>
+<h4 id="36-命令模式command"><a class="markdownIt-Anchor" href="#36-命令模式command"></a> 3.6 命令模式（Command）</h4>
+<ul>
+<li><strong>意图</strong>：将一个请求封装为一个对象，从而使用户可用不同的请求对客户进行参数化。</li>
+</ul>
+<h4 id="37-备忘录模式memento"><a class="markdownIt-Anchor" href="#37-备忘录模式memento"></a> 3.7 备忘录模式（Memento）</h4>
+<ul>
+<li><strong>意图</strong>：在不破坏封装性的前提下，捕获一个对象的内部状态，并在该对象之外保存这个状态。</li>
+</ul>
+<h3 id="38-状态模式state"><a class="markdownIt-Anchor" href="#38-状态模式state"></a> 3.8 状态模式（State）</h3>
+<ul>
+<li><strong>意图</strong>：允许一个对象在其内部状态改变时改变其行为。</li>
+</ul>
+<h3 id="39-访问者模式visitor"><a class="markdownIt-Anchor" href="#39-访问者模式visitor"></a> 3.9 访问者模式（Visitor）</h3>
+<ul>
+<li><strong>意图</strong>：为一个对象结构中的对象添加新的能力，而无需修改这些对象的类。</li>
+</ul>
+<h3 id="310-中介者模式mediator"><a class="markdownIt-Anchor" href="#310-中介者模式mediator"></a> 3.10 中介者模式（Mediator）</h3>
+<ul>
+<li><strong>意图</strong>：用一个中介对象来封装一系列对象间的交互，使对象不需要显式地相互引用，从而使其耦合松散</li>
+</ul>
+<h3 id="311-解释器模式interpreter"><a class="markdownIt-Anchor" href="#311-解释器模式interpreter"></a> 3.11 解释器模式（Interpreter）</h3>
+<ul>
+<li><strong>意图</strong>：给定一个语言，定义它的文法表示，并定义一个解释器，这个解释器使用该文法来解释语言中的句子。</li>
+</ul>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<h3 id="创建型模式creational-patterns"><a class="markdownIt-Anchor" href="#创建型模式creational-patterns"></a> 创建型模式（Creational Patterns）</h3>
+<ol>
+<li><strong>单例模式（Singleton）</strong>
+<ul>
+<li><strong>意图</strong>：确保一个类只有一个实例，并提供一个全局访问点。</li>
+<li><strong>适用范围</strong>：当需要全局访问某个资源（如配置文件、日志记录器）时，或者当对象的创建成本较高且只需要一个实例时。</li>
+</ul>
+</li>
+<li><strong>工厂方法模式（Factory Method）</strong>
+<ul>
+<li><strong>意图</strong>：定义一个创建对象的接口，让子类决定实例化哪一个类。</li>
+<li><strong>适用范围</strong>：当类的实例化过程复杂，或者需要根据不同的条件创建不同的对象时。</li>
+</ul>
+</li>
+<li><strong>抽象工厂模式（Abstract Factory）</strong>
+<ul>
+<li><strong>意图</strong>：创建相关或依赖对象的家族，而不需明确指定具体类。</li>
+<li><strong>适用范围</strong>：当需要创建一组相关或依赖的对象，而不需要指定它们的具体类时。</li>
+</ul>
+</li>
+<li><strong>建造者模式（Builder）</strong>
+<ul>
+<li><strong>意图</strong>：将一个复杂对象的构建与它的表示分离，使得同样的构建过程可以创建不同的表示。</li>
+<li><strong>适用范围</strong>：当需要构建一个复杂的对象，并且对象的构建过程需要逐步进行时。</li>
+</ul>
+</li>
+<li><strong>原型模式（Prototype）</strong>
+<ul>
+<li><strong>意图</strong>：通过复制现有的实例来创建新的实例，而不是通过新建实例。</li>
+<li><strong>适用范围</strong>：当创建对象的过程比较复杂，或者需要频繁创建相似的对象时。</li>
+</ul>
+</li>
+</ol>
+<h3 id="结构型模式structural-patterns"><a class="markdownIt-Anchor" href="#结构型模式structural-patterns"></a> 结构型模式（Structural Patterns）</h3>
+<ol>
+<li><strong>适配器模式（Adapter）</strong>
+<ul>
+<li><strong>意图</strong>：将一个类的接口转换成客户希望的另一个接口。</li>
+<li><strong>适用范围</strong>：当需要使用一个已有的类，但其接口不符合当前需求时。</li>
+</ul>
+</li>
+<li><strong>桥接模式（Bridge）</strong>
+<ul>
+<li><strong>意图</strong>：将抽象与实现解耦，让它们可以独立变化。</li>
+<li><strong>适用范围</strong>：当需要将抽象与实现分离，或者需要在运行时动态地选择实现时。</li>
+</ul>
+</li>
+<li><strong>组合模式（Composite）</strong>
+<ul>
+<li><strong>意图</strong>：将对象组合成树形结构以表示“部分 - 整体”的层次结构。</li>
+<li><strong>适用范围</strong>：当需要表示对象的部分 - 整体关系时，例如文件系统中的文件和目录。</li>
+</ul>
+</li>
+<li><strong>装饰器模式（Decorator）</strong>
+<ul>
+<li><strong>意图</strong>：动态地给一个对象添加额外的职责。</li>
+<li><strong>适用范围</strong>：当需要在运行时动态地给对象添加功能时，而不是通过继承。</li>
+</ul>
+</li>
+<li><strong>外观模式（Facade）</strong>
+<ul>
+<li><strong>意图</strong>：为子系统中的一组接口提供一个一致的界面。</li>
+<li><strong>适用范围</strong>：当需要简化复杂的子系统接口，或者需要提供一个统一的高层接口时。</li>
+</ul>
+</li>
+<li><strong>享元模式（Flyweight）</strong>
+<ul>
+<li><strong>意图</strong>：通过共享来高效地支持大量细粒度的对象。</li>
+<li><strong>适用范围</strong>：当需要创建大量相似的对象，并且这些对象的创建和存储成本较高时。</li>
+</ul>
+</li>
+<li><strong>代理模式（Proxy）</strong>
+<ul>
+<li><strong>意图</strong>：为其他对象提供一种代理以控制对这个对象的访问。</li>
+<li><strong>适用范围</strong>：当需要控制对对象的访问，或者需要在对象的创建和使用过程中添加额外的逻辑时。</li>
+</ul>
+</li>
+</ol>
+<h3 id="行为型模式behavioral-patterns"><a class="markdownIt-Anchor" href="#行为型模式behavioral-patterns"></a> 行为型模式（Behavioral Patterns）</h3>
+<ol>
+<li><strong>责任链模式（Chain of Responsibility）</strong>
+<ul>
+<li><strong>意图</strong>：使多个对象都有机会处理请求，从而避免请求的发送者和接收者之间的耦合关系。</li>
+<li><strong>适用范围</strong>：当需要处理一系列请求，并且每个请求可能由不同的对象处理时。</li>
+</ul>
+</li>
+<li><strong>命令模式（Command）</strong>
+<ul>
+<li><strong>意图</strong>：将一个请求封装为一个对象，从而使用户可用不同的请求对客户进行参数化。</li>
+<li><strong>适用范围</strong>：当需要将请求的发送者和接收者解耦，或者需要支持撤销操作时。</li>
+</ul>
+</li>
+<li><strong>解释器模式（Interpreter）</strong>
+<ul>
+<li><strong>意图</strong>：给定一个语言，定义它的文法的一种表示，并定义一个解释器，这个解释器使用该表示来解释语言中的句子。</li>
+<li><strong>适用范围</strong>：当需要解释一种语言或表达式时，例如SQL查询、正则表达式等。</li>
+</ul>
+</li>
+<li><strong>迭代器模式（Iterator）</strong>
+<ul>
+<li><strong>意图</strong>：提供一种顺序访问一个聚合对象中各个元素的方法，而不暴露其内部的表示。</li>
+<li><strong>适用范围</strong>：当需要遍历一个聚合对象，但又不想暴露其内部结构时。</li>
+</ul>
+</li>
+<li><strong>中介者模式（Mediator）</strong>
+<ul>
+<li><strong>意图</strong>：用一个中介对象来封装一系列的对象交互。</li>
+<li><strong>适用范围</strong>：当多个对象之间存在复杂的交互关系，需要减少它们之间的耦合时。</li>
+</ul>
+</li>
+<li><strong>备忘录模式（Memento）</strong>
+<ul>
+<li><strong>意图</strong>：在不破坏封装性的前提下，捕获一个对象的内部状态，并在该对象之外保存这个状态。</li>
+<li><strong>适用范围</strong>：当需要保存和恢复对象的状态时，例如实现撤销操作。</li>
+</ul>
+</li>
+<li><strong>观察者模式（Observer）</strong>
+<ul>
+<li><strong>意图</strong>：定义对象间的一种一对多的依赖关系，以便当一个对象的状态发生改变时，所有依赖于它的对象都得到通知并自动更新。</li>
+<li><strong>适用范围</strong>：当需要在对象之间建立动态的依赖关系时，例如事件驱动系统。</li>
+</ul>
+</li>
+<li><strong>状态模式（State）</strong>
+<ul>
+<li><strong>意图</strong>：允许一个对象在其内部状态改变时改变其行为。</li>
+<li><strong>适用范围</strong>：当一个对象的行为取决于其状态，并且状态的改变会导致行为的改变时。</li>
+</ul>
+</li>
+<li><strong>策略模式（Strategy）</strong>
+<ul>
+<li><strong>意图</strong>：定义一系列的算法，把它们一个个封装起来，并使它们可以互换。</li>
+<li><strong>适用范围</strong>：当需要在运行时选择不同的算法或行为时。</li>
+</ul>
+</li>
+<li><strong>模板方法模式（Template Method）</strong>
+<ul>
+<li><strong>意图</strong>：定义一个操作中的算法的骨架，而将一些步骤延迟到子类中。</li>
+<li><strong>适用范围</strong>：当需要定义一个算法的框架，但允许子类在某些步骤上进行定制时。</li>
+</ul>
+</li>
+<li><strong>访问者模式（Visitor）</strong>
+<ul>
+<li><strong>意图</strong>：表示一个作用于某对象结构中的各元素的操作。</li>
+<li><strong>适用范围</strong>：当需要对一个对象结构中的对象进行多种不同的操作，而不想改变这些对象的类时。</li>
+</ul>
+</li>
+</ol>
+<h2 id="面向对象测试"><a class="markdownIt-Anchor" href="#面向对象测试"></a> ·面向对象测试</h2>
+<p>算法层:测试类中定义的每个方法，基本相当于传统软件测试的单元测试。</p>
+<p>类层:测试封装在同一个类中的所有方法与属性之间的相互作用。可以认为是面向对象测试中特有的模块测试。</p>
+<p>模板层:测试一组协调工作的类之间的相互作用。大体上相当于传统软件测试中的集成测试。</p>
+<p>系统层:把各个子系统组装成完整的面向对象软件系统。</p>
+
+    </div>
+    <footer class="article-footer">
+        <blockquote class="article-copyright">
+    <p><strong><span class="icon-user icon"></span>本文作者：</strong>羡笙</p>
+    <p><strong><span class="icon-link icon"></span>本文链接：</strong><a href="http://example.com/2026/04/16/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B/">http://example.com/2026/04/16/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B/</a></p>
+    <p><strong><span class="icon-pencil icon"></span>本文标题：</strong>「软件工程」</p>
+    <p><strong><span class="icon-calendar icon"></span>本文发布时间：</strong>2026-04-16 22:43:13</p>
+    
+    <p><strong><span class="icon-copyright icon"></span>本文版权：</strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener nofollow noreferrer" target="_blank"><span class="icon-creative-commons"></span>BY-NC-SA</a> 许可协议。转载请注明出处！</p>
+    <span class="icon-creative-commons article-copyright-bg"></span>
+  </blockquote>
+        <div class="share-wrapper">
+    <a href="https://connect.qq.com/widget/shareqq/index.html?url=http%3A%2F%2Fexample.com%2F2026%2F04%2F16%2F%25E8%25BD%25AF%25E4%25BB%25B6%25E5%25B7%25A5%25E7%25A8%258B%2F&amp;title=%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B&amp;desc=%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B&amp;source=http%3A%2F%2Fexample.com" target="_blank" rel="noopener noreferrer" title="软件工程">
+      <div class="share-icon icon icon-qq">
+      </div>
+    </a>
+</div>
+        <a class="article-category-link" href="/categories/%E5%AD%A6%E4%B9%A0/" title="学习" data-aos="zoom-in">学习</a>
+
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/covers/bg3.webp" data-sizes="auto" alt="props使用" class="lazyload">
+        <a href="/2026/04/17/props%E4%BD%BF%E7%94%A8/" aria-label="前一篇: props使用" title="前一篇: props使用"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            props使用
+        </h3>
+      </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2026
+        <span class="footer-info-sep rotate"></span>
+      羡笙
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        14.9k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        01:05
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B"><span class="toc-text"> 软件工程</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BD%91%E7%BB%9C%E5%B7%A5%E7%A8%8B"><span class="toc-text"> 网络工程</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A8%A1%E5%9D%97%E5%86%85%E8%81%9A"><span class="toc-text"> 模块内聚</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%81%B6%E7%84%B6%E5%86%85%E8%81%9A"><span class="toc-text"> 1. 偶然内聚</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E9%80%BB%E8%BE%91%E5%86%85%E8%81%9A"><span class="toc-text"> 2. 逻辑内聚</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E6%97%B6%E9%97%B4%E5%86%85%E8%81%9A"><span class="toc-text"> 3. 时间内聚</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E8%BF%87%E7%A8%8B%E5%86%85%E8%81%9A"><span class="toc-text"> 4. 过程内聚</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E9%80%9A%E4%BF%A1%E5%86%85%E8%81%9A"><span class="toc-text"> 5. 通信内聚</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-%E9%A1%BA%E5%BA%8F%E5%86%85%E8%81%9A"><span class="toc-text"> 6. 顺序内聚</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-%E5%8A%9F%E8%83%BD%E5%86%85%E8%81%9A"><span class="toc-text"> 7. 功能内聚</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A8%A1%E5%9D%97%E8%80%A6%E5%90%88"><span class="toc-text"> 模块耦合</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F"><span class="toc-text"> 设计模式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E5%88%9B%E5%BB%BA%E5%9E%8B%E6%A8%A1%E5%BC%8F"><span class="toc-text"> 1.创建型模式</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#11-%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8Fsingleton"><span class="toc-text"> 1.1 单例模式（Singleton）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#12-%E5%B7%A5%E5%8E%82%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8Ffactory-method"><span class="toc-text"> 1.2 工厂方法模式（Factory Method）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#13%E6%8A%BD%E8%B1%A1%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8Fabstract-factory"><span class="toc-text"> 1.3抽象工厂模式（Abstract Factory）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#14-%E5%BB%BA%E9%80%A0%E8%80%85%E6%A8%A1%E5%BC%8Fbuilder"><span class="toc-text"> 1.4 建造者模式（Builder）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#15-%E5%8E%9F%E5%9E%8B%E6%A8%A1%E5%BC%8Fprototype"><span class="toc-text"> 1.5 原型模式（Prototype）</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E7%BB%93%E6%9E%84%E5%9E%8B%E6%A8%A1%E5%BC%8F"><span class="toc-text"> 2. 结构型模式</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#21-%E9%80%82%E9%85%8D%E5%99%A8%E6%A8%A1%E5%BC%8Fadapter"><span class="toc-text"> 2.1 适配器模式（Adapter）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#22-%E6%A1%A5%E6%8E%A5%E6%A8%A1%E5%BC%8Fbridge"><span class="toc-text"> 2.2 桥接模式（Bridge）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#23-%E7%BB%84%E5%90%88%E6%A8%A1%E5%BC%8Fcomposite"><span class="toc-text"> 2.3 组合模式（Composite）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#24-%E8%A3%85%E9%A5%B0%E6%A8%A1%E5%BC%8Fdecorator"><span class="toc-text"> 2.4 装饰模式（Decorator）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#25-%E4%BB%A3%E7%90%86%E6%A8%A1%E5%BC%8Fproxy"><span class="toc-text"> 2.5 代理模式（Proxy）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#26-%E5%A4%96%E8%A7%82%E6%A8%A1%E5%BC%8Ffacade"><span class="toc-text"> 2.6 外观模式（Facade）</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#27-%E9%A3%9E%E4%BA%AB%E6%A8%A1%E5%BC%8Fflyweight"><span class="toc-text"> 2.7 飞享模式（Flyweight）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3%E8%A1%8C%E4%B8%BA%E5%9E%8B%E6%A8%A1%E5%BC%8Fbehavioral-patterns"><span class="toc-text"> 3.行为型模式（Behavioral Patterns）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#31-%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8Fstrategy"><span class="toc-text"> 3.1 策略模式（Strategy）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#32-%E6%A8%A1%E6%9D%BF%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8Ftemplate-method"><span class="toc-text"> 3.2 模板方法模式（Template Method）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#33-%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8Fobserver"><span class="toc-text"> 3.3 观察者模式（Observer）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#34-%E8%BF%AD%E4%BB%A3%E5%99%A8%E6%A8%A1%E5%BC%8Fiterator"><span class="toc-text"> 3.4 迭代器模式（Iterator）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#35-%E8%B4%A3%E4%BB%BB%E9%93%BE%E6%A8%A1%E5%BC%8Fchain-of-responsibility"><span class="toc-text"> 3.5 责任链模式（Chain of Responsibility）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#36-%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8Fcommand"><span class="toc-text"> 3.6 命令模式（Command）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#37-%E5%A4%87%E5%BF%98%E5%BD%95%E6%A8%A1%E5%BC%8Fmemento"><span class="toc-text"> 3.7 备忘录模式（Memento）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#38-%E7%8A%B6%E6%80%81%E6%A8%A1%E5%BC%8Fstate"><span class="toc-text"> 3.8 状态模式（State）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#39-%E8%AE%BF%E9%97%AE%E8%80%85%E6%A8%A1%E5%BC%8Fvisitor"><span class="toc-text"> 3.9 访问者模式（Visitor）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#310-%E4%B8%AD%E4%BB%8B%E8%80%85%E6%A8%A1%E5%BC%8Fmediator"><span class="toc-text"> 3.10 中介者模式（Mediator）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#311-%E8%A7%A3%E9%87%8A%E5%99%A8%E6%A8%A1%E5%BC%8Finterpreter"><span class="toc-text"> 3.11 解释器模式（Interpreter）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-text"> 总结</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E5%9E%8B%E6%A8%A1%E5%BC%8Fcreational-patterns"><span class="toc-text"> 创建型模式（Creational Patterns）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%93%E6%9E%84%E5%9E%8B%E6%A8%A1%E5%BC%8Fstructural-patterns"><span class="toc-text"> 结构型模式（Structural Patterns）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A1%8C%E4%B8%BA%E5%9E%8B%E6%A8%A1%E5%BC%8Fbehavioral-patterns"><span class="toc-text"> 行为型模式（Behavioral Patterns）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E6%B5%8B%E8%AF%95"><span class="toc-text"> ·面向对象测试</span></a></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="羡笙" class="lazyload">
+  <div class="sidebar-author-name">羡笙</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">6</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/EnvySage itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/images/reimu.png" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+  
+<script src="/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/js/generator_search.js" defer></script>
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+  
+<script src="https://npm.webcache.cn/theme-shokax-pjax@0.0.3/dist/index.umd.js" integrity="sha384-xneY1WY8hOfUzswrE4CrYq35N4BdVcxqxwHPr9zawE&#x2F;jMSCxD+jAPU55x&#x2F;jj3wlf" crossorigin="anonymous"></script>
+
+  
+<script src="/js/pjax.js"></script>
+
+
+
+
+  
+<script src="https://npm.webcache.cn/quicklink@3.0.1/dist/quicklink.umd.js" integrity="sha384-caMDqvgav&#x2F;HWdEYQU1QRRHMLleigpL1YHAG0m371DhzfL8rRzUyOb+bEHtwlmYjD" crossorigin="anonymous"></script>
+
+  <script data-pjax>
+    window.quicklink?.listen({
+      timeout: 3000,
+      priority: true,
+      ignores: []
+    });
+  </script>
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "羡笙",
+          title: "软件工程",
+          url: "http://example.com/2026/04/16/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B/",
+          excerpt: "",
+          description: "",
+          stripContent: " 软件工程 概要设计的内容可以包含系统构架、模块划分、系统接口、数据设计4个主要方面的内容,不包括模块内算法设计。 需求分析阶段需完成以下要求： ►确定软件系统的功能需求和非功能需求； ►分析软件系统的数据要求； ►导出系统的逻辑模型； ►修正项目开发计划； ►如有必要，可以开发一个原型系统。  客户特性是指与客户的素质以及开发者和客户定期通信的能力相关的风险； 过程定义是指与软件过程被定义的程度以及它们被开发组织所遵守的程序相关的风险； 开发环境是指与用以构建产品的工具的可用性及质量相关的风险",
+          date: "Thu Apr 16 2026 22:43:13 GMT+0800",
+          updated: "Fri Apr 17 2026 00:40:21 GMT+0800",
+          cover: "/images/banner.webp",
+        };
+      </script>
+        
+<script src="/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+    <script>
+    var setupAPlayer = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        if (window.matchMedia('(max-width: 959px)').matches) {
+          const aplayer = _$('#aplayer');
+          if (aplayer) {
+            const aside = aplayer.parentNode?.parentNode;
+            if (aside?.tagName === 'ASIDE') {
+              aplayer.removeAttribute('data-aos');
+              aplayer.parentNode.removeChild(aplayer);
+              document.body.appendChild(aplayer);
+            }
+          }
+        }
+        new APlayer({
+          theme: "var(--color-link)",
+          container: document.getElementById('aplayer'),
+          audio: [{"name":"忆夏思乡","artist":"MoreanP","url":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/music/MoreanP%20-%20%E5%BF%86%E5%A4%8F%E6%80%9D%E4%B9%A1.mp3","cover":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/cover/MoreanP%20-%20%E5%BF%86%E5%A4%8F%E6%80%9D%E4%B9%A1.jpeg"},{"name":"かくれんぼ","artist":"AliA","url":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/music/AliA%20-%20%E3%81%8B%E3%81%8F%E3%82%8C%E3%82%93%E3%81%BC.mp3","cover":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/cover/AliA%20-%20%E3%81%8B%E3%81%8F%E3%82%8C%E3%82%93%E3%81%BC.jpeg","lrc":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/lyric/%E3%81%8B%E3%81%8F%E3%82%8C%E3%82%93%E3%81%BC%20-%20AliA.lrc"}] || [],
+          fixed: isMobile ? true : (false || false),
+          autoplay: false || false,
+          loop: 'all' || 'all',
+          order: 'list' || 'list',
+          preload: 'auto' || 'auto',
+          volume: 0.4 || 0.7,
+          mutex: true || true,
+          listFolded: false || false,
+          lrcType: 0 || 0,
+        });
+      }
+    }
+    </script>
+  
+<script src="https://npm.webcache.cn/aplayer@1.10.1/dist/APlayer.min.js" integrity="sha384-gdGYZwHnfJM54evoZhpO0s6ZF5BQiybkiyW7VXr+h5UfruuRL&#x2F;aORyw+5+HZoU6e" crossorigin="anonymous" defer onload="setupAPlayer()"></script>
+
+
+
+  </body>
+  </html>

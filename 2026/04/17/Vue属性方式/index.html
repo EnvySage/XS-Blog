@@ -1,0 +1,713 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+    <script async src="https://hm.baidu.com/hm.js?true"></script>
+  <script data-pjax>
+    var _hmt = _hmt || [];
+    _hmt.push(["_trackPageview", location.pathname]);
+  </script>
+
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_a0oqhord1y';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'http://example.com';window.REIMU_CONFIG.relative = '/';</script>
+  <title>
+    Vue属性方式 | 羡笙の窝
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_a0oqhord1y.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/css/loader.css">
+
+    <meta name="description" content="Vue属性方式  一，computed计算属性  I，computed概述 ​    计算属性是 Vue 实例的一个选项，可以用来定义一个属性，该属性的值是经过计算后的结果。它的特点是： ​    1、依赖于其他的响应式属性 ​    2、会进行缓存，只有在依赖发生变化时，才会重新计算 ​    3、计算属性可以定义为一个函数，也可以定义为一个对象，包含 getter 和 setter  II，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vue属性方式">
+<meta property="og:url" content="http://example.com/2026/04/17/Vue%E5%B1%9E%E6%80%A7%E6%96%B9%E5%BC%8F/index.html">
+<meta property="og:site_name" content="羡笙の窝">
+<meta property="og:description" content="Vue属性方式  一，computed计算属性  I，computed概述 ​    计算属性是 Vue 实例的一个选项，可以用来定义一个属性，该属性的值是经过计算后的结果。它的特点是： ​    1、依赖于其他的响应式属性 ​    2、会进行缓存，只有在依赖发生变化时，才会重新计算 ​    3、计算属性可以定义为一个函数，也可以定义为一个对象，包含 getter 和 setter  II，">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/watch.gif">
+<meta property="og:image" content="http://example.com/img/reactive.gif">
+<meta property="article:published_time" content="2026-04-16T16:15:43.582Z">
+<meta property="article:modified_time" content="2026-04-16T16:36:08.133Z">
+<meta property="article:author" content="羡笙">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/watch.gif">
+    <link rel="alternate" href="/atom.xml" title="羡笙の窝" type="application/atom+xml">
+    <link rel="shortcut icon" href="/images/favicon.ico">
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+      <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/katex@0.16.24/dist/katex.min.css" integrity="sha384-tTgKLjMYmJr94v8qu2PE5MUGSMbyN2xiH266JUB3gpm8vnnJywd1dWSOEfrFz+YI" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+    <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/aplayer@1.10.1/dist/APlayer.min.css" integrity="sha384-tLMkTWh2pfXNWGFlUS0w1TFtRG5xZ9lPWFOooj+vDDLIL+xBGQU/voDBY5XE2lVh" crossorigin="anonymous">
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/images/banner.webp" alt="Vue属性方式">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">Vue属性方式</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content" class="sidebar-left"  >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+      <div id="aplayer" theme="var(--color-link)" data-aos="fade-up"></div>
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#vue%E5%B1%9E%E6%80%A7%E6%96%B9%E5%BC%8F"><span class="toc-text"> Vue属性方式</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%80computed%E8%AE%A1%E7%AE%97%E5%B1%9E%E6%80%A7"><span class="toc-text"> 一，computed计算属性</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#icomputed%E6%A6%82%E8%BF%B0"><span class="toc-text"> I，computed概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#iicomputed%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="toc-text"> II，computed的使用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#iiicomputed%E7%9A%84%E7%BC%93%E5%AD%98%E7%89%B9%E6%80%A7"><span class="toc-text"> III，computed的缓存特性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ivcomputed%E7%9A%84get%E5%92%8Cset"><span class="toc-text"> IV，computed的get和set</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1get%E6%96%B9%E6%B3%95"><span class="toc-text"> 1，get方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2set%E6%96%B9%E6%B3%95"><span class="toc-text"> 2，set方法</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%8Cwatch%E7%9B%91%E5%90%AC%E5%B1%9E%E6%80%A7"><span class="toc-text"> 二，watch监听属性</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#i%E7%9B%91%E5%90%AC%E6%95%B0%E6%8D%AE"><span class="toc-text"> I，监听数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ii%E7%9B%91%E5%90%ACref%E7%B1%BB%E5%9E%8B"><span class="toc-text"> II，监听ref类型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1ref%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B"><span class="toc-text"> 1，ref基本类型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2ref%E5%AF%B9%E8%B1%A1%E7%B1%BB%E5%9E%8B"><span class="toc-text"> 2，ref对象类型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3%E7%9B%91%E5%90%AC%E5%AF%B9%E8%B1%A1%E5%B1%9E%E6%80%A7"><span class="toc-text"> 3，监听对象属性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#iii%E7%9B%91%E5%90%ACreactive%E5%AF%B9%E8%B1%A1%E7%B1%BB%E5%9E%8B"><span class="toc-text"> III，监听reactive对象类型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1reactive%E4%B8%8Eref%E7%9A%84%E7%9B%91%E5%90%AC%E5%AF%B9%E6%AF%94"><span class="toc-text"> 1，reactive与ref的监听对比</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%E7%9B%91%E5%90%ACreactive"><span class="toc-text"> 2，监听reactive</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3%E7%9B%91%E5%90%AC%E5%AF%B9%E8%B1%A1%E5%B1%9E%E6%80%A7-2"><span class="toc-text"> 3，监听对象属性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4%E7%9B%91%E5%90%AC%E5%A4%9A%E4%B8%AA%E6%95%B0%E6%8D%AE"><span class="toc-text"> 4，监听多个数据</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%89watcheffect"><span class="toc-text"> 三，watchEffect</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#iwatch%E5%92%8Cwatcheffect%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-text"> I，watch和watchEffect的区别</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ii%E4%B8%A4%E8%80%85%E5%AE%9E%E7%8E%B0%E6%96%B9%E5%BC%8F"><span class="toc-text"> II，两者实现方式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1watch%E5%AE%9E%E7%8E%B0%E6%96%B9%E5%BC%8F"><span class="toc-text"> 1，watch实现方式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2watcheffect%E5%AE%9E%E7%8E%B0%E6%96%B9%E5%BC%8F"><span class="toc-text"> 2，watchEffect实现方式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#iiiwatcheffect%E7%9A%84%E7%91%95%E7%96%B5"><span class="toc-text"> III，watchEffect的瑕疵</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ivwatcheffect%E7%9A%84%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="toc-text"> IV，watchEffect的注意事项</span></a></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="羡笙" class="lazyload">
+  <div class="sidebar-author-name">羡笙</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">6</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/EnvySage itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-Vue属性方式" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-04-16T16:15:43.582Z" itemprop="datePublished">2026-04-17</time>
+    <time style="display: none;" id="post-update-time">2026-04-17</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="vue属性方式"><a class="markdownIt-Anchor" href="#vue属性方式"></a> Vue属性方式</h1>
+<h1 id="一computed计算属性"><a class="markdownIt-Anchor" href="#一computed计算属性"></a> 一，computed计算属性</h1>
+<h2 id="icomputed概述"><a class="markdownIt-Anchor" href="#icomputed概述"></a> I，computed概述</h2>
+<p>​    计算属性是 Vue 实例的一个选项，可以用来定义一个属性，该属性的值是经过计算后的结果。它的特点是：</p>
+<p>​    1、依赖于其他的响应式属性</p>
+<p>​    2、会进行缓存，只有在依赖发生变化时，才会重新计算</p>
+<p>​    3、计算属性可以定义为一个函数，也可以定义为一个对象，包含 getter 和 setter</p>
+<h2 id="iicomputed的使用"><a class="markdownIt-Anchor" href="#iicomputed的使用"></a> II，computed的使用</h2>
+<p>这里使用拼接姓名作为例子，输入姓和名，最终拼接成完整的姓名，实例如下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div class=&quot;person&quot;&gt;</span><br><span class="line">    姓：&lt;input type=&quot;text&quot; v-model=&quot;firstName&quot;&gt; &lt;br&gt;</span><br><span class="line">    名：&lt;input type=&quot;text&quot; v-model=&quot;lastName&quot;&gt; &lt;br&gt;</span><br><span class="line">    全名：&lt;span&gt;&#123;&#123;firstName&#125;&#125;-&#123;&#123;lastName&#125;&#125;&lt;/span&gt; &lt;br&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script lang=&quot;ts&quot; setup name=&quot;Person&quot;&gt;</span><br><span class="line">  import &#123;ref&#125; from &#x27;vue&#x27;</span><br><span class="line"></span><br><span class="line">  let firstName = ref(&#x27;zhang&#x27;)</span><br><span class="line">  let lastName = ref(&#x27;san&#x27;)</span><br><span class="line">&lt;/script&gt;  </span><br></pre></td></tr></table></figure>
+<p>这样写固然简单，但是倘若加入一些规则，比如我们需要让首字母大写，这时候我们就需要用到computed计算属性，改动如下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div class=&quot;person&quot;&gt;</span><br><span class="line">    姓：&lt;input type=&quot;text&quot; v-model=&quot;firstName&quot;&gt; &lt;br&gt;</span><br><span class="line">    名：&lt;input type=&quot;text&quot; v-model=&quot;lastName&quot;&gt; &lt;br&gt;</span><br><span class="line">    全名：&lt;span&gt;&#123;&#123;firstName.slice(0,1).toUpperCase() + firstName.slice(1)&#125;&#125;-&#123;&#123; lastName &#125;&#125;&lt;/span&gt; &lt;br&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br></pre></td></tr></table></figure>
+<p>这样写也固然可以，但是违背了Vue官方文档的原则，即是让模板写的语句尽可能的简单，易读。所以我们这时候就可以用上computed属性</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div class=&quot;person&quot;&gt;</span><br><span class="line">    姓：&lt;input type=&quot;text&quot; v-model=&quot;firstName&quot;&gt; &lt;br&gt;</span><br><span class="line">    名：&lt;input type=&quot;text&quot; v-model=&quot;lastName&quot;&gt; &lt;br&gt;</span><br><span class="line">    全名：&lt;span&gt;&#123;&#123;fullName&#125;&#125;&lt;/span&gt; &lt;br&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line">&lt;script lang=&quot;ts&quot; setup&gt;</span><br><span class="line">  import &#123;ref,computed&#125; from &#x27;vue&#x27;</span><br><span class="line"></span><br><span class="line">  let firstName = ref(&#x27;zhang&#x27;)</span><br><span class="line">  let lastName = ref(&#x27;san&#x27;)</span><br><span class="line"></span><br><span class="line">  let fullName = computed(() =&gt; &#123;</span><br><span class="line">    return firstName.value.slice(0,1).toUpperCase() + firstName.value.slice(1) + &#x27;-&#x27; + lastName.value</span><br><span class="line">  &#125;)</span><br><span class="line">&lt;/script&gt;  </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>这样写业务逻辑也会更加清楚</p>
+<h2 id="iiicomputed的缓存特性"><a class="markdownIt-Anchor" href="#iiicomputed的缓存特性"></a> III，computed的缓存特性</h2>
+<p>computed属性无论使用多少次，它只会计算一次，只要它依赖的变量没有发生变化，它就不会重新计算。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div class=&quot;person&quot;&gt;</span><br><span class="line">    姓：&lt;input type=&quot;text&quot; v-model=&quot;firstName&quot;&gt; &lt;br&gt;</span><br><span class="line">    名：&lt;input type=&quot;text&quot; v-model=&quot;lastName&quot;&gt; &lt;br&gt;</span><br><span class="line">    全名：&lt;span&gt;&#123;&#123;fullName&#125;&#125;&lt;/span&gt; &lt;br&gt;</span><br><span class="line">    全名：&lt;span&gt;&#123;&#123;fullName&#125;&#125;&lt;/span&gt; &lt;br&gt;</span><br><span class="line">    全名：&lt;span&gt;&#123;&#123;fullName&#125;&#125;&lt;/span&gt; &lt;br&gt;</span><br><span class="line">    全名：&lt;span&gt;&#123;&#123;fullName&#125;&#125;&lt;/span&gt; &lt;br&gt;</span><br><span class="line">    全名：&lt;span&gt;&#123;&#123;fullName&#125;&#125;&lt;/span&gt; &lt;br&gt;</span><br><span class="line">    全名：&lt;span&gt;&#123;&#123;fullName&#125;&#125;&lt;/span&gt; &lt;br&gt;</span><br><span class="line">    全名：&lt;span&gt;&#123;&#123;fullName&#125;&#125;&lt;/span&gt; &lt;br&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script lang=&quot;ts&quot; setup name=&quot;Person&quot;&gt;</span><br><span class="line">  import &#123;ref,computed&#125; from &#x27;vue&#x27;</span><br><span class="line"></span><br><span class="line">  let firstName = ref(&#x27;zhang&#x27;)</span><br><span class="line">  let lastName = ref(&#x27;san&#x27;)</span><br><span class="line"></span><br><span class="line">  // fullName是一个计算属性，且是只读的</span><br><span class="line">  let fullName = computed(()=&gt;&#123;</span><br><span class="line">    console.log(&#x27;执行computed计算&#x27;)</span><br><span class="line">    return firstName.value.slice(0,1).toUpperCase() + firstName.value.slice(1) + &#x27;-&#x27; + lastName.value</span><br><span class="line">  &#125;)</span><br><span class="line">&lt;/script&gt;  </span><br></pre></td></tr></table></figure>
+<p>这里计算属性依赖的变量没有改变所以只会计算一次，其他的使用缓存</p>
+<h2 id="ivcomputed的get和set"><a class="markdownIt-Anchor" href="#ivcomputed的get和set"></a> IV，computed的get和set</h2>
+<p>computed计算属性如果传入回调函数，那么它是一个只读属性，不能修改。但是可以通过get和set方法进行修改。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div class=&quot;person&quot;&gt;</span><br><span class="line">    姓：&lt;input type=&quot;text&quot; v-model=&quot;firstName&quot;&gt; &lt;br&gt;</span><br><span class="line">    名：&lt;input type=&quot;text&quot; v-model=&quot;lastName&quot;&gt; &lt;br&gt;</span><br><span class="line">    全名：&lt;span&gt;&#123;&#123;fullName&#125;&#125;&lt;/span&gt; &lt;br&gt;</span><br><span class="line">    &lt;button @click=&quot;changeFullName&quot;&gt;将全名改为li-si&lt;/button&gt; &lt;br&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script lang=&quot;ts&quot; setup name=&quot;Person&quot;&gt;</span><br><span class="line">  import &#123;ref,computed&#125; from &#x27;vue&#x27;</span><br><span class="line"></span><br><span class="line">  let firstName = ref(&#x27;zhang&#x27;)</span><br><span class="line">  let lastName = ref(&#x27;san&#x27;)</span><br><span class="line"></span><br><span class="line">  // fullName是一个计算属性，可读可写</span><br><span class="line">  let fullName = computed(&#123;</span><br><span class="line">    // 当fullName被读取时，get调用</span><br><span class="line">    get()&#123;</span><br><span class="line">      return firstName.value.slice(0,1).toUpperCase() + firstName.value.slice(1) + &#x27;-&#x27; + lastName.value</span><br><span class="line">    &#125;,</span><br><span class="line">    // 当fullName被修改时，set调用，且会收到修改的值</span><br><span class="line">    set(val)&#123;</span><br><span class="line">      const [str1,str2] = val.split(&#x27;-&#x27;)</span><br><span class="line">      firstName.value = str1</span><br><span class="line">      lastName.value = str2</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">  function changeFullName()&#123;</span><br><span class="line">    fullName.value = &#x27;li-si&#x27;</span><br><span class="line">  &#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="1get方法"><a class="markdownIt-Anchor" href="#1get方法"></a> 1，get方法</h3>
+<p>调用get方法就是显示在模板里的内容，也是就是我们return的内容</p>
+<h3 id="2set方法"><a class="markdownIt-Anchor" href="#2set方法"></a> 2，set方法</h3>
+<p>set方法在你修改这个计算属性的时候它就会执行，它会把最新的值接收回来。我们知道，想让computed重新计算，实际上是让它所依赖的变量发生改变，那么我们只需要在set方法里把它依赖的变量重新赋值，即可重新计算最新值。</p>
+<h1 id="二watch监听属性"><a class="markdownIt-Anchor" href="#二watch监听属性"></a> 二，watch监听属性</h1>
+<h2 id="i监听数据"><a class="markdownIt-Anchor" href="#i监听数据"></a> I，监听数据</h2>
+<p>Vue3中watch只能监听以下四种数据</p>
+<blockquote>
+<ol>
+<li><code>ref</code>定义的数据。</li>
+<li><code>reactive</code>定义的数据。</li>
+<li>函数返回一个值（<code>getter</code>函数）。</li>
+<li>一个包含上述内容的数组。</li>
+</ol>
+</blockquote>
+<h2 id="ii监听ref类型"><a class="markdownIt-Anchor" href="#ii监听ref类型"></a> II，监听ref类型</h2>
+<h3 id="1ref基本类型"><a class="markdownIt-Anchor" href="#1ref基本类型"></a> 1，ref基本类型</h3>
+<p>首先watch由三个部分构成，依次是监听对象，回调函数和配置规则，其中回调函数中会有两个值，依次是新的改变量和旧的改变量。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">import &#123;watch&#125; from &#x27;vue&#x27;</span><br><span class="line">watch(sum,(newValue,oldValue)=&gt;&#123;</span><br><span class="line"></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>举个例子，点击按钮让数字加一，这里的数字属于基本类型，符合监听数据的范围</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div class=&quot;person&quot;&gt;</span><br><span class="line">    &lt;h2&gt;当前求和为：&#123;&#123;sum&#125;&#125;&lt;/h2&gt;</span><br><span class="line">    &lt;button @click=&quot;changeSum&quot;&gt;点我sum+1&lt;/button&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script lang=&quot;ts&quot; setup name=&quot;Person&quot;&gt;</span><br><span class="line">  import &#123;ref,watch&#125; from &#x27;vue&#x27;</span><br><span class="line">  // 数据</span><br><span class="line">  let sum = ref(0)</span><br><span class="line">  // 方法</span><br><span class="line">  function changeSum()&#123;</span><br><span class="line">    sum.value += 1</span><br><span class="line">  &#125;</span><br><span class="line">  watch(sum,(newValue,oldValue)=&gt;&#123;</span><br><span class="line">    console.log(&#x27;sum变化了&#x27;, newValue, oldValue)</span><br><span class="line">  &#125;)</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="2ref对象类型"><a class="markdownIt-Anchor" href="#2ref对象类型"></a> 2，ref对象类型</h3>
+<p>这里监听对象的实质就是看监听的对象的地址是否有变化，比如前面用到的Object.assign</p>
+<p>对整个对象类型进行替换，这个实质是把对应的值赋给原有对象的值，并没有新创建出一个地址，所以他们的地址没有变化，这时候就不会触发监听</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div class=&quot;person&quot;&gt;</span><br><span class="line">    &lt;h2&gt;姓名：&#123;&#123; person.name &#125;&#125;&lt;/h2&gt;</span><br><span class="line">    &lt;h2&gt;年龄：&#123;&#123; person.age &#125;&#125;&lt;/h2&gt;</span><br><span class="line">    &lt;button @click=&quot;changeName&quot;&gt;修改名字&lt;/button&gt;</span><br><span class="line">    &lt;button @click=&quot;changeAge&quot;&gt;修改年龄&lt;/button&gt;</span><br><span class="line">    &lt;button @click=&quot;changePerson&quot;&gt;修改整个人&lt;/button&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script lang=&quot;ts&quot; setup name=&quot;Person&quot;&gt;</span><br><span class="line">  import &#123;ref,watch&#125; from &#x27;vue&#x27;</span><br><span class="line">  // 数据</span><br><span class="line">  let person = ref(&#123;</span><br><span class="line">    name:&#x27;张三&#x27;,</span><br><span class="line">    age:18</span><br><span class="line">  &#125;)</span><br><span class="line">  // 方法</span><br><span class="line">  function changeName()&#123;</span><br><span class="line">    person.value.name += &#x27;~&#x27;</span><br><span class="line">  &#125;</span><br><span class="line">  function changeAge()&#123;</span><br><span class="line">    person.value.age += 1</span><br><span class="line">  &#125;</span><br><span class="line">  function changePerson()&#123;</span><br><span class="line">    person.value = &#123;name:&#x27;李四&#x27;,age:90&#125;</span><br><span class="line">  &#125;</span><br><span class="line">  watch(person,(newValue,oldValue)=&gt;&#123;</span><br><span class="line">    console.log(&#x27;person变化了&#x27;,newValue,oldValue)</span><br><span class="line">  &#125;)</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+<p>我们发现，直接把对象放进去watch进行监听，它是无法监听内部属性的变化的，它只能监听整个对象有没有被重新赋值，也就是它的地址有没有改变。</p>
+<p><img src="/img/watch.gif" alt="watch" /></p>
+<h3 id="3监听对象属性"><a class="markdownIt-Anchor" href="#3监听对象属性"></a> 3，监听对象属性</h3>
+<p>在实际的开发中，我们更多的是监听对象里的属性变化。此时需要手动开启深度监听，也就是设置deep: true。</p>
+<p>​      在Vue3中，它同样是设置deep:true，区别就在于它是在watch的第三个参数里设置，第三个参数是一个对象，用来设置watch的一些配置项，比如{deep: true}。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">watch</span>(person,<span class="function">(<span class="params">newValue,oldValue</span>)=&gt;</span>&#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;person变化了&#x27;</span>,newValue,oldValue)</span><br><span class="line">&#125;, &#123;</span><br><span class="line">  <span class="attr">deep</span>: <span class="literal">true</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>我们发现，设置了deep:true深度监听之后，不管是属性值发生变化，还是整个对象发生变化，它一样能监听得到。</p>
+<p>​      当然除了deep:true之外，还有immediate:true也是比较常用，这个是立即监听的意思，它是先执行监听的函数，因此在初始化数据的时候，它就会立即调用一次watch监听。它的作用跟Vue2是完全一致的，在这里就不再举例详述。</p>
+<blockquote>
+<p>注意：我们在监听对象的时候，如果是整个对象发生改变，那么它是可以识别新对象与旧对象的。但如果对象不变，只是内部的属性发生改变，那么它的newValue与oldValue是一致的。</p>
+</blockquote>
+<h2 id="iii监听reactive对象类型"><a class="markdownIt-Anchor" href="#iii监听reactive对象类型"></a> III，监听reactive对象类型</h2>
+<h3 id="1reactive与ref的监听对比"><a class="markdownIt-Anchor" href="#1reactive与ref的监听对比"></a> 1，reactive与ref的监听对比</h3>
+<p>reactive只能定义对象类型，它不像ref那样可以定义基本和对象两种类型。reactive与ref在监听的时候，主要有以下两点区别：</p>
+<p>​    1、reactive类型是不允许改变整个对象的，也就是说不能给它赋值一个新对象，因此它就不会出现监听整个对象发生变化的情况</p>
+<p>​    2、默认开启深度监听</p>
+<h3 id="2监听reactive"><a class="markdownIt-Anchor" href="#2监听reactive"></a> 2，监听reactive</h3>
+<p>其实监听reactive跟ref是一样的，也是把对象传进去watch里进行监听，不过它比ref更加方便，直接就可以监听到里面的属性变化，不需要设置deep:true。准确来说是Vue3强行设置深度监听，哪怕你设置deep:false也是没用的。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div class=&quot;person&quot;&gt;</span><br><span class="line">    &lt;h2&gt;姓名：&#123;&#123; person.name &#125;&#125;&lt;/h2&gt;</span><br><span class="line">    &lt;h2&gt;年龄：&#123;&#123; person.age &#125;&#125;&lt;/h2&gt;</span><br><span class="line">    &lt;button @click=&quot;changeName&quot;&gt;修改名字&lt;/button&gt;</span><br><span class="line">    &lt;button @click=&quot;changeAge&quot;&gt;修改年龄&lt;/button&gt;</span><br><span class="line">    &lt;button @click=&quot;changePerson&quot;&gt;修改整个人&lt;/button&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script lang=&quot;ts&quot; setup name=&quot;Person&quot;&gt;</span><br><span class="line">  import &#123;reactive,watch&#125; from &#x27;vue&#x27;</span><br><span class="line">  // 数据</span><br><span class="line">  let person = reactive(&#123;</span><br><span class="line">    name:&#x27;张三&#x27;,</span><br><span class="line">    age:18</span><br><span class="line">  &#125;)</span><br><span class="line">  // 方法</span><br><span class="line">  function changeName()&#123;</span><br><span class="line">    person.name += &#x27;~&#x27;</span><br><span class="line">  &#125;</span><br><span class="line">  function changeAge()&#123;</span><br><span class="line">    person.age += 1</span><br><span class="line">  &#125;</span><br><span class="line">  function changePerson()&#123;</span><br><span class="line">    Object.assign(person,&#123;name:&#x27;李四&#x27;,age:80&#125;)</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  watch(person,(newValue,oldValue)=&gt;&#123;</span><br><span class="line">    console.log(&#x27;person变化了&#x27;,newValue,oldValue)</span><br><span class="line">  &#125;)</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+<p><img src="/img/reactive.gif" alt="reactive" /></p>
+<blockquote>
+<p>注意：示例中修改整个人(整个对象)，它实际上是使用了Object.assign()方法，这个方法实际上并没有改变对象地址，它只不过是批量改变对象的各个属性而已。</p>
+</blockquote>
+<h3 id="3监听对象属性-2"><a class="markdownIt-Anchor" href="#3监听对象属性-2"></a> 3，监听对象属性</h3>
+<p>在Vue3监听一个对象，是直接把对象放进去watch里监听即可。现在要监听对象里的属性，我们的第一反应就会把对象.属性放进去监听。</p>
+<p>​    例如在例子中想监听对象的名字，很容易就会写成watch(<a target="_blank" rel="noopener" href="http://person.name">person.name</a>, ()=&gt;{})，如下所示：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div class=&quot;person&quot;&gt;</span><br><span class="line">    &lt;h2&gt;姓名：&#123;&#123; person.name &#125;&#125;&lt;/h2&gt;</span><br><span class="line">    &lt;h2&gt;年龄：&#123;&#123; person.age &#125;&#125;&lt;/h2&gt;</span><br><span class="line">    &lt;h2&gt;汽车：&#123;&#123; person.car.c1 &#125;&#125;、&#123;&#123; person.car.c2 &#125;&#125;&lt;/h2&gt;</span><br><span class="line">    &lt;button @click=&quot;changeName&quot;&gt;修改名字&lt;/button&gt;</span><br><span class="line">    &lt;button @click=&quot;changeAge&quot;&gt;修改年龄&lt;/button&gt;</span><br><span class="line">    &lt;button @click=&quot;changeC1&quot;&gt;修改第一台车&lt;/button&gt;</span><br><span class="line">    &lt;button @click=&quot;changeC2&quot;&gt;修改第二台车&lt;/button&gt;</span><br><span class="line">    &lt;button @click=&quot;changeCar&quot;&gt;修改整个车&lt;/button&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script lang=&quot;ts&quot; setup name=&quot;Person&quot;&gt;</span><br><span class="line">  import &#123;reactive,watch&#125; from &#x27;vue&#x27;</span><br><span class="line"></span><br><span class="line">  // 数据</span><br><span class="line">  let person = reactive(&#123;</span><br><span class="line">    name:&#x27;张三&#x27;,</span><br><span class="line">    age:18,</span><br><span class="line">    car:&#123;</span><br><span class="line">      c1:&#x27;奔驰&#x27;,</span><br><span class="line">      c2:&#x27;宝马&#x27;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;)</span><br><span class="line">  // 方法</span><br><span class="line">  function changeName()&#123;</span><br><span class="line">    person.name += &#x27;~&#x27;</span><br><span class="line">  &#125;</span><br><span class="line">  ......</span><br><span class="line">  watch(person.name, (newValue,oldValue) =&gt; &#123;</span><br><span class="line">    console.log(&#x27;person.name变化了&#x27;,newValue,oldValue)</span><br><span class="line">  &#125;)</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+<p>我们发现，我们直接以对象.属性的方式放进去监听，Vue3是不允许的，它会发出警告：这是一个无效的监听源，它只允许以下四种类型：getter函数、ref类型、reactive类型、以上3种类型组合的数组。</p>
+<p>所以我们可以修改成这样</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">watch</span>(<span class="function">() =&gt;</span> person.<span class="property">name</span>, <span class="function">(<span class="params">newValue,oldValue</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;person.name变化了&#x27;</span>,newValue,oldValue)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>这样就只会监听对象的name属性了。<strong>所以我们一般推荐用箭头函数包裹对象</strong></p>
+<p>但是包裹了箭头函数之后，它反而无法监听里面的属性变化，它只关注对象的地址是否发生改变</p>
+<p><strong>如果想既监听内部属性，也监听对象地址，只需要再加上深度监听属性即可，即设置deep:true</strong>。</p>
+<h3 id="4监听多个数据"><a class="markdownIt-Anchor" href="#4监听多个数据"></a> 4，监听多个数据</h3>
+<p>Vue3它可以同时监听多个数据，不需要分开写多个watch，可以写在一个watch里，将需要监听的属性放进数组里传入watch监听即可。</p>
+<p>​    这里还是举上述的例子，这次监听的是名字和汽车这两个属性，但不监听年龄属性：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> person = <span class="title function_">reactive</span>(&#123;</span><br><span class="line">  <span class="attr">name</span>:<span class="string">&#x27;张三&#x27;</span>,</span><br><span class="line">  <span class="attr">age</span>:<span class="number">18</span>,</span><br><span class="line">  <span class="attr">car</span>:&#123;</span><br><span class="line">    <span class="attr">c1</span>:<span class="string">&#x27;奔驰&#x27;</span>,</span><br><span class="line">    <span class="attr">c2</span>:<span class="string">&#x27;宝马&#x27;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br><span class="line"><span class="keyword">function</span> <span class="title function_">changeC1</span>(<span class="params"></span>)&#123;</span><br><span class="line">  person.<span class="property">car</span>.<span class="property">c1</span> = <span class="string">&#x27;奥迪&#x27;</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">function</span> <span class="title function_">changeC2</span>(<span class="params"></span>)&#123;</span><br><span class="line">  person.<span class="property">car</span>.<span class="property">c2</span> = <span class="string">&#x27;大众&#x27;</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">function</span> <span class="title function_">changeCar</span>(<span class="params"></span>)&#123;</span><br><span class="line">  person.<span class="property">car</span> = &#123;<span class="attr">c1</span>:<span class="string">&#x27;雅迪&#x27;</span>,<span class="attr">c2</span>:<span class="string">&#x27;爱玛&#x27;</span>&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="title function_">watch</span>([<span class="function">()=&gt;</span>person.<span class="property">name</span>,person.<span class="property">car</span>],<span class="function">(<span class="params">newValue,oldValue</span>)=&gt;</span>&#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;person.car变化了&#x27;</span>,newValue,oldValue)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>注意：因为你是同时监听多个属性，因此里面只要某一个属性发生了变化，它都会触发。你传入的是数组，因此它也会返回整个数组，里面就是各个属性的值。</p>
+</blockquote>
+<h1 id="三watcheffect"><a class="markdownIt-Anchor" href="#三watcheffect"></a> 三，watchEffect</h1>
+<h2 id="iwatch和watcheffect的区别"><a class="markdownIt-Anchor" href="#iwatch和watcheffect的区别"></a> I，watch和watchEffect的区别</h2>
+<p>1、都能监听响应式数据的变化，不同的是监听数据变化的方式不同</p>
+<p>​    2、watch：要明确指出监听的数据，它是一个惰性监听，你不指定它就不监听</p>
+<p>​    3、watchEffect：不用明确指出监听的数据（函数中用到哪些属性，那就监听哪些属性）。</p>
+<h2 id="ii两者实现方式"><a class="markdownIt-Anchor" href="#ii两者实现方式"></a> II，两者实现方式</h2>
+<h3 id="1watch实现方式"><a class="markdownIt-Anchor" href="#1watch实现方式"></a> 1，watch实现方式</h3>
+<p>watch有多种监听方式，可以对水温和水位分别监听，也可以同时监听。这里我们使用最快捷的方式，使用数组同时监听俩属性：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">watch</span>([temp,height],<span class="function">(<span class="params">value</span>)=&gt;</span>&#123;</span><br><span class="line">  <span class="comment">// 从value中获取最新的水温(newTemp)、最新的水位(newHeight)</span></span><br><span class="line">  <span class="keyword">let</span> [newTemp,newHeight] = value</span><br><span class="line">  <span class="comment">// 逻辑</span></span><br><span class="line">  <span class="keyword">if</span>(newTemp &gt;= <span class="number">60</span> || newHeight &gt;= <span class="number">80</span>)&#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;给服务器发请求&#x27;</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>在这个需求里，涉及到的变量总共是两个，分别是水温和水位，因此watch需要监听这两个属性才能实现。如果需求很复杂，涉及的变量有10个，那么你也只能老老实实的给watch指定这10个变量的监听。</p>
+<h3 id="2watcheffect实现方式"><a class="markdownIt-Anchor" href="#2watcheffect实现方式"></a> 2，watchEffect实现方式</h3>
+<p>watchEffect它不需要你去指定具体监听的属性，你只需要关注业务逻辑，只要代码涉及到的变量，它会帮你自动监听。</p>
+<p>​      如果用watchEffect来实现上面的需求，将会省去所有监听的属性，变得更加简洁和灵活。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">watchEffect</span>(<span class="function">()=&gt;</span>&#123;</span><br><span class="line">  <span class="keyword">if</span>(temp.<span class="property">value</span> &gt;= <span class="number">60</span> || height.<span class="property">value</span> &gt;= <span class="number">80</span>)&#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;给服务器发请求&#x27;</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="iiiwatcheffect的瑕疵"><a class="markdownIt-Anchor" href="#iiiwatcheffect的瑕疵"></a> III，watchEffect的瑕疵</h2>
+<p>如果在if条件里使用了或运算符||，它会按照条件顺序进行监听，一旦前面的条件符合，则后续的条件将不会监听。</p>
+<p>​      继续用上面的例子：当水温达到60度，或水位达到80cm时，给服务器发请求。我们的代码写成if(temp.value &gt;= 60 || height.value &gt;= 80)，按照我们的理解，无论是temp还是height变量，只要哪一个条件符合它都会触发。</p>
+<p>但watchEffect的机制并非如此，它认为第一个条件是temp是否大于60，如果符合，则height的值无论是多少它都不关心。它只有在第一个条件不符合的情况下，它才会关注第二个条件。</p>
+<p>​      因此大家在使用watchEffect写逻辑的时候，要小心使用||运算符，如果实在想在watchEffect实现if的或运算符，可以多写一个if来巧妙的绕开或运算符。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">watchEffect(()=&gt;&#123;</span><br><span class="line">  if (temp.value &gt;= 60) &#123;</span><br><span class="line">    console.log(&#x27;给服务器发请求&#x27;)</span><br><span class="line">  &#125;</span><br><span class="line">  if (height.value &gt;= 80 &amp;&amp; temp.value &lt; 60) &#123;</span><br><span class="line">    console.log(&#x27;给服务器发请求&#x27;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>上面的代码将if(temp.value &gt;= 60 || height.value &gt;= 80)拆分成两段，如果水温temp大于60就发请求，如果水位超过80且水温不到60也发请求（因为水温到60就不用考虑水位了）。这样也同样能完美实现我们的需求。</p>
+<h2 id="ivwatcheffect的注意事项"><a class="markdownIt-Anchor" href="#ivwatcheffect的注意事项"></a> IV，watchEffect的注意事项</h2>
+<p>1、watchEffect是立即监听的，相当于watch配置了immediate为true一样</p>
+<p>2、watchEffect无论是基本类型还是对象类型，它都可以监听到</p>
+<p>3、watchEffect的解除监听方式跟watch是一样的</p>
+
+    </div>
+    <footer class="article-footer">
+        <blockquote class="article-copyright">
+    <p><strong><span class="icon-user icon"></span>本文作者：</strong>羡笙</p>
+    <p><strong><span class="icon-link icon"></span>本文链接：</strong><a href="http://example.com/2026/04/17/Vue%E5%B1%9E%E6%80%A7%E6%96%B9%E5%BC%8F/">http://example.com/2026/04/17/Vue%E5%B1%9E%E6%80%A7%E6%96%B9%E5%BC%8F/</a></p>
+    <p><strong><span class="icon-pencil icon"></span>本文标题：</strong>「Vue属性方式」</p>
+    <p><strong><span class="icon-calendar icon"></span>本文发布时间：</strong>2026-04-17 00:15:43</p>
+    
+    <p><strong><span class="icon-copyright icon"></span>本文版权：</strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener nofollow noreferrer" target="_blank"><span class="icon-creative-commons"></span>BY-NC-SA</a> 许可协议。转载请注明出处！</p>
+    <span class="icon-creative-commons article-copyright-bg"></span>
+  </blockquote>
+        <div class="share-wrapper">
+    <a href="https://connect.qq.com/widget/shareqq/index.html?url=http%3A%2F%2Fexample.com%2F2026%2F04%2F17%2FVue%25E5%25B1%259E%25E6%2580%25A7%25E6%2596%25B9%25E5%25BC%258F%2F&amp;title=Vue%E5%B1%9E%E6%80%A7%E6%96%B9%E5%BC%8F&amp;desc=Vue%E5%B1%9E%E6%80%A7%E6%96%B9%E5%BC%8F&amp;source=http%3A%2F%2Fexample.com" target="_blank" rel="noopener noreferrer" title="Vue属性方式">
+      <div class="share-icon icon icon-qq">
+      </div>
+    </a>
+</div>
+        <a class="article-category-link" href="/categories/%E5%AD%A6%E4%B9%A0/" title="学习" data-aos="zoom-in">学习</a>
+
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/covers/bg2.webp" data-sizes="auto" alt="Vue学习" class="lazyload">
+        <a href="/2026/04/17/Vue%E5%AD%A6%E4%B9%A0/" aria-label="前一篇: Vue学习" title="前一篇: Vue学习"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            Vue学习
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/covers/bg5.webp" data-sizes="auto" alt="Typescript" class="lazyload">
+      <a href="/2026/04/17/Typescript/" aria-label="后一篇: Typescript"  title="后一篇: Typescript"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          Typescript
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2026
+        <span class="footer-info-sep rotate"></span>
+      羡笙
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        14.9k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        01:05
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#vue%E5%B1%9E%E6%80%A7%E6%96%B9%E5%BC%8F"><span class="toc-text"> Vue属性方式</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%80computed%E8%AE%A1%E7%AE%97%E5%B1%9E%E6%80%A7"><span class="toc-text"> 一，computed计算属性</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#icomputed%E6%A6%82%E8%BF%B0"><span class="toc-text"> I，computed概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#iicomputed%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="toc-text"> II，computed的使用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#iiicomputed%E7%9A%84%E7%BC%93%E5%AD%98%E7%89%B9%E6%80%A7"><span class="toc-text"> III，computed的缓存特性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ivcomputed%E7%9A%84get%E5%92%8Cset"><span class="toc-text"> IV，computed的get和set</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1get%E6%96%B9%E6%B3%95"><span class="toc-text"> 1，get方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2set%E6%96%B9%E6%B3%95"><span class="toc-text"> 2，set方法</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%8Cwatch%E7%9B%91%E5%90%AC%E5%B1%9E%E6%80%A7"><span class="toc-text"> 二，watch监听属性</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#i%E7%9B%91%E5%90%AC%E6%95%B0%E6%8D%AE"><span class="toc-text"> I，监听数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ii%E7%9B%91%E5%90%ACref%E7%B1%BB%E5%9E%8B"><span class="toc-text"> II，监听ref类型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1ref%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B"><span class="toc-text"> 1，ref基本类型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2ref%E5%AF%B9%E8%B1%A1%E7%B1%BB%E5%9E%8B"><span class="toc-text"> 2，ref对象类型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3%E7%9B%91%E5%90%AC%E5%AF%B9%E8%B1%A1%E5%B1%9E%E6%80%A7"><span class="toc-text"> 3，监听对象属性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#iii%E7%9B%91%E5%90%ACreactive%E5%AF%B9%E8%B1%A1%E7%B1%BB%E5%9E%8B"><span class="toc-text"> III，监听reactive对象类型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1reactive%E4%B8%8Eref%E7%9A%84%E7%9B%91%E5%90%AC%E5%AF%B9%E6%AF%94"><span class="toc-text"> 1，reactive与ref的监听对比</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%E7%9B%91%E5%90%ACreactive"><span class="toc-text"> 2，监听reactive</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3%E7%9B%91%E5%90%AC%E5%AF%B9%E8%B1%A1%E5%B1%9E%E6%80%A7-2"><span class="toc-text"> 3，监听对象属性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4%E7%9B%91%E5%90%AC%E5%A4%9A%E4%B8%AA%E6%95%B0%E6%8D%AE"><span class="toc-text"> 4，监听多个数据</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%89watcheffect"><span class="toc-text"> 三，watchEffect</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#iwatch%E5%92%8Cwatcheffect%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-text"> I，watch和watchEffect的区别</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ii%E4%B8%A4%E8%80%85%E5%AE%9E%E7%8E%B0%E6%96%B9%E5%BC%8F"><span class="toc-text"> II，两者实现方式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1watch%E5%AE%9E%E7%8E%B0%E6%96%B9%E5%BC%8F"><span class="toc-text"> 1，watch实现方式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2watcheffect%E5%AE%9E%E7%8E%B0%E6%96%B9%E5%BC%8F"><span class="toc-text"> 2，watchEffect实现方式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#iiiwatcheffect%E7%9A%84%E7%91%95%E7%96%B5"><span class="toc-text"> III，watchEffect的瑕疵</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ivwatcheffect%E7%9A%84%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="toc-text"> IV，watchEffect的注意事项</span></a></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="羡笙" class="lazyload">
+  <div class="sidebar-author-name">羡笙</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">6</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/EnvySage itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/images/reimu.png" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+  
+<script src="/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/js/generator_search.js" defer></script>
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+  
+<script src="https://npm.webcache.cn/theme-shokax-pjax@0.0.3/dist/index.umd.js" integrity="sha384-xneY1WY8hOfUzswrE4CrYq35N4BdVcxqxwHPr9zawE&#x2F;jMSCxD+jAPU55x&#x2F;jj3wlf" crossorigin="anonymous"></script>
+
+  
+<script src="/js/pjax.js"></script>
+
+
+
+
+  
+<script src="https://npm.webcache.cn/quicklink@3.0.1/dist/quicklink.umd.js" integrity="sha384-caMDqvgav&#x2F;HWdEYQU1QRRHMLleigpL1YHAG0m371DhzfL8rRzUyOb+bEHtwlmYjD" crossorigin="anonymous"></script>
+
+  <script data-pjax>
+    window.quicklink?.listen({
+      timeout: 3000,
+      priority: true,
+      ignores: []
+    });
+  </script>
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "羡笙",
+          title: "Vue属性方式",
+          url: "http://example.com/2026/04/17/Vue%E5%B1%9E%E6%80%A7%E6%96%B9%E5%BC%8F/",
+          excerpt: "",
+          description: "",
+          stripContent: " Vue属性方式  一，computed计算属性  I，computed概述 ​    计算属性是 Vue 实例的一个选项，可以用来定义一个属性，该属性的值是经过计算后的结果。它的特点是： ​    1、依赖于其他的响应式属性 ​    2、会进行缓存，只有在依赖发生变化时，才会重新计算 ​    3、计算属性可以定义为一个函数，也可以定义为一个对象，包含 getter 和 setter  II，computed的使用 这里使用拼接姓名作为例子，输入姓和名，最终拼接成完整的姓名，实例如下 123",
+          date: "Fri Apr 17 2026 00:15:43 GMT+0800",
+          updated: "Fri Apr 17 2026 00:36:08 GMT+0800",
+          cover: "/images/banner.webp",
+        };
+      </script>
+        
+<script src="/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+    <script>
+    var setupAPlayer = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        if (window.matchMedia('(max-width: 959px)').matches) {
+          const aplayer = _$('#aplayer');
+          if (aplayer) {
+            const aside = aplayer.parentNode?.parentNode;
+            if (aside?.tagName === 'ASIDE') {
+              aplayer.removeAttribute('data-aos');
+              aplayer.parentNode.removeChild(aplayer);
+              document.body.appendChild(aplayer);
+            }
+          }
+        }
+        new APlayer({
+          theme: "var(--color-link)",
+          container: document.getElementById('aplayer'),
+          audio: [{"name":"忆夏思乡","artist":"MoreanP","url":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/music/MoreanP%20-%20%E5%BF%86%E5%A4%8F%E6%80%9D%E4%B9%A1.mp3","cover":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/cover/MoreanP%20-%20%E5%BF%86%E5%A4%8F%E6%80%9D%E4%B9%A1.jpeg"},{"name":"かくれんぼ","artist":"AliA","url":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/music/AliA%20-%20%E3%81%8B%E3%81%8F%E3%82%8C%E3%82%93%E3%81%BC.mp3","cover":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/cover/AliA%20-%20%E3%81%8B%E3%81%8F%E3%82%8C%E3%82%93%E3%81%BC.jpeg","lrc":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/lyric/%E3%81%8B%E3%81%8F%E3%82%8C%E3%82%93%E3%81%BC%20-%20AliA.lrc"}] || [],
+          fixed: isMobile ? true : (false || false),
+          autoplay: false || false,
+          loop: 'all' || 'all',
+          order: 'list' || 'list',
+          preload: 'auto' || 'auto',
+          volume: 0.4 || 0.7,
+          mutex: true || true,
+          listFolded: false || false,
+          lrcType: 0 || 0,
+        });
+      }
+    }
+    </script>
+  
+<script src="https://npm.webcache.cn/aplayer@1.10.1/dist/APlayer.min.js" integrity="sha384-gdGYZwHnfJM54evoZhpO0s6ZF5BQiybkiyW7VXr+h5UfruuRL&#x2F;aORyw+5+HZoU6e" crossorigin="anonymous" defer onload="setupAPlayer()"></script>
+
+
+
+  </body>
+  </html>

@@ -1,0 +1,687 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+    <script async src="https://hm.baidu.com/hm.js?true"></script>
+  <script data-pjax>
+    var _hmt = _hmt || [];
+    _hmt.push(["_trackPageview", location.pathname]);
+  </script>
+
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_a0oqhord1y';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'http://example.com';window.REIMU_CONFIG.relative = '/';</script>
+  <title>
+    Vue学习 | 羡笙の窝
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_a0oqhord1y.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/css/loader.css">
+
+    <meta name="description" content="Vue学习  一，创建Vue项目 在有node.js的环境下，才可以使用npm指令 1npm create vue@latest 进行基于vite的vue项目启动   I，OptionsAPI选项式配置项 Options类型的 API，数据、方法、计算属性等，是分散在：data、methods、computed中的，若想新增或者修改一个需求，就需要分别修改：data、methods、comput">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vue学习">
+<meta property="og:url" content="http://example.com/2026/04/17/Vue%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="羡笙の窝">
+<meta property="og:description" content="Vue学习  一，创建Vue项目 在有node.js的环境下，才可以使用npm指令 1npm create vue@latest 进行基于vite的vue项目启动   I，OptionsAPI选项式配置项 Options类型的 API，数据、方法、计算属性等，是分散在：data、methods、computed中的，若想新增或者修改一个需求，就需要分别修改：data、methods、comput">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/1.png">
+<meta property="og:image" content="http://example.com/img/OptionAPI.gif">
+<meta property="og:image" content="http://example.com/img/OptionAPI2.gif">
+<meta property="og:image" content="http://example.com/img/CompositionAPI.gif">
+<meta property="og:image" content="http://example.com/img/CompositionAPI2.gif">
+<meta property="og:image" content="http://example.com/img/export.png">
+<meta property="og:image" content="http://example.com/img/ref.png">
+<meta property="og:image" content="http://example.com/img/toRefs.png">
+<meta property="article:published_time" content="2026-04-16T16:15:43.855Z">
+<meta property="article:modified_time" content="2026-04-16T16:36:05.416Z">
+<meta property="article:author" content="羡笙">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/1.png">
+    <link rel="alternate" href="/atom.xml" title="羡笙の窝" type="application/atom+xml">
+    <link rel="shortcut icon" href="/images/favicon.ico">
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+      <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/katex@0.16.24/dist/katex.min.css" integrity="sha384-tTgKLjMYmJr94v8qu2PE5MUGSMbyN2xiH266JUB3gpm8vnnJywd1dWSOEfrFz+YI" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+    <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/aplayer@1.10.1/dist/APlayer.min.css" integrity="sha384-tLMkTWh2pfXNWGFlUS0w1TFtRG5xZ9lPWFOooj+vDDLIL+xBGQU/voDBY5XE2lVh" crossorigin="anonymous">
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/images/banner.webp" alt="Vue学习">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">Vue学习</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content" class="sidebar-left"  >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+      <div id="aplayer" theme="var(--color-link)" data-aos="fade-up"></div>
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#vue%E5%AD%A6%E4%B9%A0"><span class="toc-text"> Vue学习</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%80%E5%88%9B%E5%BB%BAvue%E9%A1%B9%E7%9B%AE"><span class="toc-text"> 一，创建Vue项目</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#ioptionsapi%E9%80%89%E9%A1%B9%E5%BC%8F%E9%85%8D%E7%BD%AE%E9%A1%B9"><span class="toc-text"> I，OptionsAPI选项式配置项</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#iicompositionapi%E7%BB%84%E5%90%88%E5%BC%8F%E9%85%8D%E7%BD%AE%E9%A1%B9"><span class="toc-text"> II，CompositionAPI组合式配置项</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%8Csetup"><span class="toc-text"> 二，setup</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#isetup%E6%A6%82%E8%BF%B0"><span class="toc-text"> I，setup概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#iisetup%E6%89%A7%E8%A1%8C%E6%97%B6%E6%9C%BA"><span class="toc-text"> II，setup执行时机</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#iiisetup%E8%AF%AD%E6%B3%95%E7%B3%96"><span class="toc-text"> III，setup语法糖</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1setup%E5%87%BD%E6%95%B0%E5%86%99%E6%B3%95"><span class="toc-text"> 1，setup函数写法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2script%E9%87%8C%E5%86%99setup"><span class="toc-text"> 2，script里写setup</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#iv%E9%87%8D%E5%A4%8D%E5%AF%BC%E5%87%BA%E6%8A%A5%E9%94%99"><span class="toc-text"> IV，重复导出报错</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%89ref%E5%93%8D%E5%BA%94%E5%BC%8F%E5%AF%B9%E8%B1%A1"><span class="toc-text"> 三，ref响应式对象</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#iref%E5%9F%BA%E6%9C%AC%E5%93%8D%E5%BA%94%E5%BC%8F"><span class="toc-text"> I，ref基本响应式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E5%AF%BC%E5%85%A5ref"><span class="toc-text"> 1，导入ref</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2ref%E5%8C%85%E8%A3%B9%E5%AF%B9%E8%B1%A1"><span class="toc-text"> 2，ref包裹对象</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#iireactive%E5%AF%B9%E8%B1%A1%E7%B1%BB%E5%93%8D%E5%BA%94%E5%BC%8F"><span class="toc-text"> II，reactive对象类响应式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E6%B7%B1%E5%B1%82%E6%AC%A1%E7%9A%84%E5%8C%85%E8%A3%B9"><span class="toc-text"> 1，深层次的包裹</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#iiiref%E5%AF%B9%E6%AF%94reactive"><span class="toc-text"> III，ref对比reactive</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%AE%8F%E8%A7%82%E8%A7%92%E5%BA%A6"><span class="toc-text"> 1、宏观角度</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%8C%BA%E5%88%AB"><span class="toc-text"> 2、区别</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E4%BD%BF%E7%94%A8%E5%8E%9F%E5%88%99"><span class="toc-text"> 3、使用原则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86"><span class="toc-text"> 4，实现原理</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9B%9Btorefs%E4%B8%8Etoref"><span class="toc-text"> 四，toRefs与toRef</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#itorefs"><span class="toc-text"> I，toRefs</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#iitoref"><span class="toc-text"> II，toRef</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%94ref%E6%A0%87%E7%AD%BE"><span class="toc-text"> 五，ref标签</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#i%E4%BD%BF%E7%94%A8ref%E6%A0%87%E7%AD%BE"><span class="toc-text"> I，使用ref标签</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ii-defineexpose%E4%BD%BF%E7%94%A8"><span class="toc-text"> II， defineExpose使用</span></a></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="羡笙" class="lazyload">
+  <div class="sidebar-author-name">羡笙</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">6</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/EnvySage itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-Vue学习" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-04-16T16:15:43.855Z" itemprop="datePublished">2026-04-17</time>
+    <time style="display: none;" id="post-update-time">2026-04-17</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="vue学习"><a class="markdownIt-Anchor" href="#vue学习"></a> Vue学习</h1>
+<h1 id="一创建vue项目"><a class="markdownIt-Anchor" href="#一创建vue项目"></a> 一，创建Vue项目</h1>
+<p>在有node.js的环境下，才可以使用npm指令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm create vue@latest</span><br></pre></td></tr></table></figure>
+<p>进行基于vite的vue项目启动</p>
+<p><img src="/img/1.png" alt="1" /></p>
+<h2 id="ioptionsapi选项式配置项"><a class="markdownIt-Anchor" href="#ioptionsapi选项式配置项"></a> I，OptionsAPI选项式配置项</h2>
+<p><code>Options</code>类型的 <code>API</code>，数据、方法、计算属性等，是分散在：<code>data</code>、<code>methods</code>、<code>computed</code>中的，若想新增或者修改一个需求，就需要分别修改：<code>data</code>、<code>methods</code>、<code>computed</code>，不便于维护和复用。</p>
+<p><img src="/img/OptionAPI.gif" alt="OptionAPI" />  <img src="/img/OptionAPI2.gif" alt="OptionAPI2" /></p>
+<h2 id="iicompositionapi组合式配置项"><a class="markdownIt-Anchor" href="#iicompositionapi组合式配置项"></a> II，CompositionAPI组合式配置项</h2>
+<p>可以用函数的方式，更加优雅的组织代码，让相关功能的代码更加有序的组织在一起。</p>
+<p>​    所谓组合式，其实就是将相同功能的代码组合在一起，不像选项式那样拆散，如果想加功能或者维护，只需要在对应的功能函数体内添加即可。</p>
+<img src="/img/CompositionAPI.gif" alt="CompositionAPI" style="zoom:80%;" />  
+<img src="/img/CompositionAPI2.gif" alt="CompositionAPI2" style="zoom: 80%;" />
+<h1 id="二setup"><a class="markdownIt-Anchor" href="#二setup"></a> 二，setup</h1>
+<h2 id="isetup概述"><a class="markdownIt-Anchor" href="#isetup概述"></a> I，setup概述</h2>
+<p>etup是Vue3中一个新的配置项，值是一个函数，它是Composition API表演的舞台，组件中所用到的：数据、方法、计算属性、监视…等等，均配置在setup中。</p>
+<h2 id="iisetup执行时机"><a class="markdownIt-Anchor" href="#iisetup执行时机"></a> II，setup执行时机</h2>
+<p>在Vue2中，在所有生命周期中最早执行的是beforeCreate，而setup执行时机比beforeCreat更快。</p>
+<p>因为setup的时机比beforecreate更早，所以如果同时用了vue2和vue3的写法的情况下，vue2能拿到vue3里的数据</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;person&quot;</span>&gt;</span></span><br><span class="line">    ......</span><br><span class="line">    <span class="tag">&lt;<span class="name">h2</span>&gt;</span>测试1：&#123;&#123;a&#125;&#125;<span class="tag">&lt;/<span class="name">h2</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">h2</span>&gt;</span>测试2：&#123;&#123;c&#125;&#125;<span class="tag">&lt;/<span class="name">h2</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">button</span> @<span class="attr">click</span>=<span class="string">&quot;b&quot;</span>&gt;</span>测试<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">lang</span>=<span class="string">&quot;ts&quot;</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript">  <span class="keyword">export</span> <span class="keyword">default</span> &#123;</span></span><br><span class="line"><span class="language-javascript">    <span class="attr">name</span>:<span class="string">&#x27;Person&#x27;</span>,</span></span><br><span class="line"><span class="language-javascript">    <span class="title function_">data</span>(<span class="params"></span>)&#123;</span></span><br><span class="line"><span class="language-javascript">      <span class="keyword">return</span> &#123;</span></span><br><span class="line"><span class="language-javascript">        <span class="attr">a</span>:<span class="number">100</span>,</span></span><br><span class="line"><span class="language-javascript">        <span class="attr">c</span>:<span class="variable language_">this</span>.<span class="property">name</span></span></span><br><span class="line"><span class="language-javascript">      &#125;</span></span><br><span class="line"><span class="language-javascript">    &#125;,</span></span><br><span class="line"><span class="language-javascript">    <span class="attr">methods</span>:&#123;</span></span><br><span class="line"><span class="language-javascript">      <span class="title function_">b</span>(<span class="params"></span>)&#123;</span></span><br><span class="line"><span class="language-javascript">        <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;b&#x27;</span>)</span></span><br><span class="line"><span class="language-javascript">      &#125;</span></span><br><span class="line"><span class="language-javascript">    &#125;,</span></span><br><span class="line"><span class="language-javascript">    <span class="title function_">setup</span>(<span class="params"></span>)&#123;</span></span><br><span class="line"><span class="language-javascript">      <span class="keyword">let</span> name = <span class="string">&#x27;张三&#x27;</span></span></span><br><span class="line"><span class="language-javascript">      <span class="keyword">let</span> age = <span class="number">18</span></span></span><br><span class="line"><span class="language-javascript">      <span class="keyword">let</span> tel = <span class="string">&#x27;13888888888&#x27;</span></span></span><br><span class="line"><span class="language-javascript">      </span></span><br><span class="line"><span class="language-javascript">      ......</span></span><br><span class="line"><span class="language-javascript">    &#125;</span></span><br><span class="line"><span class="language-javascript">  &#125;</span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h2 id="iiisetup语法糖"><a class="markdownIt-Anchor" href="#iiisetup语法糖"></a> III，setup语法糖</h2>
+<h3 id="1setup函数写法"><a class="markdownIt-Anchor" href="#1setup函数写法"></a> 1，setup函数写法</h3>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">lang</span>=<span class="string">&quot;ts&quot;</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript">    <span class="title function_">setup</span>(<span class="params"></span>)&#123;</span></span><br><span class="line"><span class="language-javascript">      <span class="keyword">let</span> a = <span class="number">2222</span></span></span><br><span class="line"><span class="language-javascript">      <span class="keyword">return</span> &#123;a&#125;</span></span><br><span class="line"><span class="language-javascript">    &#125;</span></span><br><span class="line"><span class="language-javascript">  &#125;</span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>这里需要写出setup方法和return导出，才能使用</p>
+<h3 id="2script里写setup"><a class="markdownIt-Anchor" href="#2script里写setup"></a> 2，script里写setup</h3>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">setup</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript">  <span class="keyword">let</span> a = <span class="number">666</span></span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>这里则只申明变量也会有默认导出的操作，换而言之就是你不在需要自己导出和写setup方法</p>
+<h2 id="iv重复导出报错"><a class="markdownIt-Anchor" href="#iv重复导出报错"></a> IV，重复导出报错</h2>
+<p>前面说到，在setup语法糖中会自动参配return的导出。所以如果在此基础上再加上export default等导出方式就会报错</p>
+<img src="/img/export.png" alt="export" style="zoom: 80%;" />
+<h1 id="三ref响应式对象"><a class="markdownIt-Anchor" href="#三ref响应式对象"></a> 三，ref响应式对象</h1>
+<p>Vue2是把数据放在data里，在data里的数据，全都是响应式数据。而在Vue3是通过ref和reactive来实现响应式，这个ref跟标签的ref是不相同的，在后面会详细讲解标签ref。Vue3的理念是，它并不会把所有数据都设置成响应式，而是你需要哪个数据是响应式，就在哪个数据包裹一下ref()，让它变成响应式。</p>
+<h2 id="iref基本响应式"><a class="markdownIt-Anchor" href="#iref基本响应式"></a> I，ref基本响应式</h2>
+<h3 id="1导入ref"><a class="markdownIt-Anchor" href="#1导入ref"></a> 1，导入ref</h3>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123;ref&#125; <span class="keyword">from</span> <span class="string">&#x27;vue&#x27;</span></span><br></pre></td></tr></table></figure>
+<h3 id="2ref包裹对象"><a class="markdownIt-Anchor" href="#2ref包裹对象"></a> 2，ref包裹对象</h3>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  <span class="language-xml"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;person&quot;</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">    <span class="tag">&lt;<span class="name">h2</span>&gt;</span>姓名：&#123;&#123;name&#125;&#125;<span class="tag">&lt;/<span class="name">h2</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">    <span class="tag">&lt;<span class="name">h2</span>&gt;</span>年龄：&#123;&#123;age&#125;&#125;<span class="tag">&lt;/<span class="name">h2</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">    <span class="tag">&lt;<span class="name">h2</span>&gt;</span>地址：&#123;&#123;address&#125;&#125;<span class="tag">&lt;/<span class="name">h2</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">    <span class="tag">&lt;<span class="name">button</span> @<span class="attr">click</span>=<span class="string">&quot;changeName&quot;</span>&gt;</span>修改名字<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">    <span class="tag">&lt;<span class="name">button</span> @<span class="attr">click</span>=<span class="string">&quot;changeAge&quot;</span>&gt;</span>修改年龄<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line"><span class="language-xml"><span class="tag">&lt;<span class="name">script</span> <span class="attr">lang</span>=<span class="string">&quot;ts&quot;</span> <span class="attr">setup</span> <span class="attr">name</span>=<span class="string">&quot;Person&quot;</span>&gt;</span><span class="language-javascript"></span></span></span><br><span class="line"><span class="language-javascript"><span class="language-xml">    <span class="keyword">import</span> &#123;ref&#125; <span class="keyword">from</span> <span class="string">&#x27;vue&#x27;</span></span></span></span><br><span class="line"><span class="language-javascript"><span class="language-xml"></span></span></span><br><span class="line"><span class="language-javascript"><span class="language-xml">    <span class="keyword">let</span> name = <span class="title function_">ref</span>(<span class="string">&#x27;张三&#x27;</span>)</span></span></span><br><span class="line"><span class="language-javascript"><span class="language-xml">    <span class="keyword">let</span> age = <span class="title function_">ref</span>(<span class="number">18</span>)</span></span></span><br><span class="line"><span class="language-javascript"><span class="language-xml">    <span class="keyword">let</span> tel = <span class="string">&#x27;12345657&#x27;</span></span></span></span><br><span class="line"><span class="language-javascript"><span class="language-xml">    <span class="comment">// 方法</span></span></span></span><br><span class="line"><span class="language-javascript"><span class="language-xml">    <span class="keyword">function</span> <span class="title function_">changeName</span>(<span class="params"></span>) &#123;</span></span></span><br><span class="line"><span class="language-javascript"><span class="language-xml">        name = <span class="string">&#x27;zhang-san&#x27;</span></span></span></span><br><span class="line"><span class="language-javascript"><span class="language-xml">    &#125;</span></span></span><br><span class="line"><span class="language-javascript"><span class="language-xml">    <span class="keyword">function</span> <span class="title function_">changeAge</span>(<span class="params"></span>) &#123;</span></span></span><br><span class="line"><span class="language-javascript"><span class="language-xml">        age += <span class="number">1</span></span></span></span><br><span class="line"><span class="language-javascript"><span class="language-xml">    &#125;</span></span></span><br><span class="line"><span class="language-javascript"><span class="language-xml"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></span><br></pre></td></tr></table></figure>
+<p>这里就是把那么和age包裹成响应式对象</p>
+<p><img src="/img/ref.png" alt="ref" /></p>
+<h2 id="iireactive对象类响应式"><a class="markdownIt-Anchor" href="#iireactive对象类响应式"></a> II，reactive对象类响应式</h2>
+<p>ref主要是针对基本类型的响应式，如果是对象类型我们可以使用reactive，用法跟ref一样，也是使用reactive把对象进行包裹。</p>
+<h3 id="1深层次的包裹"><a class="markdownIt-Anchor" href="#1深层次的包裹"></a> 1，深层次的包裹</h3>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">h1</span>&gt;</span>&#123;&#123; obj.a.b.c &#125;&#125;<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">lang</span>=<span class="string">&quot;ts&quot;</span> <span class="attr">setup</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript"><span class="keyword">import</span> &#123;reactive&#125; <span class="keyword">from</span> <span class="string">&#x27;vue&#x27;</span></span></span><br><span class="line"><span class="language-javascript"><span class="keyword">let</span> obj = <span class="title function_">reactive</span>(&#123;</span></span><br><span class="line"><span class="language-javascript">    <span class="attr">a</span>:&#123;</span></span><br><span class="line"><span class="language-javascript">        <span class="attr">b</span>:&#123;</span></span><br><span class="line"><span class="language-javascript">            <span class="attr">c</span>:<span class="number">222</span></span></span><br><span class="line"><span class="language-javascript">        &#125;</span></span><br><span class="line"><span class="language-javascript">    &#125;</span></span><br><span class="line"><span class="language-javascript">&#125;)</span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h2 id="iiiref对比reactive"><a class="markdownIt-Anchor" href="#iiiref对比reactive"></a> III，ref对比reactive</h2>
+<h3 id="1-宏观角度"><a class="markdownIt-Anchor" href="#1-宏观角度"></a> 1、宏观角度</h3>
+<p>​      (1)ref用来定义：基本类型数据、对象类型数据</p>
+<p>​      (2)reactive用来定义：对象类型数据</p>
+<h3 id="2-区别"><a class="markdownIt-Anchor" href="#2-区别"></a> 2、区别</h3>
+<p>​      (1)ref创建的变量必须使用<code>.value</code>（可以使用<code>volar</code>插件自动添加<code>.value</code>）。</p>
+<p>​      (2)reactive重新分配一个新对象，会<code>失去响应式</code>（可以使用<code>Object.assign</code>去整体替换）。（局限性）</p>
+<h3 id="3-使用原则"><a class="markdownIt-Anchor" href="#3-使用原则"></a> 3、使用原则</h3>
+<p>​      (1)若需要一个基本类型的响应式数据，必须使用<code>ref</code>。</p>
+<p>​      (2)若需要一个响应式对象，层级不深，<code>ref</code>、<code>reactive</code>都可以。</p>
+<p>​      (3)若需要一个响应式对象，且层级较深，推荐使用<code>reactive</code>。</p>
+<h3 id="4实现原理"><a class="markdownIt-Anchor" href="#4实现原理"></a> 4，实现原理</h3>
+<p>虽然ref能干reactive的活，但是ref底层也是调用reactive来包裹响应式对象，所以reactive并不可能消失</p>
+<h1 id="四torefs与toref"><a class="markdownIt-Anchor" href="#四torefs与toref"></a> 四，toRefs与toRef</h1>
+<h2 id="itorefs"><a class="markdownIt-Anchor" href="#itorefs"></a> I，toRefs</h2>
+<p>我们用reactive包裹了对象之后，它就变成了响应式了，假设此时我们使用解构赋值，要注意的一点是，解构赋值的变量，并不是响应式的，它只是一个普通的变量而已。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;script lang=<span class="string">&quot;ts&quot;</span> setup name=<span class="string">&quot;Person&quot;</span>&gt;</span><br><span class="line">  <span class="keyword">let</span> person = <span class="title function_">reactive</span>(&#123;</span><br><span class="line">    <span class="attr">name</span>:<span class="string">&#x27;张三&#x27;</span>,</span><br><span class="line">    <span class="attr">age</span>:<span class="number">18</span></span><br><span class="line">  &#125;)</span><br><span class="line">  <span class="keyword">let</span> &#123;name,age&#125; = person</span><br><span class="line">  <span class="comment">//这里相当于是</span></span><br><span class="line">  <span class="keyword">let</span> name = person.<span class="property">name</span></span><br><span class="line">  <span class="keyword">let</span> age = person.<span class="property">age</span></span><br><span class="line">  <span class="comment">//但是相适应对象是person，所以重新解构的name不是响应对象</span></span><br><span class="line">&lt;/script&gt;  </span><br><span class="line">  </span><br></pre></td></tr></table></figure>
+<p>此时toRefs就可以派上用场了，它的作用就是可以让对象的每一个属性解构出来都变成响应式：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;script lang=<span class="string">&quot;ts&quot;</span> setup name=<span class="string">&quot;Person&quot;</span>&gt;</span><br><span class="line">  <span class="keyword">let</span> person = <span class="title function_">reactive</span>(&#123;</span><br><span class="line">    <span class="attr">name</span>:<span class="string">&#x27;张三&#x27;</span>,</span><br><span class="line">    <span class="attr">age</span>:<span class="number">18</span></span><br><span class="line">  &#125;)</span><br><span class="line">  <span class="keyword">let</span> &#123;name,age&#125; = <span class="title function_">toRefs</span>(person)</span><br><span class="line">&lt;/script&gt;  </span><br></pre></td></tr></table></figure>
+<p>​    包裹了toRefs()之后，整个对象里的各个属性值都变成了ref对象，我们可以通过输出toRefs(person)进行观察：</p>
+<p><img src="/img/toRefs.png" alt="toRefs" /></p>
+<h2 id="iitoref"><a class="markdownIt-Anchor" href="#iitoref"></a> II，toRef</h2>
+<p>见名知意，就是toRefs的单数，他会把响应式对象里的其中一项改为响应式数据</p>
+<h1 id="五ref标签"><a class="markdownIt-Anchor" href="#五ref标签"></a> 五，ref标签</h1>
+<h2 id="i使用ref标签"><a class="markdownIt-Anchor" href="#i使用ref标签"></a> I，使用ref标签</h2>
+<p>vue3在模板上的使用跟vue2是一样的，但获取ref元素的时候，它需要用ref类型先把ref标签保存起来，然后再使用。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div class=&quot;person&quot;&gt;</span><br><span class="line">    &lt;h1&gt;中国&lt;/h1&gt;</span><br><span class="line">    &lt;h2 ref=&quot;title2&quot;&gt;北京&lt;/h2&gt;</span><br><span class="line">    &lt;h3&gt;尚硅谷&lt;/h3&gt;</span><br><span class="line">    &lt;button @click=&quot;showLog&quot;&gt;点我输出h2这个元素&lt;/button&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script lang=&quot;ts&quot; setup name=&quot;Person&quot;&gt;</span><br><span class="line">  import &#123;ref&#125; from &#x27;vue&#x27;</span><br><span class="line"></span><br><span class="line">  // 创建一个title2，用于存储ref标记的内容</span><br><span class="line">  let title2 = ref()</span><br><span class="line"></span><br><span class="line">  function showLog()&#123;</span><br><span class="line">    console.log(title2.value)</span><br><span class="line">  &#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="ii-defineexpose使用"><a class="markdownIt-Anchor" href="#ii-defineexpose使用"></a> II， defineExpose使用</h2>
+<p>ref标签不只是用在普通的html元素，它还可以应用在组件标签上。假设这里存在一对父子组件，在父组件里对子组件标签使用ref的话，它获取的是子组件的实例。</p>
+<p>父组件：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;button @click=&quot;showLog&quot;&gt;测试&lt;/button&gt;</span><br><span class="line">  &lt;Person ref=&quot;child&quot;/&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script lang=&quot;ts&quot; setup name=&quot;App&quot;&gt;</span><br><span class="line">  import Person from &#x27;./components/Person.vue&#x27;</span><br><span class="line">  import &#123;ref&#125; from &#x27;vue&#x27;</span><br><span class="line"></span><br><span class="line">  let child = ref()</span><br><span class="line"></span><br><span class="line">  function showLog()&#123;</span><br><span class="line">    console.log(child.value)</span><br><span class="line">  &#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+<p>子组件：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div class=&quot;person&quot;&gt;</span><br><span class="line">    ......</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script lang=&quot;ts&quot; setup name=&quot;Person&quot;&gt;</span><br><span class="line">  let a = ref(0)</span><br><span class="line">  let b = ref(1)</span><br><span class="line">  let c = ref(2)</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+<p>这里的ref就只能拿到person整个页面的实例，但是拿不到person里面abc实例的数据，这时候就需要defineExpose登场了</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&lt;script lang=&quot;ts&quot; setup name=&quot;Person&quot;&gt;</span><br><span class="line">  import &#123;ref&#125; from &#x27;vue&#x27;</span><br><span class="line"></span><br><span class="line">  // 创建一个title2，用于存储ref标记的内容</span><br><span class="line">  let title2 = ref()</span><br><span class="line">  let a = ref(0)</span><br><span class="line">  let b = ref(1)</span><br><span class="line">  let c = ref(2)</span><br><span class="line"></span><br><span class="line">  function showLog()&#123;</span><br><span class="line">    console.log(title2.value)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  defineExpose(&#123;a,b,c&#125;)</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+<p>将想要给父类看到的东西defineExpose出来，父类才能看到子类的数据</p>
+
+    </div>
+    <footer class="article-footer">
+        <blockquote class="article-copyright">
+    <p><strong><span class="icon-user icon"></span>本文作者：</strong>羡笙</p>
+    <p><strong><span class="icon-link icon"></span>本文链接：</strong><a href="http://example.com/2026/04/17/Vue%E5%AD%A6%E4%B9%A0/">http://example.com/2026/04/17/Vue%E5%AD%A6%E4%B9%A0/</a></p>
+    <p><strong><span class="icon-pencil icon"></span>本文标题：</strong>「Vue学习」</p>
+    <p><strong><span class="icon-calendar icon"></span>本文发布时间：</strong>2026-04-17 00:15:43</p>
+    
+    <p><strong><span class="icon-copyright icon"></span>本文版权：</strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener nofollow noreferrer" target="_blank"><span class="icon-creative-commons"></span>BY-NC-SA</a> 许可协议。转载请注明出处！</p>
+    <span class="icon-creative-commons article-copyright-bg"></span>
+  </blockquote>
+        <div class="share-wrapper">
+    <a href="https://connect.qq.com/widget/shareqq/index.html?url=http%3A%2F%2Fexample.com%2F2026%2F04%2F17%2FVue%25E5%25AD%25A6%25E4%25B9%25A0%2F&amp;title=Vue%E5%AD%A6%E4%B9%A0&amp;desc=Vue%E5%AD%A6%E4%B9%A0&amp;source=http%3A%2F%2Fexample.com" target="_blank" rel="noopener noreferrer" title="Vue学习">
+      <div class="share-icon icon icon-qq">
+      </div>
+    </a>
+</div>
+        <a class="article-category-link" href="/categories/%E5%AD%A6%E4%B9%A0/" title="学习" data-aos="zoom-in">学习</a>
+
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="路由" class="lazyload">
+        <a href="/2026/04/17/%E8%B7%AF%E7%94%B1/" aria-label="前一篇: 路由" title="前一篇: 路由"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            路由
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/covers/bg3.webp" data-sizes="auto" alt="Vue属性方式" class="lazyload">
+      <a href="/2026/04/17/Vue%E5%B1%9E%E6%80%A7%E6%96%B9%E5%BC%8F/" aria-label="后一篇: Vue属性方式"  title="后一篇: Vue属性方式"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          Vue属性方式
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2026
+        <span class="footer-info-sep rotate"></span>
+      羡笙
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        14.9k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        01:05
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#vue%E5%AD%A6%E4%B9%A0"><span class="toc-text"> Vue学习</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%80%E5%88%9B%E5%BB%BAvue%E9%A1%B9%E7%9B%AE"><span class="toc-text"> 一，创建Vue项目</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#ioptionsapi%E9%80%89%E9%A1%B9%E5%BC%8F%E9%85%8D%E7%BD%AE%E9%A1%B9"><span class="toc-text"> I，OptionsAPI选项式配置项</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#iicompositionapi%E7%BB%84%E5%90%88%E5%BC%8F%E9%85%8D%E7%BD%AE%E9%A1%B9"><span class="toc-text"> II，CompositionAPI组合式配置项</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%8Csetup"><span class="toc-text"> 二，setup</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#isetup%E6%A6%82%E8%BF%B0"><span class="toc-text"> I，setup概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#iisetup%E6%89%A7%E8%A1%8C%E6%97%B6%E6%9C%BA"><span class="toc-text"> II，setup执行时机</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#iiisetup%E8%AF%AD%E6%B3%95%E7%B3%96"><span class="toc-text"> III，setup语法糖</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1setup%E5%87%BD%E6%95%B0%E5%86%99%E6%B3%95"><span class="toc-text"> 1，setup函数写法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2script%E9%87%8C%E5%86%99setup"><span class="toc-text"> 2，script里写setup</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#iv%E9%87%8D%E5%A4%8D%E5%AF%BC%E5%87%BA%E6%8A%A5%E9%94%99"><span class="toc-text"> IV，重复导出报错</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%89ref%E5%93%8D%E5%BA%94%E5%BC%8F%E5%AF%B9%E8%B1%A1"><span class="toc-text"> 三，ref响应式对象</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#iref%E5%9F%BA%E6%9C%AC%E5%93%8D%E5%BA%94%E5%BC%8F"><span class="toc-text"> I，ref基本响应式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E5%AF%BC%E5%85%A5ref"><span class="toc-text"> 1，导入ref</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2ref%E5%8C%85%E8%A3%B9%E5%AF%B9%E8%B1%A1"><span class="toc-text"> 2，ref包裹对象</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#iireactive%E5%AF%B9%E8%B1%A1%E7%B1%BB%E5%93%8D%E5%BA%94%E5%BC%8F"><span class="toc-text"> II，reactive对象类响应式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E6%B7%B1%E5%B1%82%E6%AC%A1%E7%9A%84%E5%8C%85%E8%A3%B9"><span class="toc-text"> 1，深层次的包裹</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#iiiref%E5%AF%B9%E6%AF%94reactive"><span class="toc-text"> III，ref对比reactive</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%AE%8F%E8%A7%82%E8%A7%92%E5%BA%A6"><span class="toc-text"> 1、宏观角度</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%8C%BA%E5%88%AB"><span class="toc-text"> 2、区别</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E4%BD%BF%E7%94%A8%E5%8E%9F%E5%88%99"><span class="toc-text"> 3、使用原则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86"><span class="toc-text"> 4，实现原理</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9B%9Btorefs%E4%B8%8Etoref"><span class="toc-text"> 四，toRefs与toRef</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#itorefs"><span class="toc-text"> I，toRefs</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#iitoref"><span class="toc-text"> II，toRef</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%94ref%E6%A0%87%E7%AD%BE"><span class="toc-text"> 五，ref标签</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#i%E4%BD%BF%E7%94%A8ref%E6%A0%87%E7%AD%BE"><span class="toc-text"> I，使用ref标签</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ii-defineexpose%E4%BD%BF%E7%94%A8"><span class="toc-text"> II， defineExpose使用</span></a></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="羡笙" class="lazyload">
+  <div class="sidebar-author-name">羡笙</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">6</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/EnvySage itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/images/reimu.png" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+  
+<script src="/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/js/generator_search.js" defer></script>
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+  
+<script src="https://npm.webcache.cn/theme-shokax-pjax@0.0.3/dist/index.umd.js" integrity="sha384-xneY1WY8hOfUzswrE4CrYq35N4BdVcxqxwHPr9zawE&#x2F;jMSCxD+jAPU55x&#x2F;jj3wlf" crossorigin="anonymous"></script>
+
+  
+<script src="/js/pjax.js"></script>
+
+
+
+
+  
+<script src="https://npm.webcache.cn/quicklink@3.0.1/dist/quicklink.umd.js" integrity="sha384-caMDqvgav&#x2F;HWdEYQU1QRRHMLleigpL1YHAG0m371DhzfL8rRzUyOb+bEHtwlmYjD" crossorigin="anonymous"></script>
+
+  <script data-pjax>
+    window.quicklink?.listen({
+      timeout: 3000,
+      priority: true,
+      ignores: []
+    });
+  </script>
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "羡笙",
+          title: "Vue学习",
+          url: "http://example.com/2026/04/17/Vue%E5%AD%A6%E4%B9%A0/",
+          excerpt: "",
+          description: "",
+          stripContent: " Vue学习  一，创建Vue项目 在有node.js的环境下，才可以使用npm指令 1npm create vue@latest 进行基于vite的vue项目启动   I，OptionsAPI选项式配置项 Options类型的 API，数据、方法、计算属性等，是分散在：data、methods、computed中的，若想新增或者修改一个需求，就需要分别修改：data、methods、computed，不便于维护和复用。     II，CompositionAPI组合式配置项 可以用函数的方式，",
+          date: "Fri Apr 17 2026 00:15:43 GMT+0800",
+          updated: "Fri Apr 17 2026 00:36:05 GMT+0800",
+          cover: "/images/banner.webp",
+        };
+      </script>
+        
+<script src="/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+    <script>
+    var setupAPlayer = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        if (window.matchMedia('(max-width: 959px)').matches) {
+          const aplayer = _$('#aplayer');
+          if (aplayer) {
+            const aside = aplayer.parentNode?.parentNode;
+            if (aside?.tagName === 'ASIDE') {
+              aplayer.removeAttribute('data-aos');
+              aplayer.parentNode.removeChild(aplayer);
+              document.body.appendChild(aplayer);
+            }
+          }
+        }
+        new APlayer({
+          theme: "var(--color-link)",
+          container: document.getElementById('aplayer'),
+          audio: [{"name":"忆夏思乡","artist":"MoreanP","url":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/music/MoreanP%20-%20%E5%BF%86%E5%A4%8F%E6%80%9D%E4%B9%A1.mp3","cover":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/cover/MoreanP%20-%20%E5%BF%86%E5%A4%8F%E6%80%9D%E4%B9%A1.jpeg"},{"name":"かくれんぼ","artist":"AliA","url":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/music/AliA%20-%20%E3%81%8B%E3%81%8F%E3%82%8C%E3%82%93%E3%81%BC.mp3","cover":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/cover/AliA%20-%20%E3%81%8B%E3%81%8F%E3%82%8C%E3%82%93%E3%81%BC.jpeg","lrc":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/lyric/%E3%81%8B%E3%81%8F%E3%82%8C%E3%82%93%E3%81%BC%20-%20AliA.lrc"}] || [],
+          fixed: isMobile ? true : (false || false),
+          autoplay: false || false,
+          loop: 'all' || 'all',
+          order: 'list' || 'list',
+          preload: 'auto' || 'auto',
+          volume: 0.4 || 0.7,
+          mutex: true || true,
+          listFolded: false || false,
+          lrcType: 0 || 0,
+        });
+      }
+    }
+    </script>
+  
+<script src="https://npm.webcache.cn/aplayer@1.10.1/dist/APlayer.min.js" integrity="sha384-gdGYZwHnfJM54evoZhpO0s6ZF5BQiybkiyW7VXr+h5UfruuRL&#x2F;aORyw+5+HZoU6e" crossorigin="anonymous" defer onload="setupAPlayer()"></script>
+
+
+
+  </body>
+  </html>
