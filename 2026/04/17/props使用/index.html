@@ -12,7 +12,7 @@
     _hmt.push(["_trackPageview", location.pathname]);
   </script>
 
-  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_a0oqhord1y';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://envysage.github.io/XS-Blog';window.REIMU_CONFIG.relative = '/XS-Blog/';</script>
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_a0oqhord1y';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://envysage.github.io/XS-Blog';</script>
   <title>
     props使用 | 羡笙の窝
   </title>
@@ -20,7 +20,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
     <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_a0oqhord1y.woff2" as="font" type="font/woff2" crossorigin="anonymous">
     
-<link rel="stylesheet" href="/XS-Blog/css/loader.css">
+<link rel="stylesheet" href="../../../../css/loader.css">
 
     <meta name="description" content="props使用  一，defineProps接收 props最主要的作用就是接收父组件的传参，在Vue2里直接使用props接收参数即可，而在vue3需要依赖defineProps来接参。 这里举一个简单的例子，父组件传一个数组给子组件渲染出来。 父组件Person.vue： 123456789101112131415&lt;template&gt;  &lt;div class&#x3D;&quot;p">
 <meta property="og:type" content="article">
@@ -33,10 +33,10 @@
 <meta property="article:modified_time" content="2026-04-16T16:23:31.153Z">
 <meta property="article:author" content="羡笙">
 <meta name="twitter:card" content="summary">
-    <link rel="alternate" href="/XS-Blog/atom.xml" title="羡笙の窝" type="application/atom+xml">
-    <link rel="shortcut icon" href="/XS-Blog/images/favicon.ico">
+    <link rel="alternate" href="../../../../atom.xml" title="羡笙の窝" type="application/atom+xml">
+    <link rel="shortcut icon" href="../../../../images/favicon.ico">
   
-<link rel="stylesheet" href="/XS-Blog/css/style.css">
+<link rel="stylesheet" href="../../../../css/style.css">
 
   <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
       <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/katex@0.16.24/dist/katex.min.css" integrity="sha384-tTgKLjMYmJr94v8qu2PE5MUGSMbyN2xiH266JUB3gpm8vnnJywd1dWSOEfrFz+YI" crossorigin="anonymous">
@@ -100,25 +100,25 @@
       <div id="wrap">
         <div id="header-nav">
   <nav id="main-nav" aria-label="Primary navigation">
-        <a class="main-nav-link-wrap" href="/XS-Blog/">
+        <a class="main-nav-link-wrap" href="../../../../index.html">
             <div class="main-nav-icon icon rotate">
                 &#xe62b;
             </div>
           <span class="main-nav-link">首页</span>
         </a>
-        <a class="main-nav-link-wrap" href="/XS-Blog/archives">
+        <a class="main-nav-link-wrap" href="../../../../archives">
             <div class="main-nav-icon icon rotate">
                 &#xe62b;
             </div>
           <span class="main-nav-link">归档</span>
         </a>
-        <a class="main-nav-link-wrap" href="/XS-Blog/about">
+        <a class="main-nav-link-wrap" href="../../../../about">
             <div class="main-nav-icon icon rotate">
                 &#xe62b;
             </div>
           <span class="main-nav-link">关于</span>
         </a>
-        <a class="main-nav-link-wrap" href="/XS-Blog/friend">
+        <a class="main-nav-link-wrap" href="../../../../friend">
             <div class="main-nav-icon icon rotate">
                 &#xe62b;
             </div>
@@ -127,7 +127,7 @@
     <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
   </nav>
   <nav id="sub-nav" aria-label="Secondary navigation">
-      <a id="nav-rss-link" class="nav-icon" href="/XS-Blog/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-rss-link" class="nav-icon" href="../../../../atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
       <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
   </nav>
 </div>
@@ -283,14 +283,14 @@
       </div>
     </a>
 </div>
-        <a class="article-category-link" href="/XS-Blog/categories/%E5%AD%A6%E4%B9%A0/" title="学习" data-aos="zoom-in">学习</a>
+        <a class="article-category-link" href="../../../../categories/%E5%AD%A6%E4%B9%A0/" title="学习" data-aos="zoom-in">学习</a>
 
       
     </footer>
   </div>
     <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
       <div class="article-nav-link-wrap left">
-            <img data-src="/covers/bg4.webp" data-sizes="auto" alt="Typescript" class="lazyload">
+            <img data-src="/covers/bg5.webp" data-sizes="auto" alt="Typescript" class="lazyload">
         <a href="/XS-Blog/2026/04/17/Typescript/" aria-label="前一篇: Typescript" title="前一篇: Typescript"></a>
         <div class="article-nav-caption">前一篇</div>
         <h3 class="article-nav-title">
@@ -298,7 +298,7 @@
         </h3>
       </div>
     <div class="article-nav-link-wrap right">
-          <img data-src="/covers/bg1.webp" data-sizes="auto" alt="软件工程" class="lazyload">
+          <img data-src="/covers/bg3.webp" data-sizes="auto" alt="软件工程" class="lazyload">
       <a href="/XS-Blog/2026/04/16/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B/" aria-label="后一篇: 软件工程"  title="后一篇: 软件工程"></a>
       <div class="article-nav-caption">后一篇</div>
       <h3 class="article-nav-title">
@@ -444,11 +444,11 @@
 
 
 
-<script src="/XS-Blog/js/script.js"></script>
+<script src="../../../../js/script.js"></script>
 
 
   
-<script src="/XS-Blog/js/aos.js"></script>
+<script src="../../../../js/aos.js"></script>
 
   <script>
     var aosInit = () => {
@@ -467,11 +467,11 @@
   </script>
 
 
-<script src="/XS-Blog/js/pjax_script.js" data-pjax></script>
+<script src="../../../../js/pjax_script.js" data-pjax></script>
 
 
   
-<script src="/XS-Blog/js/generator_search.js" defer></script>
+<script src="../../../../js/generator_search.js" defer></script>
 
 
 
@@ -490,7 +490,7 @@
 <script src="https://npm.webcache.cn/theme-shokax-pjax@0.0.3/dist/index.umd.js" integrity="sha384-xneY1WY8hOfUzswrE4CrYq35N4BdVcxqxwHPr9zawE&#x2F;jMSCxD+jAPU55x&#x2F;jj3wlf" crossorigin="anonymous"></script>
 
   
-<script src="/XS-Blog/js/pjax.js"></script>
+<script src="../../../../js/pjax.js"></script>
 
 
 
@@ -524,10 +524,10 @@
         };
       </script>
         
-<script src="/XS-Blog/js/insert_highlight.js" data-pjax></script>
+<script src="../../../../js/insert_highlight.js" data-pjax></script>
 
       
-<script src="/XS-Blog/js/tabs.js" data-pjax defer></script>
+<script src="../../../../js/tabs.js" data-pjax defer></script>
 
       <script type="module" data-pjax>
         (async () => {

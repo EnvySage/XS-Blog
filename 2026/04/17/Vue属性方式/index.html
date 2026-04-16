@@ -12,7 +12,7 @@
     _hmt.push(["_trackPageview", location.pathname]);
   </script>
 
-  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_a0oqhord1y';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://envysage.github.io/XS-Blog';window.REIMU_CONFIG.relative = '/XS-Blog/';</script>
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_a0oqhord1y';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://envysage.github.io/XS-Blog';</script>
   <title>
     Vue属性方式 | 羡笙の窝
   </title>
@@ -20,7 +20,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
     <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_a0oqhord1y.woff2" as="font" type="font/woff2" crossorigin="anonymous">
     
-<link rel="stylesheet" href="/XS-Blog/css/loader.css">
+<link rel="stylesheet" href="../../../../css/loader.css">
 
     <meta name="description" content="Vue属性方式  一，computed计算属性  I，computed概述 ​    计算属性是 Vue 实例的一个选项，可以用来定义一个属性，该属性的值是经过计算后的结果。它的特点是： ​    1、依赖于其他的响应式属性 ​    2、会进行缓存，只有在依赖发生变化时，才会重新计算 ​    3、计算属性可以定义为一个函数，也可以定义为一个对象，包含 getter 和 setter  II，">
 <meta property="og:type" content="article">
@@ -29,17 +29,17 @@
 <meta property="og:site_name" content="羡笙の窝">
 <meta property="og:description" content="Vue属性方式  一，computed计算属性  I，computed概述 ​    计算属性是 Vue 实例的一个选项，可以用来定义一个属性，该属性的值是经过计算后的结果。它的特点是： ​    1、依赖于其他的响应式属性 ​    2、会进行缓存，只有在依赖发生变化时，才会重新计算 ​    3、计算属性可以定义为一个函数，也可以定义为一个对象，包含 getter 和 setter  II，">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://envysage.github.io/img/watch.gif">
-<meta property="og:image" content="https://envysage.github.io/img/reactive.gif">
+<meta property="og:image" content="https://envysage.github.io/XS-Blog/img/watch.gif">
+<meta property="og:image" content="https://envysage.github.io/XS-Blog/img/reactive.gif">
 <meta property="article:published_time" content="2026-04-16T16:15:43.582Z">
-<meta property="article:modified_time" content="2026-04-16T16:36:08.133Z">
+<meta property="article:modified_time" content="2026-04-16T17:42:07.703Z">
 <meta property="article:author" content="羡笙">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://envysage.github.io/img/watch.gif">
-    <link rel="alternate" href="/XS-Blog/atom.xml" title="羡笙の窝" type="application/atom+xml">
-    <link rel="shortcut icon" href="/XS-Blog/images/favicon.ico">
+<meta name="twitter:image" content="https://envysage.github.io/XS-Blog/img/watch.gif">
+    <link rel="alternate" href="../../../../atom.xml" title="羡笙の窝" type="application/atom+xml">
+    <link rel="shortcut icon" href="../../../../images/favicon.ico">
   
-<link rel="stylesheet" href="/XS-Blog/css/style.css">
+<link rel="stylesheet" href="../../../../css/style.css">
 
   <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
       <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/katex@0.16.24/dist/katex.min.css" integrity="sha384-tTgKLjMYmJr94v8qu2PE5MUGSMbyN2xiH266JUB3gpm8vnnJywd1dWSOEfrFz+YI" crossorigin="anonymous">
@@ -103,25 +103,25 @@
       <div id="wrap">
         <div id="header-nav">
   <nav id="main-nav" aria-label="Primary navigation">
-        <a class="main-nav-link-wrap" href="/XS-Blog/">
+        <a class="main-nav-link-wrap" href="../../../../index.html">
             <div class="main-nav-icon icon rotate">
                 &#xe62b;
             </div>
           <span class="main-nav-link">首页</span>
         </a>
-        <a class="main-nav-link-wrap" href="/XS-Blog/archives">
+        <a class="main-nav-link-wrap" href="../../../../archives">
             <div class="main-nav-icon icon rotate">
                 &#xe62b;
             </div>
           <span class="main-nav-link">归档</span>
         </a>
-        <a class="main-nav-link-wrap" href="/XS-Blog/about">
+        <a class="main-nav-link-wrap" href="../../../../about">
             <div class="main-nav-icon icon rotate">
                 &#xe62b;
             </div>
           <span class="main-nav-link">关于</span>
         </a>
-        <a class="main-nav-link-wrap" href="/XS-Blog/friend">
+        <a class="main-nav-link-wrap" href="../../../../friend">
             <div class="main-nav-icon icon rotate">
                 &#xe62b;
             </div>
@@ -130,7 +130,7 @@
     <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
   </nav>
   <nav id="sub-nav" aria-label="Secondary navigation">
-      <a id="nav-rss-link" class="nav-icon" href="/XS-Blog/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-rss-link" class="nav-icon" href="../../../../atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
       <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
   </nav>
 </div>
@@ -289,7 +289,7 @@
 <p>对整个对象类型进行替换，这个实质是把对应的值赋给原有对象的值，并没有新创建出一个地址，所以他们的地址没有变化，这时候就不会触发监听</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div class=&quot;person&quot;&gt;</span><br><span class="line">    &lt;h2&gt;姓名：&#123;&#123; person.name &#125;&#125;&lt;/h2&gt;</span><br><span class="line">    &lt;h2&gt;年龄：&#123;&#123; person.age &#125;&#125;&lt;/h2&gt;</span><br><span class="line">    &lt;button @click=&quot;changeName&quot;&gt;修改名字&lt;/button&gt;</span><br><span class="line">    &lt;button @click=&quot;changeAge&quot;&gt;修改年龄&lt;/button&gt;</span><br><span class="line">    &lt;button @click=&quot;changePerson&quot;&gt;修改整个人&lt;/button&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script lang=&quot;ts&quot; setup name=&quot;Person&quot;&gt;</span><br><span class="line">  import &#123;ref,watch&#125; from &#x27;vue&#x27;</span><br><span class="line">  // 数据</span><br><span class="line">  let person = ref(&#123;</span><br><span class="line">    name:&#x27;张三&#x27;,</span><br><span class="line">    age:18</span><br><span class="line">  &#125;)</span><br><span class="line">  // 方法</span><br><span class="line">  function changeName()&#123;</span><br><span class="line">    person.value.name += &#x27;~&#x27;</span><br><span class="line">  &#125;</span><br><span class="line">  function changeAge()&#123;</span><br><span class="line">    person.value.age += 1</span><br><span class="line">  &#125;</span><br><span class="line">  function changePerson()&#123;</span><br><span class="line">    person.value = &#123;name:&#x27;李四&#x27;,age:90&#125;</span><br><span class="line">  &#125;</span><br><span class="line">  watch(person,(newValue,oldValue)=&gt;&#123;</span><br><span class="line">    console.log(&#x27;person变化了&#x27;,newValue,oldValue)</span><br><span class="line">  &#125;)</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
 <p>我们发现，直接把对象放进去watch进行监听，它是无法监听内部属性的变化的，它只能监听整个对象有没有被重新赋值，也就是它的地址有没有改变。</p>
-<p><img src="/img/watch.gif" alt="watch" /></p>
+<p><img src="/XS-Blog/img/watch.gif" alt="watch" /></p>
 <h3 id="3监听对象属性"><a class="markdownIt-Anchor" href="#3监听对象属性"></a> 3，监听对象属性</h3>
 <p>在实际的开发中，我们更多的是监听对象里的属性变化。此时需要手动开启深度监听，也就是设置deep: true。</p>
 <p>​      在Vue3中，它同样是设置deep:true，区别就在于它是在watch的第三个参数里设置，第三个参数是一个对象，用来设置watch的一些配置项，比如{deep: true}。</p>
@@ -307,7 +307,7 @@
 <h3 id="2监听reactive"><a class="markdownIt-Anchor" href="#2监听reactive"></a> 2，监听reactive</h3>
 <p>其实监听reactive跟ref是一样的，也是把对象传进去watch里进行监听，不过它比ref更加方便，直接就可以监听到里面的属性变化，不需要设置deep:true。准确来说是Vue3强行设置深度监听，哪怕你设置deep:false也是没用的。</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div class=&quot;person&quot;&gt;</span><br><span class="line">    &lt;h2&gt;姓名：&#123;&#123; person.name &#125;&#125;&lt;/h2&gt;</span><br><span class="line">    &lt;h2&gt;年龄：&#123;&#123; person.age &#125;&#125;&lt;/h2&gt;</span><br><span class="line">    &lt;button @click=&quot;changeName&quot;&gt;修改名字&lt;/button&gt;</span><br><span class="line">    &lt;button @click=&quot;changeAge&quot;&gt;修改年龄&lt;/button&gt;</span><br><span class="line">    &lt;button @click=&quot;changePerson&quot;&gt;修改整个人&lt;/button&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script lang=&quot;ts&quot; setup name=&quot;Person&quot;&gt;</span><br><span class="line">  import &#123;reactive,watch&#125; from &#x27;vue&#x27;</span><br><span class="line">  // 数据</span><br><span class="line">  let person = reactive(&#123;</span><br><span class="line">    name:&#x27;张三&#x27;,</span><br><span class="line">    age:18</span><br><span class="line">  &#125;)</span><br><span class="line">  // 方法</span><br><span class="line">  function changeName()&#123;</span><br><span class="line">    person.name += &#x27;~&#x27;</span><br><span class="line">  &#125;</span><br><span class="line">  function changeAge()&#123;</span><br><span class="line">    person.age += 1</span><br><span class="line">  &#125;</span><br><span class="line">  function changePerson()&#123;</span><br><span class="line">    Object.assign(person,&#123;name:&#x27;李四&#x27;,age:80&#125;)</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  watch(person,(newValue,oldValue)=&gt;&#123;</span><br><span class="line">    console.log(&#x27;person变化了&#x27;,newValue,oldValue)</span><br><span class="line">  &#125;)</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
-<p><img src="/img/reactive.gif" alt="reactive" /></p>
+<p><img src="/XS-Blog/img/reactive.gif" alt="reactive" /></p>
 <blockquote>
 <p>注意：示例中修改整个人(整个对象)，它实际上是使用了Object.assign()方法，这个方法实际上并没有改变对象地址，它只不过是批量改变对象的各个属性而已。</p>
 </blockquote>
@@ -371,7 +371,7 @@
       </div>
     </a>
 </div>
-        <a class="article-category-link" href="/XS-Blog/categories/%E5%AD%A6%E4%B9%A0/" title="学习" data-aos="zoom-in">学习</a>
+        <a class="article-category-link" href="../../../../categories/%E5%AD%A6%E4%B9%A0/" title="学习" data-aos="zoom-in">学习</a>
 
       
     </footer>
@@ -386,7 +386,7 @@
         </h3>
       </div>
     <div class="article-nav-link-wrap right">
-          <img data-src="/covers/bg4.webp" data-sizes="auto" alt="Typescript" class="lazyload">
+          <img data-src="/covers/bg3.webp" data-sizes="auto" alt="Typescript" class="lazyload">
       <a href="/XS-Blog/2026/04/17/Typescript/" aria-label="后一篇: Typescript"  title="后一篇: Typescript"></a>
       <div class="article-nav-caption">后一篇</div>
       <h3 class="article-nav-title">
@@ -532,11 +532,11 @@
 
 
 
-<script src="/XS-Blog/js/script.js"></script>
+<script src="../../../../js/script.js"></script>
 
 
   
-<script src="/XS-Blog/js/aos.js"></script>
+<script src="../../../../js/aos.js"></script>
 
   <script>
     var aosInit = () => {
@@ -555,11 +555,11 @@
   </script>
 
 
-<script src="/XS-Blog/js/pjax_script.js" data-pjax></script>
+<script src="../../../../js/pjax_script.js" data-pjax></script>
 
 
   
-<script src="/XS-Blog/js/generator_search.js" defer></script>
+<script src="../../../../js/generator_search.js" defer></script>
 
 
 
@@ -578,7 +578,7 @@
 <script src="https://npm.webcache.cn/theme-shokax-pjax@0.0.3/dist/index.umd.js" integrity="sha384-xneY1WY8hOfUzswrE4CrYq35N4BdVcxqxwHPr9zawE&#x2F;jMSCxD+jAPU55x&#x2F;jj3wlf" crossorigin="anonymous"></script>
 
   
-<script src="/XS-Blog/js/pjax.js"></script>
+<script src="../../../../js/pjax.js"></script>
 
 
 
@@ -607,15 +607,15 @@
           description: "",
           stripContent: " Vue属性方式  一，computed计算属性  I，computed概述 ​    计算属性是 Vue 实例的一个选项，可以用来定义一个属性，该属性的值是经过计算后的结果。它的特点是： ​    1、依赖于其他的响应式属性 ​    2、会进行缓存，只有在依赖发生变化时，才会重新计算 ​    3、计算属性可以定义为一个函数，也可以定义为一个对象，包含 getter 和 setter  II，computed的使用 这里使用拼接姓名作为例子，输入姓和名，最终拼接成完整的姓名，实例如下 123",
           date: "Fri Apr 17 2026 00:15:43 GMT+0800",
-          updated: "Fri Apr 17 2026 00:36:08 GMT+0800",
+          updated: "Fri Apr 17 2026 01:42:07 GMT+0800",
           cover: "/XS-Blog/images/banner.webp",
         };
       </script>
         
-<script src="/XS-Blog/js/insert_highlight.js" data-pjax></script>
+<script src="../../../../js/insert_highlight.js" data-pjax></script>
 
       
-<script src="/XS-Blog/js/tabs.js" data-pjax defer></script>
+<script src="../../../../js/tabs.js" data-pjax defer></script>
 
       <script type="module" data-pjax>
         (async () => {
