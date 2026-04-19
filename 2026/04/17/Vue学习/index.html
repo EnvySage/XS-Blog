@@ -252,15 +252,15 @@
 <p>在有node.js的环境下，才可以使用npm指令</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm create vue@latest</span><br></pre></td></tr></table></figure>
 <p>进行基于vite的vue项目启动</p>
-<p><img src="../images/img/1.png" alt="1"></p>
+<p><img src="../images/img/1.png" alt="1" /></p>
 <h2 id="ioptionsapi选项式配置项"><a class="markdownIt-Anchor" href="#ioptionsapi选项式配置项"></a> I，OptionsAPI选项式配置项</h2>
 <p><code>Options</code>类型的 <code>API</code>，数据、方法、计算属性等，是分散在：<code>data</code>、<code>methods</code>、<code>computed</code>中的，若想新增或者修改一个需求，就需要分别修改：<code>data</code>、<code>methods</code>、<code>computed</code>，不便于维护和复用。</p>
-<p><img src="../images/img/OptionAPI.gif" alt="OptionAPI">  <img src="../images/img/OptionAPI2.gif" alt="OptionAPI2"></p>
+<p><img src="../images/img/OptionAPI.gif" alt="OptionAPI" />  <img src="../images/img/OptionAPI2.gif" alt="OptionAPI2" /></p>
 <h2 id="iicompositionapi组合式配置项"><a class="markdownIt-Anchor" href="#iicompositionapi组合式配置项"></a> II，CompositionAPI组合式配置项</h2>
 <p>可以用函数的方式，更加优雅的组织代码，让相关功能的代码更加有序的组织在一起。</p>
 <p>​    所谓组合式，其实就是将相同功能的代码组合在一起，不像选项式那样拆散，如果想加功能或者维护，只需要在对应的功能函数体内添加即可。</p>
-<img src="../images/img/CompositionAPI.gif" alt="CompositionAPI" style="zoom:80%;">  
-<img src="../images/img/CompositionAPI2.gif" alt="CompositionAPI2" style="zoom: 80%;">
+<img src="../images/img/CompositionAPI.gif" alt="CompositionAPI" style="zoom:80%;" />  
+<img src="../images/img/CompositionAPI2.gif" alt="CompositionAPI2" style="zoom: 80%;" />
 <h1 id="二setup"><a class="markdownIt-Anchor" href="#二setup"></a> 二，setup</h1>
 <h2 id="isetup概述"><a class="markdownIt-Anchor" href="#isetup概述"></a> I，setup概述</h2>
 <p>etup是Vue3中一个新的配置项，值是一个函数，它是Composition API表演的舞台，组件中所用到的：数据、方法、计算属性、监视…等等，均配置在setup中。</p>
@@ -277,7 +277,7 @@
 <p>这里则只申明变量也会有默认导出的操作，换而言之就是你不在需要自己导出和写setup方法</p>
 <h2 id="iv重复导出报错"><a class="markdownIt-Anchor" href="#iv重复导出报错"></a> IV，重复导出报错</h2>
 <p>前面说到，在setup语法糖中会自动参配return的导出。所以如果在此基础上再加上export default等导出方式就会报错</p>
-<img src="../images/img/export.png" alt="export" style="zoom: 80%;">
+<img src="../images/img/export.png" alt="export" style="zoom: 80%;" />
 <h1 id="三ref响应式对象"><a class="markdownIt-Anchor" href="#三ref响应式对象"></a> 三，ref响应式对象</h1>
 <p>Vue2是把数据放在data里，在data里的数据，全都是响应式数据。而在Vue3是通过ref和reactive来实现响应式，这个ref跟标签的ref是不相同的，在后面会详细讲解标签ref。Vue3的理念是，它并不会把所有数据都设置成响应式，而是你需要哪个数据是响应式，就在哪个数据包裹一下ref()，让它变成响应式。</p>
 <h2 id="iref基本响应式"><a class="markdownIt-Anchor" href="#iref基本响应式"></a> I，ref基本响应式</h2>
@@ -286,7 +286,7 @@
 <h3 id="2ref包裹对象"><a class="markdownIt-Anchor" href="#2ref包裹对象"></a> 2，ref包裹对象</h3>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  <span class="language-xml"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;person&quot;</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">    <span class="tag">&lt;<span class="name">h2</span>&gt;</span>姓名：&#123;&#123;name&#125;&#125;<span class="tag">&lt;/<span class="name">h2</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">    <span class="tag">&lt;<span class="name">h2</span>&gt;</span>年龄：&#123;&#123;age&#125;&#125;<span class="tag">&lt;/<span class="name">h2</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">    <span class="tag">&lt;<span class="name">h2</span>&gt;</span>地址：&#123;&#123;address&#125;&#125;<span class="tag">&lt;/<span class="name">h2</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">    <span class="tag">&lt;<span class="name">button</span> @<span class="attr">click</span>=<span class="string">&quot;changeName&quot;</span>&gt;</span>修改名字<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">    <span class="tag">&lt;<span class="name">button</span> @<span class="attr">click</span>=<span class="string">&quot;changeAge&quot;</span>&gt;</span>修改年龄<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line"><span class="language-xml"><span class="tag">&lt;<span class="name">script</span> <span class="attr">lang</span>=<span class="string">&quot;ts&quot;</span> <span class="attr">setup</span> <span class="attr">name</span>=<span class="string">&quot;Person&quot;</span>&gt;</span><span class="language-javascript"></span></span></span><br><span class="line"><span class="language-javascript"><span class="language-xml">    <span class="keyword">import</span> &#123;ref&#125; <span class="keyword">from</span> <span class="string">&#x27;vue&#x27;</span></span></span></span><br><span class="line"><span class="language-javascript"><span class="language-xml"></span></span></span><br><span class="line"><span class="language-javascript"><span class="language-xml">    <span class="keyword">let</span> name = <span class="title function_">ref</span>(<span class="string">&#x27;张三&#x27;</span>)</span></span></span><br><span class="line"><span class="language-javascript"><span class="language-xml">    <span class="keyword">let</span> age = <span class="title function_">ref</span>(<span class="number">18</span>)</span></span></span><br><span class="line"><span class="language-javascript"><span class="language-xml">    <span class="keyword">let</span> tel = <span class="string">&#x27;12345657&#x27;</span></span></span></span><br><span class="line"><span class="language-javascript"><span class="language-xml">    <span class="comment">// 方法</span></span></span></span><br><span class="line"><span class="language-javascript"><span class="language-xml">    <span class="keyword">function</span> <span class="title function_">changeName</span>(<span class="params"></span>) &#123;</span></span></span><br><span class="line"><span class="language-javascript"><span class="language-xml">        name = <span class="string">&#x27;zhang-san&#x27;</span></span></span></span><br><span class="line"><span class="language-javascript"><span class="language-xml">    &#125;</span></span></span><br><span class="line"><span class="language-javascript"><span class="language-xml">    <span class="keyword">function</span> <span class="title function_">changeAge</span>(<span class="params"></span>) &#123;</span></span></span><br><span class="line"><span class="language-javascript"><span class="language-xml">        age += <span class="number">1</span></span></span></span><br><span class="line"><span class="language-javascript"><span class="language-xml">    &#125;</span></span></span><br><span class="line"><span class="language-javascript"><span class="language-xml"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></span><br></pre></td></tr></table></figure>
 <p>这里就是把那么和age包裹成响应式对象</p>
-<p><img src="../images/img/ref.png" alt="ref"></p>
+<p><img src="../images/img/ref.png" alt="ref" /></p>
 <h2 id="iireactive对象类响应式"><a class="markdownIt-Anchor" href="#iireactive对象类响应式"></a> II，reactive对象类响应式</h2>
 <p>ref主要是针对基本类型的响应式，如果是对象类型我们可以使用reactive，用法跟ref一样，也是使用reactive把对象进行包裹。</p>
 <h3 id="1深层次的包裹"><a class="markdownIt-Anchor" href="#1深层次的包裹"></a> 1，深层次的包裹</h3>
@@ -311,7 +311,7 @@
 <p>此时toRefs就可以派上用场了，它的作用就是可以让对象的每一个属性解构出来都变成响应式：</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;script lang=<span class="string">&quot;ts&quot;</span> setup name=<span class="string">&quot;Person&quot;</span>&gt;</span><br><span class="line">  <span class="keyword">let</span> person = <span class="title function_">reactive</span>(&#123;</span><br><span class="line">    <span class="attr">name</span>:<span class="string">&#x27;张三&#x27;</span>,</span><br><span class="line">    <span class="attr">age</span>:<span class="number">18</span></span><br><span class="line">  &#125;)</span><br><span class="line">  <span class="keyword">let</span> &#123;name,age&#125; = <span class="title function_">toRefs</span>(person)</span><br><span class="line">&lt;/script&gt;  </span><br></pre></td></tr></table></figure>
 <p>​    包裹了toRefs()之后，整个对象里的各个属性值都变成了ref对象，我们可以通过输出toRefs(person)进行观察：</p>
-<p><img src="../images/img/toRefs.png" alt="toRefs"></p>
+<p><img src="../images/img/toRefs.png" alt="toRefs" /></p>
 <h2 id="iitoref"><a class="markdownIt-Anchor" href="#iitoref"></a> II，toRef</h2>
 <p>见名知意，就是toRefs的单数，他会把响应式对象里的其中一项改为响应式数据</p>
 <h1 id="五ref标签"><a class="markdownIt-Anchor" href="#五ref标签"></a> 五，ref标签</h1>
@@ -360,7 +360,7 @@
         </h3>
       </div>
     <div class="article-nav-link-wrap right">
-          <img data-src="https://envysage.github.io/XS-Blog/images/covers/bg3.webp" data-sizes="auto" alt="Vue属性方式" class="lazyload">
+          <img data-src="https://envysage.github.io/XS-Blog/images/covers/bg1.webp" data-sizes="auto" alt="Vue属性方式" class="lazyload">
       <a href="/XS-Blog/2026/04/17/Vue%E5%B1%9E%E6%80%A7%E6%96%B9%E5%BC%8F/" aria-label="后一篇: Vue属性方式"  title="后一篇: Vue属性方式"></a>
       <div class="article-nav-caption">后一篇</div>
       <h3 class="article-nav-title">
