@@ -30,9 +30,9 @@
 <meta property="og:description" content="Vue属性方式  一，computed计算属性  I，computed概述 ​    计算属性是 Vue 实例的一个选项，可以用来定义一个属性，该属性的值是经过计算后的结果。它的特点是： ​    1、依赖于其他的响应式属性 ​    2、会进行缓存，只有在依赖发生变化时，才会重新计算 ​    3、计算属性可以定义为一个函数，也可以定义为一个对象，包含 getter 和 setter  II，">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://envysage.github.io/XS-Blog/2026/04/17/images/img/watch.gif">
-<meta property="og:image" content="https://envysage.github.io/XS-Blog/2026/04/17/images/img/reactive.gif">
+<meta property="og:image" content="https://envysage.github.io/XS-Blog/images/img/reactive.gif">
 <meta property="article:published_time" content="2026-04-16T16:15:43.582Z">
-<meta property="article:modified_time" content="2026-04-19T09:24:04.184Z">
+<meta property="article:modified_time" content="2026-04-19T10:16:16.622Z">
 <meta property="article:author" content="羡笙">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://envysage.github.io/XS-Blog/2026/04/17/images/img/watch.gif">
@@ -307,7 +307,7 @@
 <h3 id="2监听reactive"><a class="markdownIt-Anchor" href="#2监听reactive"></a> 2，监听reactive</h3>
 <p>其实监听reactive跟ref是一样的，也是把对象传进去watch里进行监听，不过它比ref更加方便，直接就可以监听到里面的属性变化，不需要设置deep:true。准确来说是Vue3强行设置深度监听，哪怕你设置deep:false也是没用的。</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div class=&quot;person&quot;&gt;</span><br><span class="line">    &lt;h2&gt;姓名：&#123;&#123; person.name &#125;&#125;&lt;/h2&gt;</span><br><span class="line">    &lt;h2&gt;年龄：&#123;&#123; person.age &#125;&#125;&lt;/h2&gt;</span><br><span class="line">    &lt;button @click=&quot;changeName&quot;&gt;修改名字&lt;/button&gt;</span><br><span class="line">    &lt;button @click=&quot;changeAge&quot;&gt;修改年龄&lt;/button&gt;</span><br><span class="line">    &lt;button @click=&quot;changePerson&quot;&gt;修改整个人&lt;/button&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script lang=&quot;ts&quot; setup name=&quot;Person&quot;&gt;</span><br><span class="line">  import &#123;reactive,watch&#125; from &#x27;vue&#x27;</span><br><span class="line">  // 数据</span><br><span class="line">  let person = reactive(&#123;</span><br><span class="line">    name:&#x27;张三&#x27;,</span><br><span class="line">    age:18</span><br><span class="line">  &#125;)</span><br><span class="line">  // 方法</span><br><span class="line">  function changeName()&#123;</span><br><span class="line">    person.name += &#x27;~&#x27;</span><br><span class="line">  &#125;</span><br><span class="line">  function changeAge()&#123;</span><br><span class="line">    person.age += 1</span><br><span class="line">  &#125;</span><br><span class="line">  function changePerson()&#123;</span><br><span class="line">    Object.assign(person,&#123;name:&#x27;李四&#x27;,age:80&#125;)</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  watch(person,(newValue,oldValue)=&gt;&#123;</span><br><span class="line">    console.log(&#x27;person变化了&#x27;,newValue,oldValue)</span><br><span class="line">  &#125;)</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
-<p><img src="../images/img/reactive.gif" alt="reactive" /></p>
+<p><img src="/XS-Blog/images/img/reactive.gif" alt="reactive" /></p>
 <blockquote>
 <p>注意：示例中修改整个人(整个对象)，它实际上是使用了Object.assign()方法，这个方法实际上并没有改变对象地址，它只不过是批量改变对象的各个属性而已。</p>
 </blockquote>
@@ -378,7 +378,7 @@
   </div>
     <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
       <div class="article-nav-link-wrap left">
-            <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="Vue学习" class="lazyload">
+            <img data-src="https://envysage.github.io/XS-Blog/images/covers/bg1.webp" data-sizes="auto" alt="Vue学习" class="lazyload">
         <a href="/XS-Blog/2026/04/17/Vue%E5%AD%A6%E4%B9%A0/" aria-label="前一篇: Vue学习" title="前一篇: Vue学习"></a>
         <div class="article-nav-caption">前一篇</div>
         <h3 class="article-nav-title">
@@ -386,7 +386,7 @@
         </h3>
       </div>
     <div class="article-nav-link-wrap right">
-          <img data-src="https://envysage.github.io/XS-Blog/images/covers/bg1.webp" data-sizes="auto" alt="Typescript" class="lazyload">
+          <img data-src="https://envysage.github.io/XS-Blog/images/covers/bg5.webp" data-sizes="auto" alt="Typescript" class="lazyload">
       <a href="/XS-Blog/2026/04/17/Typescript/" aria-label="后一篇: Typescript"  title="后一篇: Typescript"></a>
       <div class="article-nav-caption">后一篇</div>
       <h3 class="article-nav-title">
@@ -597,7 +597,7 @@
           description: "",
           stripContent: " Vue属性方式  一，computed计算属性  I，computed概述 ​    计算属性是 Vue 实例的一个选项，可以用来定义一个属性，该属性的值是经过计算后的结果。它的特点是： ​    1、依赖于其他的响应式属性 ​    2、会进行缓存，只有在依赖发生变化时，才会重新计算 ​    3、计算属性可以定义为一个函数，也可以定义为一个对象，包含 getter 和 setter  II，computed的使用 这里使用拼接姓名作为例子，输入姓和名，最终拼接成完整的姓名，实例如下 123",
           date: "Fri Apr 17 2026 00:15:43 GMT+0800",
-          updated: "Sun Apr 19 2026 17:24:04 GMT+0800",
+          updated: "Sun Apr 19 2026 18:16:16 GMT+0800",
           cover: "/XS-Blog/images/banner.webp",
         };
       </script>
