@@ -1,0 +1,762 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+    <script async src="https://hm.baidu.com/hm.js?true"></script>
+  <script data-pjax>
+    var _hmt = _hmt || [];
+    _hmt.push(["_trackPageview", location.pathname]);
+  </script>
+
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_a0oqhord1y';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://envysage.github.io/XS-Blog';</script>
+  <title>
+    LangChain 学习笔记：从入门到 RAG 应用 | 羡笙の窝
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_a0oqhord1y.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="../../../../css/loader.css">
+
+    <meta name="description" content="LangChain Agent 学习笔记  学习日期：2026年4月23日 使用模型：通义千问 (Qwen3-Max)    一、Agent 基础概念 Agent（智能体）是 LangChain 中的核心组件，能够让 LLM 自主决策并调用工具完成任务，而不仅仅是生成文本。  1.1 Agent vs 普通 LLM    特性 普通 LLM Agent     工具调用 ❌ ✅   自主决策 ❌">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LangChain 学习笔记：从入门到 RAG 应用">
+<meta property="og:url" content="https://envysage.github.io/XS-Blog/2026/04/23/LangChain_Agent%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="羡笙の窝">
+<meta property="og:description" content="LangChain Agent 学习笔记  学习日期：2026年4月23日 使用模型：通义千问 (Qwen3-Max)    一、Agent 基础概念 Agent（智能体）是 LangChain 中的核心组件，能够让 LLM 自主决策并调用工具完成任务，而不仅仅是生成文本。  1.1 Agent vs 普通 LLM    特性 普通 LLM Agent     工具调用 ❌ ✅   自主决策 ❌">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-04-22T16:12:44.252Z">
+<meta property="article:modified_time" content="2026-04-22T16:13:10.636Z">
+<meta property="article:author" content="羡笙">
+<meta name="twitter:card" content="summary">
+    <link rel="alternate" href="../../../../atom.xml" title="羡笙の窝" type="application/atom+xml">
+    <link rel="shortcut icon" href="../../../../images/favicon.ico">
+  
+<link rel="stylesheet" href="../../../../css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+      <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/katex@0.16.24/dist/katex.min.css" integrity="sha384-tTgKLjMYmJr94v8qu2PE5MUGSMbyN2xiH266JUB3gpm8vnnJywd1dWSOEfrFz+YI" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+    <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/aplayer@1.10.1/dist/APlayer.min.css" integrity="sha384-tLMkTWh2pfXNWGFlUS0w1TFtRG5xZ9lPWFOooj+vDDLIL+xBGQU/voDBY5XE2lVh" crossorigin="anonymous">
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="../../../../index.html">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="../../../../archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="../../../../about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="../../../../friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="../../../../atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/XS-Blog/images/banner.webp" alt="LangChain 学习笔记：从入门到 RAG 应用">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">LangChain 学习笔记：从入门到 RAG 应用</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content" class="sidebar-left"  >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+      <div id="aplayer" theme="var(--color-link)" data-aos="fade-up"></div>
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#langchain-agent-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0"><span class="toc-text"> LangChain Agent 学习笔记</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80-agent-%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5"><span class="toc-text"> 一、Agent 基础概念</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#11-agent-vs-%E6%99%AE%E9%80%9A-llm"><span class="toc-text"> 1.1 Agent vs 普通 LLM</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C-agent-%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8"><span class="toc-text"> 二、Agent 快速入门</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#21-%E5%9F%BA%E7%A1%80%E5%88%9B%E5%BB%BA"><span class="toc-text"> 2.1 基础创建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#22-%E5%93%8D%E5%BA%94%E8%A7%A3%E6%9E%90"><span class="toc-text"> 2.2 响应解析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#23-%E6%B5%81%E5%BC%8F%E8%BE%93%E5%87%BA"><span class="toc-text"> 2.3 流式输出</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89-react-%E6%A1%86%E6%9E%B6"><span class="toc-text"> 三、ReAct 框架</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#31-%E4%BB%80%E4%B9%88%E6%98%AF-react"><span class="toc-text"> 3.1 什么是 ReAct</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#32-react-%E6%A1%88%E4%BE%8B%E8%AE%A1%E7%AE%97-bmi"><span class="toc-text"> 3.2 ReAct 案例：计算 BMI</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#33-react-%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B"><span class="toc-text"> 3.3 ReAct 执行流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#34-%E7%9B%91%E6%8E%A7%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8"><span class="toc-text"> 3.4 监控工具调用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B-%E4%B8%AD%E9%97%B4%E4%BB%B6-middleware"><span class="toc-text"> 四、中间件 (Middleware)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#41-%E4%B8%AD%E9%97%B4%E4%BB%B6%E7%B1%BB%E5%9E%8B"><span class="toc-text"> 4.1 中间件类型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#42-%E4%B8%AD%E9%97%B4%E4%BB%B6%E7%A4%BA%E4%BE%8B"><span class="toc-text"> 4.2 中间件示例</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94-%E5%B7%A5%E5%85%B7%E5%AE%9A%E4%B9%89%E8%A7%84%E8%8C%83"><span class="toc-text"> 五、工具定义规范</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#51-%E5%9F%BA%E7%A1%80%E5%B7%A5%E5%85%B7"><span class="toc-text"> 5.1 基础工具</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#52-%E5%B8%A6%E5%8F%82%E6%95%B0%E7%9A%84%E5%B7%A5%E5%85%B7"><span class="toc-text"> 5.2 带参数的工具</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#53-%E5%B7%A5%E5%85%B7%E6%8F%8F%E8%BF%B0%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7"><span class="toc-text"> 5.3 工具描述的重要性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD-%E5%AE%9E%E6%88%98%E6%A1%88%E4%BE%8B"><span class="toc-text"> 六、实战案例</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#61-%E5%A4%A9%E6%B0%94%E6%9F%A5%E8%AF%A2-agent"><span class="toc-text"> 6.1 天气查询 Agent</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#62-%E5%A4%9A%E5%B7%A5%E5%85%B7%E5%8D%8F%E4%BD%9C-agent"><span class="toc-text"> 6.2 多工具协作 Agent</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83-%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93"><span class="toc-text"> 七、学习总结</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#71-%E6%A0%B8%E5%BF%83%E8%A6%81%E7%82%B9"><span class="toc-text"> 7.1 核心要点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#72-%E4%B8%8E-langchain-%E5%9F%BA%E7%A1%80%E5%AF%B9%E6%AF%94"><span class="toc-text"> 7.2 与 LangChain 基础对比</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AB-%E5%90%8E%E7%BB%AD%E5%AD%A6%E4%B9%A0%E6%96%B9%E5%90%91"><span class="toc-text"> 八、后续学习方向</span></a></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/XS-Blog/avatar/avatar.webp" data-sizes="auto" alt="羡笙" class="lazyload">
+  <div class="sidebar-author-name">羡笙</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">8</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/EnvySage itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-LangChain_Agent学习笔记" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-04-22T16:12:44.252Z" itemprop="datePublished">2026-04-23</time>
+    <time style="display: none;" id="post-update-time">2026-04-23</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="langchain-agent-学习笔记"><a class="markdownIt-Anchor" href="#langchain-agent-学习笔记"></a> LangChain Agent 学习笔记</h1>
+<blockquote>
+<p>学习日期：2026年4月23日<br />
+使用模型：通义千问 (Qwen3-Max)</p>
+</blockquote>
+<hr />
+<h2 id="一-agent-基础概念"><a class="markdownIt-Anchor" href="#一-agent-基础概念"></a> 一、Agent 基础概念</h2>
+<p>Agent（智能体）是 LangChain 中的核心组件，能够让 LLM 自主决策并调用工具完成任务，而不仅仅是生成文本。</p>
+<h3 id="11-agent-vs-普通-llm"><a class="markdownIt-Anchor" href="#11-agent-vs-普通-llm"></a> 1.1 Agent vs 普通 LLM</h3>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>普通 LLM</th>
+<th>Agent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>工具调用</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>自主决策</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>多步骤推理</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>环境交互</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="二-agent-快速入门"><a class="markdownIt-Anchor" href="#二-agent-快速入门"></a> 二、Agent 快速入门</h2>
+<h3 id="21-基础创建"><a class="markdownIt-Anchor" href="#21-基础创建"></a> 2.1 基础创建</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> langchain.agents <span class="keyword">import</span> create_agent</span><br><span class="line"><span class="keyword">from</span> langchain_community.chat_models.tongyi <span class="keyword">import</span> ChatTongyi</span><br><span class="line"><span class="keyword">from</span> langchain_core.tools <span class="keyword">import</span> tool</span><br><span class="line"></span><br><span class="line"><span class="comment"># 定义工具函数</span></span><br><span class="line"><span class="meta">@tool(<span class="params">description=<span class="string">&quot;获取天气&quot;</span></span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">get_weather</span>() -&gt; <span class="built_in">str</span>:</span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;晴天&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建 Agent</span></span><br><span class="line">agent = create_agent(</span><br><span class="line">    model=ChatTongyi(model=<span class="string">&quot;qwen3-max&quot;</span>),</span><br><span class="line">    tools=[get_weather],</span><br><span class="line">    system_prompt=<span class="string">&quot;你是一个有用的助手，可以帮助用户解决各种问题。&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 调用 Agent</span></span><br><span class="line">res = agent.invoke(&#123;</span><br><span class="line">    <span class="string">&quot;messages&quot;</span>: [</span><br><span class="line">        &#123;<span class="string">&quot;role&quot;</span>: <span class="string">&quot;user&quot;</span>, <span class="string">&quot;content&quot;</span>: <span class="string">&quot;你好，请问今天的天气怎么样？&quot;</span>&#125;,</span><br><span class="line">    ]</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<h3 id="22-响应解析"><a class="markdownIt-Anchor" href="#22-响应解析"></a> 2.2 响应解析</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> msg <span class="keyword">in</span> res[<span class="string">&quot;messages&quot;</span>]:</span><br><span class="line">    <span class="built_in">print</span>(<span class="built_in">type</span>(msg).__name__, msg.content)</span><br></pre></td></tr></table></figure>
+<p>Agent 返回的是消息数组，包含 <code>HumanMessage</code>、<code>AIMessage</code>、<code>ToolMessage</code> 等类型。</p>
+<h3 id="23-流式输出"><a class="markdownIt-Anchor" href="#23-流式输出"></a> 2.3 流式输出</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> chunk <span class="keyword">in</span> agent.stream(</span><br><span class="line">    &#123;<span class="string">&quot;messages&quot;</span>: [&#123;<span class="string">&quot;role&quot;</span>: <span class="string">&quot;user&quot;</span>, <span class="string">&quot;content&quot;</span>: <span class="string">&quot;问题...&quot;</span>&#125;]&#125;,</span><br><span class="line">    stream_mode=<span class="string">&quot;values&quot;</span></span><br><span class="line">):</span><br><span class="line">    latest_message = chunk[<span class="string">&quot;messages&quot;</span>][-<span class="number">1</span>]</span><br><span class="line">    <span class="keyword">if</span> latest_message.content:</span><br><span class="line">        <span class="built_in">print</span>(latest_message.content)</span><br></pre></td></tr></table></figure>
+<hr />
+<h2 id="三-react-框架"><a class="markdownIt-Anchor" href="#三-react-框架"></a> 三、ReAct 框架</h2>
+<h3 id="31-什么是-react"><a class="markdownIt-Anchor" href="#31-什么是-react"></a> 3.1 什么是 ReAct</h3>
+<p>ReAct = <strong>Re</strong>asoning + <strong>Act</strong>ing</p>
+<p>一种让 Agent 通过「思考 → 行动 → 观察」循环来解决问题的推理框架。</p>
+<h3 id="32-react-案例计算-bmi"><a class="markdownIt-Anchor" href="#32-react-案例计算-bmi"></a> 3.2 ReAct 案例：计算 BMI</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@tool(<span class="params">description=<span class="string">&quot;获取身高&quot;</span></span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">get_height</span>() -&gt; <span class="built_in">str</span>:</span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;169&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@tool(<span class="params">description=<span class="string">&quot;获取体重&quot;</span></span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">get_weight</span>() -&gt; <span class="built_in">str</span>:</span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;80&quot;</span></span><br><span class="line"></span><br><span class="line">agent = create_agent(</span><br><span class="line">    model=ChatTongyi(model=<span class="string">&quot;qwen3-max&quot;</span>),</span><br><span class="line">    tools=[get_height, get_weight],</span><br><span class="line">    system_prompt=<span class="string">&quot;&quot;&quot;你是一个严格准守ReAct框架的智能体，</span></span><br><span class="line"><span class="string">    必须按照[思考-&gt;行动-&gt;观察]步骤来回答用户的问题。</span></span><br><span class="line"><span class="string">    每轮思考仅能使用一个工具&quot;&quot;&quot;</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<h3 id="33-react-执行流程"><a class="markdownIt-Anchor" href="#33-react-执行流程"></a> 3.3 ReAct 执行流程</h3>
+<ol>
+<li><strong>思考 (Thought)</strong>：分析问题，决定下一步行动</li>
+<li><strong>行动 (Action)</strong>：调用工具获取信息</li>
+<li><strong>观察 (Observation)</strong>：分析工具返回结果</li>
+<li>循环直到得到最终答案</li>
+</ol>
+<h3 id="34-监控工具调用"><a class="markdownIt-Anchor" href="#34-监控工具调用"></a> 3.4 监控工具调用</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> chunk <span class="keyword">in</span> agent.stream(&#123;<span class="string">&quot;messages&quot;</span>: [...]&#125;, stream_mode=<span class="string">&quot;values&quot;</span>):</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        <span class="keyword">if</span> latest_message.tool_calls:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">f&quot;工具调用: <span class="subst">&#123;[tc[<span class="string">&#x27;name&#x27;</span>] <span class="keyword">for</span> tc <span class="keyword">in</span> latest_message.tool_calls]&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="keyword">except</span> AttributeError:</span><br><span class="line">        <span class="keyword">pass</span></span><br></pre></td></tr></table></figure>
+<hr />
+<h2 id="四-中间件-middleware"><a class="markdownIt-Anchor" href="#四-中间件-middleware"></a> 四、中间件 (Middleware)</h2>
+<h3 id="41-中间件类型"><a class="markdownIt-Anchor" href="#41-中间件类型"></a> 4.1 中间件类型</h3>
+<table>
+<thead>
+<tr>
+<th>装饰器</th>
+<th>时机</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@before_agent</code></td>
+<td>Agent 执行前</td>
+<td>初始化、日志</td>
+</tr>
+<tr>
+<td><code>@after_agent</code></td>
+<td>Agent 执行后</td>
+<td>资源清理、记录结果</td>
+</tr>
+<tr>
+<td><code>@before_model</code></td>
+<td>模型调用前</td>
+<td>请求预处理</td>
+</tr>
+<tr>
+<td><code>@after_model</code></td>
+<td>模型调用后</td>
+<td>响应后处理</td>
+</tr>
+<tr>
+<td><code>@wrap_model_call</code></td>
+<td>模型调用中</td>
+<td>监控、拦截</td>
+</tr>
+<tr>
+<td><code>@wrap_tool_call</code></td>
+<td>工具执行中</td>
+<td>记录工具参数</td>
+</tr>
+</tbody>
+</table>
+<h3 id="42-中间件示例"><a class="markdownIt-Anchor" href="#42-中间件示例"></a> 4.2 中间件示例</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> langchain.agents <span class="keyword">import</span> create_agent, AgentState</span><br><span class="line"><span class="keyword">from</span> langchain.agents.middleware <span class="keyword">import</span> (</span><br><span class="line">    before_agent, after_agent, </span><br><span class="line">    before_model, after_model,</span><br><span class="line">    wrap_model_call, wrap_tool_call</span><br><span class="line">)</span><br><span class="line"><span class="keyword">from</span> langgraph.runtime <span class="keyword">import</span> Runtime</span><br><span class="line"></span><br><span class="line"><span class="meta">@tool(<span class="params">description=<span class="string">&quot;获取天气,传入城市名称&quot;</span></span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">get_weather</span>(<span class="params">city: <span class="built_in">str</span></span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">    <span class="keyword">return</span> <span class="string">f&quot;<span class="subst">&#123;city&#125;</span>晴天&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Agent 执行前</span></span><br><span class="line"><span class="meta">@before_agent</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">log_before_agent</span>(<span class="params">state: AgentState, runtime: Runtime</span>):</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;[before_agent] agent启动，附带<span class="subst">&#123;<span class="built_in">len</span>(state[<span class="string">&#x27;messages&#x27;</span>])&#125;</span>消息&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Agent 执行后</span></span><br><span class="line"><span class="meta">@after_agent</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">log_after_agent</span>(<span class="params">state: AgentState, runtime: Runtime</span>):</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;[after_agent] agent结束，附带<span class="subst">&#123;<span class="built_in">len</span>(state[<span class="string">&#x27;messages&#x27;</span>])&#125;</span>消息&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 模型调用前</span></span><br><span class="line"><span class="meta">@before_model</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">log_before_model</span>(<span class="params">state: AgentState, runtime: Runtime</span>):</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;[before_model] 模型即将调用&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 模型调用后</span></span><br><span class="line"><span class="meta">@after_model</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">log_after_model</span>(<span class="params">state: AgentState, runtime: Runtime</span>):</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;[after_model] 模型调用结束&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 模型调用中</span></span><br><span class="line"><span class="meta">@wrap_model_call</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">model_call_hook</span>(<span class="params">request, handler</span>):</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;模型调用中...&quot;</span>)</span><br><span class="line">    <span class="keyword">return</span> handler(request)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 工具调用监控</span></span><br><span class="line"><span class="meta">@wrap_tool_call</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">monitor_tool_call</span>(<span class="params">request, handler</span>):</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;工具执行: <span class="subst">&#123;request.tool_call[<span class="string">&#x27;name&#x27;</span>]&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;工具参数: <span class="subst">&#123;request.tool_call[<span class="string">&#x27;args&#x27;</span>]&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="keyword">return</span> handler(request)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 注册中间件</span></span><br><span class="line">agent = create_agent(</span><br><span class="line">    model=ChatTongyi(model=<span class="string">&quot;qwen3-max&quot;</span>),</span><br><span class="line">    tools=[get_weather],</span><br><span class="line">    middleware=[</span><br><span class="line">        log_before_agent, log_after_agent,</span><br><span class="line">        log_before_model, log_after_model,</span><br><span class="line">        model_call_hook, monitor_tool_call</span><br><span class="line">    ],</span><br><span class="line">    system_prompt=<span class="string">&quot;你是一个有用的助手&quot;</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<hr />
+<h2 id="五-工具定义规范"><a class="markdownIt-Anchor" href="#五-工具定义规范"></a> 五、工具定义规范</h2>
+<h3 id="51-基础工具"><a class="markdownIt-Anchor" href="#51-基础工具"></a> 5.1 基础工具</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@tool(<span class="params">description=<span class="string">&quot;工具描述（LLM据此选择工具）&quot;</span></span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">tool_name</span>() -&gt; <span class="built_in">str</span>:</span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;返回值&quot;</span></span><br></pre></td></tr></table></figure>
+<h3 id="52-带参数的工具"><a class="markdownIt-Anchor" href="#52-带参数的工具"></a> 5.2 带参数的工具</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@tool(<span class="params">description=<span class="string">&quot;获取天气,传入城市名称&quot;</span></span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">get_weather</span>(<span class="params">city: <span class="built_in">str</span></span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">    <span class="keyword">return</span> <span class="string">f&quot;<span class="subst">&#123;city&#125;</span>晴天&quot;</span></span><br></pre></td></tr></table></figure>
+<h3 id="53-工具描述的重要性"><a class="markdownIt-Anchor" href="#53-工具描述的重要性"></a> 5.3 工具描述的重要性</h3>
+<p>LLM 根据 <code>description</code> 判断何时调用工具，描述应该：</p>
+<ul>
+<li>清晰说明工具用途</li>
+<li>说明必要的输入参数</li>
+<li>用自然语言描述预期行为</li>
+</ul>
+<hr />
+<h2 id="六-实战案例"><a class="markdownIt-Anchor" href="#六-实战案例"></a> 六、实战案例</h2>
+<h3 id="61-天气查询-agent"><a class="markdownIt-Anchor" href="#61-天气查询-agent"></a> 6.1 天气查询 Agent</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> langchain.agents <span class="keyword">import</span> create_agent</span><br><span class="line"><span class="keyword">from</span> langchain_community.chat_models.tongyi <span class="keyword">import</span> ChatTongyi</span><br><span class="line"><span class="keyword">from</span> langchain_core.tools <span class="keyword">import</span> tool</span><br><span class="line"></span><br><span class="line"><span class="meta">@tool(<span class="params">description=<span class="string">&quot;获取天气,传入城市名称&quot;</span></span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">get_weather</span>(<span class="params">city: <span class="built_in">str</span></span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">    <span class="keyword">return</span> <span class="string">f&quot;<span class="subst">&#123;city&#125;</span>晴天&quot;</span></span><br><span class="line"></span><br><span class="line">agent = create_agent(</span><br><span class="line">    model=ChatTongyi(model=<span class="string">&quot;qwen3-max&quot;</span>),</span><br><span class="line">    tools=[get_weather],</span><br><span class="line">    system_prompt=<span class="string">&quot;你是一个有用的助手&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">res = agent.invoke(&#123;</span><br><span class="line">    <span class="string">&quot;messages&quot;</span>: [</span><br><span class="line">        &#123;<span class="string">&quot;role&quot;</span>: <span class="string">&quot;user&quot;</span>, <span class="string">&quot;content&quot;</span>: <span class="string">&quot;你好，请问深圳今天的天气怎么样？&quot;</span>&#125;,</span><br><span class="line">    ]</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<h3 id="62-多工具协作-agent"><a class="markdownIt-Anchor" href="#62-多工具协作-agent"></a> 6.2 多工具协作 Agent</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@tool(<span class="params">description=<span class="string">&quot;获取身高&quot;</span></span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">get_height</span>() -&gt; <span class="built_in">str</span>:</span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;169&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@tool(<span class="params">description=<span class="string">&quot;获取体重&quot;</span></span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">get_weight</span>() -&gt; <span class="built_in">str</span>:</span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;80&quot;</span></span><br><span class="line"></span><br><span class="line">agent = create_agent(</span><br><span class="line">    model=ChatTongyi(model=<span class="string">&quot;qwen3-max&quot;</span>),</span><br><span class="line">    tools=[get_height, get_weight],</span><br><span class="line">    system_prompt=<span class="string">&quot;你是一个严格准守ReAct框架的智能体&quot;</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<hr />
+<h2 id="七-学习总结"><a class="markdownIt-Anchor" href="#七-学习总结"></a> 七、学习总结</h2>
+<h3 id="71-核心要点"><a class="markdownIt-Anchor" href="#71-核心要点"></a> 7.1 核心要点</h3>
+<ul>
+<li><strong>Agent = LLM + 工具</strong>：让模型具备执行能力</li>
+<li><strong>ReAct 框架</strong>：思考-行动-观察的循环推理</li>
+<li><strong>中间件</strong>：监控和干预 Agent 执行流程</li>
+<li><strong>工具描述</strong>：决定 LLM 如何选择和使用工具</li>
+</ul>
+<h3 id="72-与-langchain-基础对比"><a class="markdownIt-Anchor" href="#72-与-langchain-基础对比"></a> 7.2 与 LangChain 基础对比</h3>
+<table>
+<thead>
+<tr>
+<th>概念</th>
+<th>LangChain 基础</th>
+<th>Agent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>调用方式</td>
+<td>链式调用</td>
+<td>自主决策</td>
+</tr>
+<tr>
+<td>工具使用</td>
+<td>手动调用</td>
+<td>自动选择</td>
+</tr>
+<tr>
+<td>状态管理</td>
+<td>手动管理</td>
+<td>自动维护</td>
+</tr>
+<tr>
+<td>多步骤</td>
+<td>预设流程</td>
+<td>动态规划</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="八-后续学习方向"><a class="markdownIt-Anchor" href="#八-后续学习方向"></a> 八、后续学习方向</h2>
+<ol>
+<li><strong>Tool Calling</strong>：深入学习 LLM 原生工具调用机制</li>
+<li><strong>Plan-and-Execute Agent</strong>：规划-执行分离模式</li>
+<li><strong>Self-Ask Agent</strong>：自我提问推理</li>
+<li><strong>Memory Agent</strong>：带记忆的长期任务 Agent</li>
+<li><strong>多 Agent 协作</strong>：多个 Agent 配合完成任务</li>
+</ol>
+<hr />
+<p><em>本文档由个人学习整理，如有问题欢迎交流探讨。</em></p>
+
+    </div>
+    <footer class="article-footer">
+        <blockquote class="article-copyright">
+    <p><strong><span class="icon-user icon"></span>本文作者：</strong>羡笙</p>
+    <p><strong><span class="icon-link icon"></span>本文链接：</strong><a href="https://envysage.github.io/XS-Blog/2026/04/23/LangChain_Agent%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">https://envysage.github.io/XS-Blog/2026/04/23/LangChain_Agent%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</a></p>
+    <p><strong><span class="icon-pencil icon"></span>本文标题：</strong>「LangChain 学习笔记：从入门到 RAG 应用」</p>
+    <p><strong><span class="icon-calendar icon"></span>本文发布时间：</strong>2026-04-23 00:12:44</p>
+    
+    <p><strong><span class="icon-copyright icon"></span>本文版权：</strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener nofollow noreferrer" target="_blank"><span class="icon-creative-commons"></span>BY-NC-SA</a> 许可协议。转载请注明出处！</p>
+    <span class="icon-creative-commons article-copyright-bg"></span>
+  </blockquote>
+        <div class="share-wrapper">
+    <a href="https://connect.qq.com/widget/shareqq/index.html?url=https%3A%2F%2Fenvysage.github.io%2FXS-Blog%2F2026%2F04%2F23%2FLangChain_Agent%25E5%25AD%25A6%25E4%25B9%25A0%25E7%25AC%2594%25E8%25AE%25B0%2F&amp;title=LangChain%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%9A%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%20RAG%20%E5%BA%94%E7%94%A8&amp;desc=LangChain%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%9A%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%20RAG%20%E5%BA%94%E7%94%A8&amp;source=https%3A%2F%2Fenvysage.github.io%2FXS-Blog" target="_blank" rel="noopener noreferrer" title="LangChain 学习笔记：从入门到 RAG 应用">
+      <div class="share-icon icon icon-qq">
+      </div>
+    </a>
+</div>
+        <a class="article-category-link" href="../../../../categories/%E5%AD%A6%E4%B9%A0/" title="学习" data-aos="zoom-in">学习</a>
+
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+    <div class="article-nav-link-wrap right">
+          <img data-src="https://envysage.github.io/XS-Blog/images/covers/bg5.webp" data-sizes="auto" alt="LangChain 学习笔记：从入门到 RAG 应用" class="lazyload">
+      <a href="/XS-Blog/2026/04/22/LangChain%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" aria-label="后一篇: LangChain 学习笔记：从入门到 RAG 应用"  title="后一篇: LangChain 学习笔记：从入门到 RAG 应用"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          LangChain 学习笔记：从入门到 RAG 应用
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2026
+        <span class="footer-info-sep rotate"></span>
+      羡笙
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        17.2k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        01:17
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#langchain-agent-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0"><span class="toc-text"> LangChain Agent 学习笔记</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80-agent-%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5"><span class="toc-text"> 一、Agent 基础概念</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#11-agent-vs-%E6%99%AE%E9%80%9A-llm"><span class="toc-text"> 1.1 Agent vs 普通 LLM</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C-agent-%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8"><span class="toc-text"> 二、Agent 快速入门</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#21-%E5%9F%BA%E7%A1%80%E5%88%9B%E5%BB%BA"><span class="toc-text"> 2.1 基础创建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#22-%E5%93%8D%E5%BA%94%E8%A7%A3%E6%9E%90"><span class="toc-text"> 2.2 响应解析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#23-%E6%B5%81%E5%BC%8F%E8%BE%93%E5%87%BA"><span class="toc-text"> 2.3 流式输出</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89-react-%E6%A1%86%E6%9E%B6"><span class="toc-text"> 三、ReAct 框架</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#31-%E4%BB%80%E4%B9%88%E6%98%AF-react"><span class="toc-text"> 3.1 什么是 ReAct</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#32-react-%E6%A1%88%E4%BE%8B%E8%AE%A1%E7%AE%97-bmi"><span class="toc-text"> 3.2 ReAct 案例：计算 BMI</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#33-react-%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B"><span class="toc-text"> 3.3 ReAct 执行流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#34-%E7%9B%91%E6%8E%A7%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8"><span class="toc-text"> 3.4 监控工具调用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B-%E4%B8%AD%E9%97%B4%E4%BB%B6-middleware"><span class="toc-text"> 四、中间件 (Middleware)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#41-%E4%B8%AD%E9%97%B4%E4%BB%B6%E7%B1%BB%E5%9E%8B"><span class="toc-text"> 4.1 中间件类型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#42-%E4%B8%AD%E9%97%B4%E4%BB%B6%E7%A4%BA%E4%BE%8B"><span class="toc-text"> 4.2 中间件示例</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94-%E5%B7%A5%E5%85%B7%E5%AE%9A%E4%B9%89%E8%A7%84%E8%8C%83"><span class="toc-text"> 五、工具定义规范</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#51-%E5%9F%BA%E7%A1%80%E5%B7%A5%E5%85%B7"><span class="toc-text"> 5.1 基础工具</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#52-%E5%B8%A6%E5%8F%82%E6%95%B0%E7%9A%84%E5%B7%A5%E5%85%B7"><span class="toc-text"> 5.2 带参数的工具</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#53-%E5%B7%A5%E5%85%B7%E6%8F%8F%E8%BF%B0%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7"><span class="toc-text"> 5.3 工具描述的重要性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD-%E5%AE%9E%E6%88%98%E6%A1%88%E4%BE%8B"><span class="toc-text"> 六、实战案例</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#61-%E5%A4%A9%E6%B0%94%E6%9F%A5%E8%AF%A2-agent"><span class="toc-text"> 6.1 天气查询 Agent</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#62-%E5%A4%9A%E5%B7%A5%E5%85%B7%E5%8D%8F%E4%BD%9C-agent"><span class="toc-text"> 6.2 多工具协作 Agent</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83-%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93"><span class="toc-text"> 七、学习总结</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#71-%E6%A0%B8%E5%BF%83%E8%A6%81%E7%82%B9"><span class="toc-text"> 7.1 核心要点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#72-%E4%B8%8E-langchain-%E5%9F%BA%E7%A1%80%E5%AF%B9%E6%AF%94"><span class="toc-text"> 7.2 与 LangChain 基础对比</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AB-%E5%90%8E%E7%BB%AD%E5%AD%A6%E4%B9%A0%E6%96%B9%E5%90%91"><span class="toc-text"> 八、后续学习方向</span></a></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/XS-Blog/avatar/avatar.webp" data-sizes="auto" alt="羡笙" class="lazyload">
+  <div class="sidebar-author-name">羡笙</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">8</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/EnvySage itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/XS-Blog/images/reimu.png" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="../../../../js/script.js"></script>
+
+
+  
+<script src="../../../../js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="../../../../js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="../../../../js/generator_search.js" defer></script>
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+  
+<script src="https://npm.webcache.cn/theme-shokax-pjax@0.0.3/dist/index.umd.js" integrity="sha384-xneY1WY8hOfUzswrE4CrYq35N4BdVcxqxwHPr9zawE&#x2F;jMSCxD+jAPU55x&#x2F;jj3wlf" crossorigin="anonymous"></script>
+
+  
+<script src="../../../../js/pjax.js"></script>
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "羡笙",
+          title: "LangChain 学习笔记：从入门到 RAG 应用",
+          url: "https://envysage.github.io/XS-Blog/2026/04/23/LangChain_Agent%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/",
+          excerpt: "",
+          description: "",
+          stripContent: " LangChain Agent 学习笔记  学习日期：2026年4月23日 使用模型：通义千问 (Qwen3-Max)    一、Agent 基础概念 Agent（智能体）是 LangChain 中的核心组件，能够让 LLM 自主决策并调用工具完成任务，而不仅仅是生成文本。  1.1 Agent vs 普通 LLM    特性 普通 LLM Agent     工具调用 ❌ ✅   自主决策 ❌ ✅   多步骤推理 ❌ ✅   环境交互 ❌ ✅      二、Agent 快速入门  2.1 基",
+          date: "Thu Apr 23 2026 00:12:44 GMT+0800",
+          updated: "Thu Apr 23 2026 00:13:10 GMT+0800",
+          cover: "/XS-Blog/images/banner.webp",
+        };
+      </script>
+        
+<script src="../../../../js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="../../../../js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+    <script>
+    var setupAPlayer = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        if (window.matchMedia('(max-width: 959px)').matches) {
+          const aplayer = _$('#aplayer');
+          if (aplayer) {
+            const aside = aplayer.parentNode?.parentNode;
+            if (aside?.tagName === 'ASIDE') {
+              aplayer.removeAttribute('data-aos');
+              aplayer.parentNode.removeChild(aplayer);
+              document.body.appendChild(aplayer);
+            }
+          }
+        }
+        new APlayer({
+          theme: "var(--color-link)",
+          container: document.getElementById('aplayer'),
+          audio: [{"name":"忆夏思乡","artist":"MoreanP","url":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/music/MoreanP%20-%20%E5%BF%86%E5%A4%8F%E6%80%9D%E4%B9%A1.mp3","cover":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/cover/MoreanP%20-%20%E5%BF%86%E5%A4%8F%E6%80%9D%E4%B9%A1.jpeg"},{"name":"かくれんぼ","artist":"AliA","url":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/music/AliA%20-%20%E3%81%8B%E3%81%8F%E3%82%8C%E3%82%93%E3%81%BC.mp3","cover":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/cover/AliA%20-%20%E3%81%8B%E3%81%8F%E3%82%8C%E3%82%93%E3%81%BC.jpeg","lrc":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/lyric/%E3%81%8B%E3%81%8F%E3%82%8C%E3%82%93%E3%81%BC%20-%20AliA.lrc"}] || [],
+          fixed: isMobile ? true : (false || false),
+          autoplay: false || false,
+          loop: 'all' || 'all',
+          order: 'list' || 'list',
+          preload: 'auto' || 'auto',
+          volume: 0.4 || 0.7,
+          mutex: true || true,
+          listFolded: false || false,
+          lrcType: 0 || 0,
+        });
+      }
+    }
+    </script>
+  
+<script src="https://npm.webcache.cn/aplayer@1.10.1/dist/APlayer.min.js" integrity="sha384-gdGYZwHnfJM54evoZhpO0s6ZF5BQiybkiyW7VXr+h5UfruuRL&#x2F;aORyw+5+HZoU6e" crossorigin="anonymous" defer onload="setupAPlayer()"></script>
+
+
+
+  </body>
+  </html>
