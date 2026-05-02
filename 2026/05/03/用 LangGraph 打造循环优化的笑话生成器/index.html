@@ -1,0 +1,660 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+    <script async src="https://hm.baidu.com/hm.js?true"></script>
+  <script data-pjax>
+    var _hmt = _hmt || [];
+    _hmt.push(["_trackPageview", location.pathname]);
+  </script>
+
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_a0oqhord1y';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://envysage.github.io/XS-Blog';window.REIMU_CONFIG.relative = '/XS-Blog/';</script>
+  <title>
+    用 LangGraph 打造循环优化的笑话生成器 | 羡笙の窝
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_a0oqhord1y.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/XS-Blog/css/loader.css">
+
+    <meta name="description" content="用 LangGraph 打造循环优化的笑话生成器  学习日期：2026年5月2日 使用模型：通义千问 (Qwen3-Max) 参考资料：LangGraph 官方文档  最近在学习 LangGraph，写了一个有趣的小项目——让大模型不断生成笑话，直到满意为止。这背后用到了 LangGraph 的条件循环机制，非常适合&quot;生成→评估→不满意就重来&quot;的场景。 本文就来梳理一下其中的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="用 LangGraph 打造循环优化的笑话生成器">
+<meta property="og:url" content="https://envysage.github.io/XS-Blog/2026/05/03/%E7%94%A8%20LangGraph%20%E6%89%93%E9%80%A0%E5%BE%AA%E7%8E%AF%E4%BC%98%E5%8C%96%E7%9A%84%E7%AC%91%E8%AF%9D%E7%94%9F%E6%88%90%E5%99%A8/index.html">
+<meta property="og:site_name" content="羡笙の窝">
+<meta property="og:description" content="用 LangGraph 打造循环优化的笑话生成器  学习日期：2026年5月2日 使用模型：通义千问 (Qwen3-Max) 参考资料：LangGraph 官方文档  最近在学习 LangGraph，写了一个有趣的小项目——让大模型不断生成笑话，直到满意为止。这背后用到了 LangGraph 的条件循环机制，非常适合&quot;生成→评估→不满意就重来&quot;的场景。 本文就来梳理一下其中的">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-05-02T16:49:02.784Z">
+<meta property="article:modified_time" content="2026-05-02T16:51:26.958Z">
+<meta property="article:author" content="羡笙">
+<meta name="twitter:card" content="summary">
+    <link rel="alternate" href="/XS-Blog/atom.xml" title="羡笙の窝" type="application/atom+xml">
+    <link rel="shortcut icon" href="/XS-Blog/images/favicon.ico">
+  
+<link rel="stylesheet" href="/XS-Blog/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+      <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/katex@0.16.24/dist/katex.min.css" integrity="sha384-tTgKLjMYmJr94v8qu2PE5MUGSMbyN2xiH266JUB3gpm8vnnJywd1dWSOEfrFz+YI" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+    <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/aplayer@1.10.1/dist/APlayer.min.css" integrity="sha384-tLMkTWh2pfXNWGFlUS0w1TFtRG5xZ9lPWFOooj+vDDLIL+xBGQU/voDBY5XE2lVh" crossorigin="anonymous">
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/XS-Blog/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/XS-Blog/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/XS-Blog/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/XS-Blog/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/XS-Blog/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/XS-Blog/images/banner.webp" alt="用 LangGraph 打造循环优化的笑话生成器">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">用 LangGraph 打造循环优化的笑话生成器</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content" class="sidebar-left"  >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+      <div id="aplayer" theme="var(--color-link)" data-aos="fade-up"></div>
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%94%A8-langgraph-%E6%89%93%E9%80%A0%E5%BE%AA%E7%8E%AF%E4%BC%98%E5%8C%96%E7%9A%84%E7%AC%91%E8%AF%9D%E7%94%9F%E6%88%90%E5%99%A8"><span class="toc-text"> 用 LangGraph 打造循环优化的笑话生成器</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%88%E7%9C%8B%E6%95%88%E6%9E%9C"><span class="toc-text"> 先看效果</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E4%BB%A3%E7%A0%81%E8%A7%A3%E6%9E%90"><span class="toc-text"> 核心代码解析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E7%8A%B6%E6%80%81%E5%AE%9A%E4%B9%89typeddict"><span class="toc-text"> 1. 状态定义：TypedDict</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E9%93%BE%E5%BC%8F%E8%B0%83%E7%94%A8%E7%AE%A1%E9%81%93%E7%AC%A6"><span class="toc-text"> 2. 链式调用：管道符 |</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E7%BB%93%E6%9E%84%E5%8C%96%E8%BE%93%E5%87%BAwith_structured_output"><span class="toc-text"> 3. 结构化输出：with_structured_output</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E5%9B%BE%E6%9E%84%E5%BB%BAstategraph"><span class="toc-text"> 4. 图构建：StateGraph</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E6%9D%A1%E4%BB%B6%E5%BE%AA%E7%8E%AFadd_conditional_edges"><span class="toc-text"> 5. 条件循环：add_conditional_edges</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%8C%E6%95%B4%E4%BB%A3%E7%A0%81"><span class="toc-text"> 完整代码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%90%E8%A1%8C%E6%96%B9%E5%BC%8F"><span class="toc-text"> 运行方式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B0%8F%E7%BB%93"><span class="toc-text"> 小结</span></a></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/XS-Blog/avatar/avatar.webp" data-sizes="auto" alt="羡笙" class="lazyload">
+  <div class="sidebar-author-name">羡笙</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">11</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">2</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/EnvySage itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-用 LangGraph 打造循环优化的笑话生成器" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-05-02T16:49:02.784Z" itemprop="datePublished">2026-05-03</time>
+    <time style="display: none;" id="post-update-time">2026-05-03</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="用-langgraph-打造循环优化的笑话生成器"><a class="markdownIt-Anchor" href="#用-langgraph-打造循环优化的笑话生成器"></a> 用 LangGraph 打造循环优化的笑话生成器</h1>
+<blockquote>
+<p>学习日期：2026年5月2日<br />
+使用模型：通义千问 (Qwen3-Max)<br />
+参考资料：LangGraph 官方文档</p>
+</blockquote>
+<p>最近在学习 LangGraph，写了一个有趣的小项目——让大模型不断生成笑话，直到满意为止。这背后用到了 LangGraph 的<strong>条件循环</strong>机制，非常适合&quot;生成→评估→不满意就重来&quot;的场景。</p>
+<p>本文就来梳理一下其中的核心知识点。</p>
+<hr />
+<h2 id="先看效果"><a class="markdownIt-Anchor" href="#先看效果"></a> 先看效果</h2>
+<p>用户输入一个主题（比如&quot;程序员&quot;），系统会不断生成笑话，直到评估分数达到 3 分以上才会输出结果。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">用户: &quot;程序员&quot;</span><br><span class="line">  ↓</span><br><span class="line">生成笑话 → 评估分数 → [分数 &lt; 3] → 返回生成器优化</span><br><span class="line">                ↓</span><br><span class="line">          [分数 &gt;= 3] → 输出结果</span><br></pre></td></tr></table></figure>
+<hr />
+<h2 id="核心代码解析"><a class="markdownIt-Anchor" href="#核心代码解析"></a> 核心代码解析</h2>
+<h3 id="1-状态定义typeddict"><a class="markdownIt-Anchor" href="#1-状态定义typeddict"></a> 1. 状态定义：TypedDict</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> typing <span class="keyword">import</span> TypedDict</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">State</span>(<span class="title class_ inherited__">TypedDict</span>):</span><br><span class="line">    joke: <span class="built_in">str</span></span><br><span class="line">    topic: <span class="built_in">str</span></span><br><span class="line">    feedback: <span class="built_in">str</span></span><br><span class="line">    funny_level: <span class="built_in">int</span></span><br></pre></td></tr></table></figure>
+<p>LangGraph 中的状态（State）就像一个共享的黑板，所有节点都可以读写。<code>TypedDict</code> 声明了每个字段的类型，让代码更清晰。</p>
+<p><strong>关键点</strong>：节点函数返回字典时，<strong>只会更新对应字段</strong>，其他字段保持不变。比如返回 <code>{&quot;joke&quot;: &quot;xxx&quot;}</code> 就只更新笑话内容，不会影响 <code>feedback</code> 和 <code>funny_level</code>。</p>
+<hr />
+<h3 id="2-链式调用管道符"><a class="markdownIt-Anchor" href="#2-链式调用管道符"></a> 2. 链式调用：管道符 <code>|</code></h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> langchain_core.output_parsers <span class="keyword">import</span> StrOutputParser</span><br><span class="line"></span><br><span class="line">chain = llm | StrOutputParser()</span><br><span class="line">res = chain.invoke(prompt)</span><br></pre></td></tr></table></figure>
+<p><code>|</code> 是 LangChain 的语法糖，将多个组件串联起来：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">prompt → llm.invoke() → AIMessage → StrOutputParser() → 纯文本</span><br></pre></td></tr></table></figure>
+<p><code>StrOutputParser()</code> 的作用是提取 <code>AIMessage.content</code>，把对象转成普通字符串。</p>
+<hr />
+<h3 id="3-结构化输出with_structured_output"><a class="markdownIt-Anchor" href="#3-结构化输出with_structured_output"></a> 3. 结构化输出：with_structured_output</h3>
+<p>有时候我们希望 LLM 返回特定格式的数据，而不是自由文本。这时候可以用 Pydantic 模型配合 <code>with_structured_output</code>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pydantic <span class="keyword">import</span> BaseModel, Field</span><br><span class="line"><span class="keyword">from</span> typing <span class="keyword">import</span> <span class="type">Literal</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">FeedBack</span>(<span class="title class_ inherited__">BaseModel</span>):</span><br><span class="line">    grade: <span class="type">Literal</span>[<span class="string">&quot;1&quot;</span>,<span class="string">&quot;2&quot;</span>,<span class="string">&quot;3&quot;</span>,<span class="string">&quot;4&quot;</span>,<span class="string">&quot;5&quot;</span>] = Field(</span><br><span class="line">        description=<span class="string">&quot;1-5分，1分最差，3分及格，5分最好&quot;</span></span><br><span class="line">    )</span><br><span class="line">    feedback: <span class="built_in">str</span> = Field(description=<span class="string">&quot;根据评级提供改进反馈&quot;</span>)</span><br><span class="line"></span><br><span class="line">chain = llm.with_structured_output(FeedBack)</span><br><span class="line">res = chain.invoke(<span class="string">&quot;评估此笑话&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(res.grade)      <span class="comment"># &quot;1&quot; ~ &quot;5&quot;</span></span><br><span class="line"><span class="built_in">print</span>(res.feedback)   <span class="comment"># 改进建议</span></span><br></pre></td></tr></table></figure>
+<p><code>Field</code> 中的 <code>description</code> 非常重要，它告诉 LLM 这个字段的含义。写得越详细，LLM 理解得越准确。</p>
+<hr />
+<h3 id="4-图构建stategraph"><a class="markdownIt-Anchor" href="#4-图构建stategraph"></a> 4. 图构建：StateGraph</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> langgraph.graph <span class="keyword">import</span> StateGraph</span><br><span class="line"><span class="keyword">from</span> langgraph.constants <span class="keyword">import</span> START, END</span><br><span class="line"></span><br><span class="line">builder = StateGraph(State)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 注册节点</span></span><br><span class="line">builder.add_node(<span class="string">&#x27;generator&#x27;</span>, generator_func)</span><br><span class="line">builder.add_node(<span class="string">&#x27;evaluator&#x27;</span>, evaluator_func)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 定义流向</span></span><br><span class="line">builder.add_edge(START, <span class="string">&#x27;generator&#x27;</span>)</span><br><span class="line">builder.add_edge(<span class="string">&#x27;generator&#x27;</span>, <span class="string">&#x27;evaluator&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<p>StateGraph 是 LangGraph 的核心，通过三个方法构建整个工作流：</p>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>add_node(name, func)</code></td>
+<td>添加节点，name 是唯一标识</td>
+</tr>
+<tr>
+<td><code>add_edge(from, to)</code></td>
+<td>固定边，上游完成自动执行下游</td>
+</tr>
+<tr>
+<td><code>add_conditional_edges()</code></td>
+<td>条件边，由函数返回值决定下一步</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="5-条件循环add_conditional_edges"><a class="markdownIt-Anchor" href="#5-条件循环add_conditional_edges"></a> 5. 条件循环：add_conditional_edges</h3>
+<p>这是实现&quot;不满意就重试&quot;的关键：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">route_func</span>(<span class="params">state: State</span>):</span><br><span class="line">    <span class="keyword">if</span> state[<span class="string">&#x27;funny_level&#x27;</span>] &gt;= <span class="string">&quot;3&quot;</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&#x27;Accepted&#x27;</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&#x27;Rejected + Feedback&#x27;</span></span><br><span class="line"></span><br><span class="line">builder.add_conditional_edges(</span><br><span class="line">    <span class="string">&#x27;evaluator&#x27;</span>,          <span class="comment"># 源节点</span></span><br><span class="line">    route_func,           <span class="comment"># 路由函数</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="string">&#x27;Accepted&#x27;</span>: END,                      <span class="comment"># 结束</span></span><br><span class="line">        <span class="string">&#x27;Rejected + Feedback&#x27;</span>: <span class="string">&#x27;generator&#x27;</span>   <span class="comment"># 回到生成器</span></span><br><span class="line">    &#125;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">graph = builder.<span class="built_in">compile</span>()</span><br></pre></td></tr></table></figure>
+<p>流程图如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">┌──────────┐</span><br><span class="line">│  START   │</span><br><span class="line">└────┬─────┘</span><br><span class="line">     ▼</span><br><span class="line">┌──────────┐      ┌───────────┐</span><br><span class="line">│ generator │─────▶│ evaluator │</span><br><span class="line">└──────────┘      └─────┬─────┘</span><br><span class="line">     ▲                   │</span><br><span class="line">     │                   ▼</span><br><span class="line">     │            ┌──────────┐</span><br><span class="line">     │            │   路由    │</span><br><span class="line">     │            └────┬─────┘</span><br><span class="line">     │       &lt;3 分     │     &gt;= 3 分</span><br><span class="line">     └────────────────┘         │</span><br><span class="line">                         ┌─────┴─────┐</span><br><span class="line">                         │    END    │</span><br><span class="line">                         └───────────┘</span><br></pre></td></tr></table></figure>
+<p>路由函数的返回值必须是字符串，且必须是 mapping 中的 key。</p>
+<hr />
+<h2 id="完整代码"><a class="markdownIt-Anchor" href="#完整代码"></a> 完整代码</h2>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> typing <span class="keyword">import</span> TypedDict, <span class="type">Literal</span></span><br><span class="line"><span class="keyword">from</span> langchain_core.output_parsers <span class="keyword">import</span> StrOutputParser</span><br><span class="line"><span class="keyword">from</span> langgraph.constants <span class="keyword">import</span> START, END</span><br><span class="line"><span class="keyword">from</span> langgraph.graph <span class="keyword">import</span> StateGraph</span><br><span class="line"><span class="keyword">from</span> pydantic <span class="keyword">import</span> BaseModel, Field</span><br><span class="line"><span class="keyword">from</span> agent.my_llm <span class="keyword">import</span> llm</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">State</span>(<span class="title class_ inherited__">TypedDict</span>):</span><br><span class="line">    joke: <span class="built_in">str</span></span><br><span class="line">    topic: <span class="built_in">str</span></span><br><span class="line">    feedback: <span class="built_in">str</span></span><br><span class="line">    funny_level: <span class="built_in">int</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">generator_func</span>(<span class="params">state: State</span>):</span><br><span class="line">    prompt = (</span><br><span class="line">        <span class="string">f&quot;根据反馈改进笑话：<span class="subst">&#123;state[<span class="string">&#x27;feedback&#x27;</span>]&#125;</span>\n主题：<span class="subst">&#123;state[<span class="string">&#x27;topic&#x27;</span>]&#125;</span>&quot;</span></span><br><span class="line">        <span class="keyword">if</span> state.get(<span class="string">&#x27;feedback&#x27;</span>, <span class="literal">None</span>)</span><br><span class="line">        <span class="keyword">else</span> <span class="string">f&quot;生成一个关于<span class="subst">&#123;state[<span class="string">&#x27;topic&#x27;</span>]&#125;</span>的笑话&quot;</span></span><br><span class="line">    )</span><br><span class="line">    chain = llm | StrOutputParser()</span><br><span class="line">    <span class="keyword">return</span> &#123;<span class="string">&quot;joke&quot;</span>: chain.invoke(prompt)&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">FeedBack</span>(<span class="title class_ inherited__">BaseModel</span>):</span><br><span class="line">    grade: <span class="type">Literal</span>[<span class="string">&quot;1&quot;</span>,<span class="string">&quot;2&quot;</span>,<span class="string">&quot;3&quot;</span>,<span class="string">&quot;4&quot;</span>,<span class="string">&quot;5&quot;</span>]</span><br><span class="line">    feedback: <span class="built_in">str</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">evaluator_func</span>(<span class="params">state: State</span>):</span><br><span class="line">    chain = llm.with_structured_output(FeedBack)</span><br><span class="line">    res = chain.invoke(<span class="string">f&quot;评估此笑话：<span class="subst">&#123;state[<span class="string">&#x27;joke&#x27;</span>]&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="keyword">return</span> &#123;<span class="string">&quot;feedback&quot;</span>: res.feedback, <span class="string">&quot;funny_level&quot;</span>: res.grade&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">route_func</span>(<span class="params">state: State</span>):</span><br><span class="line">    <span class="keyword">return</span> <span class="string">&#x27;Accepted&#x27;</span> <span class="keyword">if</span> state[<span class="string">&#x27;funny_level&#x27;</span>] &gt;= <span class="string">&quot;3&quot;</span> <span class="keyword">else</span> <span class="string">&#x27;Rejected + Feedback&#x27;</span></span><br><span class="line"></span><br><span class="line">builder = StateGraph(State)</span><br><span class="line">builder.add_node(<span class="string">&#x27;generator&#x27;</span>, generator_func)</span><br><span class="line">builder.add_node(<span class="string">&#x27;evaluator&#x27;</span>, evaluator_func)</span><br><span class="line">builder.add_edge(START, <span class="string">&#x27;generator&#x27;</span>)</span><br><span class="line">builder.add_edge(<span class="string">&#x27;generator&#x27;</span>, <span class="string">&#x27;evaluator&#x27;</span>)</span><br><span class="line">builder.add_conditional_edges(</span><br><span class="line">    <span class="string">&#x27;evaluator&#x27;</span>, route_func,</span><br><span class="line">    &#123;<span class="string">&#x27;Accepted&#x27;</span>: END, <span class="string">&#x27;Rejected + Feedback&#x27;</span>: <span class="string">&#x27;generator&#x27;</span>&#125;</span><br><span class="line">)</span><br><span class="line">graph = builder.<span class="built_in">compile</span>()</span><br></pre></td></tr></table></figure>
+<hr />
+<h2 id="运行方式"><a class="markdownIt-Anchor" href="#运行方式"></a> 运行方式</h2>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pip install -e .</span><br><span class="line">langgraph dev</span><br></pre></td></tr></table></figure>
+<hr />
+<h2 id="小结"><a class="markdownIt-Anchor" href="#小结"></a> 小结</h2>
+<p>这篇文章通过一个&quot;笑话生成器&quot;的例子，介绍了 LangGraph 的几个核心概念：</p>
+<ul>
+<li><strong>状态共享</strong>：用 <code>TypedDict</code> 定义全局状态</li>
+<li><strong>链式调用</strong>：用 <code>|</code> 串联 LLM 和输出解析器</li>
+<li><strong>结构化输出</strong>：<code>with_structured_output</code> + Pydantic</li>
+<li><strong>条件循环</strong>：<code>add_conditional_edges</code> 实现&quot;不满意就重来&quot;</li>
+</ul>
+<p>这种模式不只适用于笑话生成，像文案撰写、代码优化、翻译润色等需要迭代改进的场景都可以用。LangGraph 让这类工作流的实现变得非常直观。</p>
+<hr />
+<p>此文章由AI自动总结生成</p>
+
+    </div>
+    <footer class="article-footer">
+        <blockquote class="article-copyright">
+    <p><strong><span class="icon-user icon"></span>本文作者：</strong>羡笙</p>
+    <p><strong><span class="icon-link icon"></span>本文链接：</strong><a href="https://envysage.github.io/XS-Blog/2026/05/03/%E7%94%A8%20LangGraph%20%E6%89%93%E9%80%A0%E5%BE%AA%E7%8E%AF%E4%BC%98%E5%8C%96%E7%9A%84%E7%AC%91%E8%AF%9D%E7%94%9F%E6%88%90%E5%99%A8/">https://envysage.github.io/XS-Blog/2026/05/03/%E7%94%A8%20LangGraph%20%E6%89%93%E9%80%A0%E5%BE%AA%E7%8E%AF%E4%BC%98%E5%8C%96%E7%9A%84%E7%AC%91%E8%AF%9D%E7%94%9F%E6%88%90%E5%99%A8/</a></p>
+    <p><strong><span class="icon-pencil icon"></span>本文标题：</strong>「用 LangGraph 打造循环优化的笑话生成器」</p>
+    <p><strong><span class="icon-calendar icon"></span>本文发布时间：</strong>2026-05-03 00:49:02</p>
+    
+    <p><strong><span class="icon-copyright icon"></span>本文版权：</strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener nofollow noreferrer" target="_blank"><span class="icon-creative-commons"></span>BY-NC-SA</a> 许可协议。转载请注明出处！</p>
+    <span class="icon-creative-commons article-copyright-bg"></span>
+  </blockquote>
+        <div class="share-wrapper">
+    <a href="https://connect.qq.com/widget/shareqq/index.html?url=https%3A%2F%2Fenvysage.github.io%2FXS-Blog%2F2026%2F05%2F03%2F%25E7%2594%25A8%2520LangGraph%2520%25E6%2589%2593%25E9%2580%25A0%25E5%25BE%25AA%25E7%258E%25AF%25E4%25BC%2598%25E5%258C%2596%25E7%259A%2584%25E7%25AC%2591%25E8%25AF%259D%25E7%2594%259F%25E6%2588%2590%25E5%2599%25A8%2F&amp;title=%E7%94%A8%20LangGraph%20%E6%89%93%E9%80%A0%E5%BE%AA%E7%8E%AF%E4%BC%98%E5%8C%96%E7%9A%84%E7%AC%91%E8%AF%9D%E7%94%9F%E6%88%90%E5%99%A8&amp;desc=%E7%94%A8%20LangGraph%20%E6%89%93%E9%80%A0%E5%BE%AA%E7%8E%AF%E4%BC%98%E5%8C%96%E7%9A%84%E7%AC%91%E8%AF%9D%E7%94%9F%E6%88%90%E5%99%A8&amp;source=https%3A%2F%2Fenvysage.github.io%2FXS-Blog" target="_blank" rel="noopener noreferrer" title="用 LangGraph 打造循环优化的笑话生成器">
+      <div class="share-icon icon icon-qq">
+      </div>
+    </a>
+</div>
+        <a class="article-category-link" href="/XS-Blog/categories/AI/" title="AI" data-aos="zoom-in">AI</a>
+
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+    <div class="article-nav-link-wrap right">
+          <img data-src="https://envysage.github.io/XS-Blog/images/covers/bg1.webp" data-sizes="auto" alt="LangGraph 学习笔记：使用通义千问构建 ReAct 智能代理" class="lazyload">
+      <a href="/XS-Blog/2026/05/02/langgraph_study_notes/" aria-label="后一篇: LangGraph 学习笔记：使用通义千问构建 ReAct 智能代理"  title="后一篇: LangGraph 学习笔记：使用通义千问构建 ReAct 智能代理"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          LangGraph 学习笔记：使用通义千问构建 ReAct 智能代理
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2026
+        <span class="footer-info-sep rotate"></span>
+      羡笙
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        19.5k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        01:29
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%94%A8-langgraph-%E6%89%93%E9%80%A0%E5%BE%AA%E7%8E%AF%E4%BC%98%E5%8C%96%E7%9A%84%E7%AC%91%E8%AF%9D%E7%94%9F%E6%88%90%E5%99%A8"><span class="toc-text"> 用 LangGraph 打造循环优化的笑话生成器</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%88%E7%9C%8B%E6%95%88%E6%9E%9C"><span class="toc-text"> 先看效果</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E4%BB%A3%E7%A0%81%E8%A7%A3%E6%9E%90"><span class="toc-text"> 核心代码解析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E7%8A%B6%E6%80%81%E5%AE%9A%E4%B9%89typeddict"><span class="toc-text"> 1. 状态定义：TypedDict</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E9%93%BE%E5%BC%8F%E8%B0%83%E7%94%A8%E7%AE%A1%E9%81%93%E7%AC%A6"><span class="toc-text"> 2. 链式调用：管道符 |</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E7%BB%93%E6%9E%84%E5%8C%96%E8%BE%93%E5%87%BAwith_structured_output"><span class="toc-text"> 3. 结构化输出：with_structured_output</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E5%9B%BE%E6%9E%84%E5%BB%BAstategraph"><span class="toc-text"> 4. 图构建：StateGraph</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E6%9D%A1%E4%BB%B6%E5%BE%AA%E7%8E%AFadd_conditional_edges"><span class="toc-text"> 5. 条件循环：add_conditional_edges</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%8C%E6%95%B4%E4%BB%A3%E7%A0%81"><span class="toc-text"> 完整代码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%90%E8%A1%8C%E6%96%B9%E5%BC%8F"><span class="toc-text"> 运行方式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B0%8F%E7%BB%93"><span class="toc-text"> 小结</span></a></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/XS-Blog/avatar/avatar.webp" data-sizes="auto" alt="羡笙" class="lazyload">
+  <div class="sidebar-author-name">羡笙</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">11</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">2</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/EnvySage itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/XS-Blog/images/reimu.png" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/XS-Blog/js/script.js"></script>
+
+
+  
+<script src="/XS-Blog/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/XS-Blog/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/XS-Blog/js/generator_search.js" defer></script>
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+  
+<script src="https://npm.webcache.cn/theme-shokax-pjax@0.0.3/dist/index.umd.js" integrity="sha384-xneY1WY8hOfUzswrE4CrYq35N4BdVcxqxwHPr9zawE&#x2F;jMSCxD+jAPU55x&#x2F;jj3wlf" crossorigin="anonymous"></script>
+
+  
+<script src="/XS-Blog/js/pjax.js"></script>
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "羡笙",
+          title: "用 LangGraph 打造循环优化的笑话生成器",
+          url: "https://envysage.github.io/XS-Blog/2026/05/03/%E7%94%A8%20LangGraph%20%E6%89%93%E9%80%A0%E5%BE%AA%E7%8E%AF%E4%BC%98%E5%8C%96%E7%9A%84%E7%AC%91%E8%AF%9D%E7%94%9F%E6%88%90%E5%99%A8/",
+          excerpt: "",
+          description: "",
+          stripContent: " 用 LangGraph 打造循环优化的笑话生成器  学习日期：2026年5月2日 使用模型：通义千问 (Qwen3-Max) 参考资料：LangGraph 官方文档  最近在学习 LangGraph，写了一个有趣的小项目——让大模型不断生成笑话，直到满意为止。这背后用到了 LangGraph 的条件循环机制，非常适合&amp;quot;生成→评估→不满意就重来&amp;quot;的场景。 本文就来梳理一下其中的核心知识点。   先看效果 用户输入一个主题（比如&amp;quot;程序员&amp;quot;），系统会不断生成笑",
+          date: "Sun May 03 2026 00:49:02 GMT+0800",
+          updated: "Sun May 03 2026 00:51:26 GMT+0800",
+          cover: "/XS-Blog/images/banner.webp",
+        };
+      </script>
+        
+<script src="/XS-Blog/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/XS-Blog/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+    <script>
+    var setupAPlayer = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        if (window.matchMedia('(max-width: 959px)').matches) {
+          const aplayer = _$('#aplayer');
+          if (aplayer) {
+            const aside = aplayer.parentNode?.parentNode;
+            if (aside?.tagName === 'ASIDE') {
+              aplayer.removeAttribute('data-aos');
+              aplayer.parentNode.removeChild(aplayer);
+              document.body.appendChild(aplayer);
+            }
+          }
+        }
+        new APlayer({
+          theme: "var(--color-link)",
+          container: document.getElementById('aplayer'),
+          audio: [{"name":"忆夏思乡","artist":"MoreanP","url":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/music/MoreanP%20-%20%E5%BF%86%E5%A4%8F%E6%80%9D%E4%B9%A1.mp3","cover":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/cover/MoreanP%20-%20%E5%BF%86%E5%A4%8F%E6%80%9D%E4%B9%A1.jpeg"},{"name":"かくれんぼ","artist":"AliA","url":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/music/AliA%20-%20%E3%81%8B%E3%81%8F%E3%82%8C%E3%82%93%E3%81%BC.mp3","cover":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/cover/AliA%20-%20%E3%81%8B%E3%81%8F%E3%82%8C%E3%82%93%E3%81%BC.jpeg","lrc":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/lyric/%E3%81%8B%E3%81%8F%E3%82%8C%E3%82%93%E3%81%BC%20-%20AliA.lrc"}] || [],
+          fixed: isMobile ? true : (false || false),
+          autoplay: false || false,
+          loop: 'all' || 'all',
+          order: 'list' || 'list',
+          preload: 'auto' || 'auto',
+          volume: 0.4 || 0.7,
+          mutex: true || true,
+          listFolded: false || false,
+          lrcType: 0 || 0,
+        });
+      }
+    }
+    </script>
+  
+<script src="https://npm.webcache.cn/aplayer@1.10.1/dist/APlayer.min.js" integrity="sha384-gdGYZwHnfJM54evoZhpO0s6ZF5BQiybkiyW7VXr+h5UfruuRL&#x2F;aORyw+5+HZoU6e" crossorigin="anonymous" defer onload="setupAPlayer()"></script>
+
+
+
+  </body>
+  </html>
