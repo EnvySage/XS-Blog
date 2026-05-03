@@ -1,0 +1,819 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+    <script async src="https://hm.baidu.com/hm.js?true"></script>
+  <script data-pjax>
+    var _hmt = _hmt || [];
+    _hmt.push(["_trackPageview", location.pathname]);
+  </script>
+
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_a0oqhord1y';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://envysage.github.io/XS-Blog';window.REIMU_CONFIG.relative = '/XS-Blog/';</script>
+  <title>
+    LangGraph 学习笔记：mcp工具调用以及基础人工审查 | 羡笙の窝
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_a0oqhord1y.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/XS-Blog/css/loader.css">
+
+    <meta name="description" content="基于 LangGraph + MCP 构建 12306 车票查询 Agent —— 从基础调用到人工审核拦截  本文记录了如何使用 LangGraph 状态图编排 + MCP（Model Context Protocol） 协议接入外部工具，构建一个具备 Human-in-the-Loop（人工审核） 能力的 12306 车票查询 Agent。我们将从最基础的工具调用开始，逐步演进到带人工审核拦">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LangGraph 学习笔记：mcp工具调用以及基础人工审查">
+<meta property="og:url" content="https://envysage.github.io/XS-Blog/2026/05/04/mcp%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8%E6%A8%A1%E5%9E%8B/index.html">
+<meta property="og:site_name" content="羡笙の窝">
+<meta property="og:description" content="基于 LangGraph + MCP 构建 12306 车票查询 Agent —— 从基础调用到人工审核拦截  本文记录了如何使用 LangGraph 状态图编排 + MCP（Model Context Protocol） 协议接入外部工具，构建一个具备 Human-in-the-Loop（人工审核） 能力的 12306 车票查询 Agent。我们将从最基础的工具调用开始，逐步演进到带人工审核拦">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-05-03T16:47:36.349Z">
+<meta property="article:modified_time" content="2026-05-03T16:48:21.140Z">
+<meta property="article:author" content="羡笙">
+<meta name="twitter:card" content="summary">
+    <link rel="alternate" href="/XS-Blog/atom.xml" title="羡笙の窝" type="application/atom+xml">
+    <link rel="shortcut icon" href="/XS-Blog/images/favicon.ico">
+  
+<link rel="stylesheet" href="/XS-Blog/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+      <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/katex@0.16.24/dist/katex.min.css" integrity="sha384-tTgKLjMYmJr94v8qu2PE5MUGSMbyN2xiH266JUB3gpm8vnnJywd1dWSOEfrFz+YI" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+    <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/aplayer@1.10.1/dist/APlayer.min.css" integrity="sha384-tLMkTWh2pfXNWGFlUS0w1TFtRG5xZ9lPWFOooj+vDDLIL+xBGQU/voDBY5XE2lVh" crossorigin="anonymous">
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/XS-Blog/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/XS-Blog/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/XS-Blog/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/XS-Blog/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/XS-Blog/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/XS-Blog/images/banner.webp" alt="LangGraph 学习笔记：mcp工具调用以及基础人工审查">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">LangGraph 学习笔记：mcp工具调用以及基础人工审查</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content" class="sidebar-left"  >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+      <div id="aplayer" theme="var(--color-link)" data-aos="fade-up"></div>
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8E-langgraph-mcp-%E6%9E%84%E5%BB%BA-12306-%E8%BD%A6%E7%A5%A8%E6%9F%A5%E8%AF%A2-agent-%E4%BB%8E%E5%9F%BA%E7%A1%80%E8%B0%83%E7%94%A8%E5%88%B0%E4%BA%BA%E5%B7%A5%E5%AE%A1%E6%A0%B8%E6%8B%A6%E6%88%AA"><span class="toc-text"> 基于 LangGraph + MCP 构建 12306 车票查询 Agent —— 从基础调用到人工审核拦截</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%AE%E5%BD%95"><span class="toc-text"> 目录</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A1%B9%E7%9B%AE%E8%83%8C%E6%99%AF"><span class="toc-text"> 项目背景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E6%9E%B6%E6%9E%84%E6%A6%82%E8%A7%88"><span class="toc-text"> 核心架构概览</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80-mcp-%E5%B7%A5%E5%85%B7%E5%B1%82-mcp_utilpy"><span class="toc-text"> 一、MCP 工具层 —— mcp_util.py</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#11-mcp-%E5%AE%A2%E6%88%B7%E7%AB%AF%E9%85%8D%E7%BD%AE"><span class="toc-text"> 1.1 MCP 客户端配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#12-%E5%BC%82%E6%AD%A5%E5%B7%A5%E5%85%B7%E8%8A%82%E7%82%B9-basictoolsnode"><span class="toc-text"> 1.2 异步工具节点 BasicToolsNode</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#13-%E5%B9%B6%E5%8F%91%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8"><span class="toc-text"> 1.3 并发工具调用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C-%E5%9F%BA%E7%A1%80%E7%89%88-graphpy%E7%BA%AF%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8"><span class="toc-text"> 二、基础版 —— graph.py（纯工具调用）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#21-%E5%AE%9A%E4%B9%89%E7%8A%B6%E6%80%81%E4%B8%8E%E6%9D%A1%E4%BB%B6%E8%B7%AF%E7%94%B1"><span class="toc-text"> 2.1 定义状态与条件路由</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#22-%E6%9D%A1%E4%BB%B6%E8%B7%AF%E7%94%B1%E5%87%BD%E6%95%B0"><span class="toc-text"> 2.2 条件路由函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#23-%E6%9E%84%E5%BB%BA%E5%9B%BE"><span class="toc-text"> 2.3 构建图</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#24-%E6%89%A7%E8%A1%8C%E6%96%B9%E5%BC%8F"><span class="toc-text"> 2.4 执行方式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89-%E8%BF%9B%E9%98%B6%E7%89%88-graph2py%E4%BA%BA%E5%B7%A5%E5%AE%A1%E6%A0%B8-token-%E7%BB%9F%E8%AE%A1"><span class="toc-text"> 三、进阶版 —— graph2.py（人工审核 + Token 统计）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#31-%E4%BA%BA%E5%B7%A5%E5%AE%A1%E6%A0%B8%E6%9C%BA%E5%88%B6"><span class="toc-text"> 3.1 人工审核机制</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%9F%E7%90%86interrupt-command-checkpointer"><span class="toc-text"> 原理：interrupt + Command + checkpointer</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B7%A5%E5%85%B7%E6%8B%A6%E6%88%AA%E6%B5%81%E7%A8%8B"><span class="toc-text"> 工具拦截流程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%81%A2%E5%A4%8D%E6%89%A7%E8%A1%8C%E7%9A%84%E9%80%BB%E8%BE%91"><span class="toc-text"> 恢复执行的逻辑</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#32-token-%E7%94%A8%E9%87%8F%E7%BB%9F%E8%AE%A1"><span class="toc-text"> 3.2 Token 用量统计</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#33-%E4%BA%A4%E4%BA%92%E5%BC%8F%E4%B8%BB%E5%BE%AA%E7%8E%AF"><span class="toc-text"> 3.3 交互式主循环</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95"><span class="toc-text"> 踩坑记录</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-unboundlocalerror-cannot-access-local-variable-result"><span class="toc-text"> 1. UnboundLocalError: cannot access local variable &#39;result&#39;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%B7%A5%E5%85%B7%E6%8B%A6%E6%88%AA%E6%9C%AA%E8%A7%A6%E5%8F%91-%E5%B7%A5%E5%85%B7%E5%90%8D%E4%B8%8D%E5%8C%B9%E9%85%8D"><span class="toc-text"> 2. 工具拦截未触发 —— 工具名不匹配</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-typeerror-cannot-instantiate-typingunion-command-%E5%AF%BC%E5%85%A5%E9%94%99%E8%AF%AF"><span class="toc-text"> 3. TypeError: Cannot instantiate typing.Union —— Command 导入错误</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E6%8B%92%E7%BB%9D%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8%E5%90%8E-llm-%E8%BF%9B%E5%85%A5%E5%BC%82%E5%B8%B8%E7%8A%B6%E6%80%81"><span class="toc-text"> 4. 拒绝工具调用后 LLM 进入异常状态</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-text"> 总结</span></a></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/XS-Blog/avatar/avatar.webp" data-sizes="auto" alt="羡笙" class="lazyload">
+  <div class="sidebar-author-name">羡笙</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">12</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">3</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/EnvySage itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-mcp工具调用模型" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-05-03T16:47:36.349Z" itemprop="datePublished">2026-05-04</time>
+    <time style="display: none;" id="post-update-time">2026-05-04</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="基于-langgraph-mcp-构建-12306-车票查询-agent-从基础调用到人工审核拦截"><a class="markdownIt-Anchor" href="#基于-langgraph-mcp-构建-12306-车票查询-agent-从基础调用到人工审核拦截"></a> 基于 LangGraph + MCP 构建 12306 车票查询 Agent —— 从基础调用到人工审核拦截</h1>
+<blockquote>
+<p>本文记录了如何使用 <strong>LangGraph</strong> 状态图编排 + <strong>MCP（Model Context Protocol）</strong> 协议接入外部工具，构建一个具备 <strong>Human-in-the-Loop（人工审核）</strong> 能力的 12306 车票查询 Agent。我们将从最基础的工具调用开始，逐步演进到带人工审核拦截的生产级方案。</p>
+</blockquote>
+<hr />
+<h2 id="目录"><a class="markdownIt-Anchor" href="#目录"></a> 目录</h2>
+<ul>
+<li><a href="#%E9%A1%B9%E7%9B%AE%E8%83%8C%E6%99%AF">项目背景</a></li>
+<li><a href="#%E6%A0%B8%E5%BF%83%E6%9E%B6%E6%9E%84%E6%A6%82%E8%A7%88">核心架构概览</a></li>
+<li><a href="#%E4%B8%80mcp-%E5%B7%A5%E5%85%B7%E5%B1%82--mcputilpy">一、MCP 工具层 —— <code>mcp_util.py</code></a></li>
+<li><a href="#%E4%BA%8C%E5%9F%BA%E7%A1%80%E7%89%88--graphpy%E7%BA%AF%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8">二、基础版 —— <code>graph.py</code>（纯工具调用）</a></li>
+<li><a href="#%E4%B8%89%E8%BF%9B%E9%98%B6%E7%89%88--graph2py%E4%BA%BA%E5%B7%A5%E5%AE%A1%E6%A0%B8--token-%E7%BB%9F%E8%AE%A1">三、进阶版 —— <code>graph2.py</code>（人工审核 + Token 统计）</a></li>
+<li><a href="#%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95">踩坑记录</a></li>
+<li><a href="#%E6%80%BB%E7%BB%93">总结</a></li>
+</ul>
+<hr />
+<h2 id="项目背景"><a class="markdownIt-Anchor" href="#项目背景"></a> 项目背景</h2>
+<p>在构建 AI Agent 时，我们经常需要让大模型调用外部工具（如查数据库、调 API）。<strong>MCP（Model Context Protocol）</strong> 是 Anthropic 提出的一种标准化协议，让 LLM 能够以统一的方式接入各种外部工具服务。</p>
+<p>本项目以 <strong>12306 火车票查询</strong> 为场景，演示了：</p>
+<table>
+<thead>
+<tr>
+<th>文件</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mcp_util.py</code></td>
+<td>MCP 客户端配置与异步工具节点</td>
+</tr>
+<tr>
+<td><code>graph.py</code></td>
+<td>基础版：LangGraph 调用 MCP 工具</td>
+</tr>
+<tr>
+<td><code>graph2.py</code></td>
+<td>进阶版：加入人工审核拦截 + Token 消耗统计</td>
+</tr>
+</tbody>
+</table>
+<p>LLM 使用的是阿里云通义千问 <code>qwen3-max</code> 模型。</p>
+<hr />
+<h2 id="核心架构概览"><a class="markdownIt-Anchor" href="#核心架构概览"></a> 核心架构概览</h2>
+<p>整个 Agent 的运行流程可以用一张状态图来描述：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">┌─────────┐         ┌─────────────┐</span><br><span class="line">│  用户输入  │ ──────&gt; │   chatbot    │</span><br><span class="line">└─────────┘         └──────┬──────┘</span><br><span class="line">                           │</span><br><span class="line">                    有 tool_calls？</span><br><span class="line">                   ╱              ╲</span><br><span class="line">                 是                否</span><br><span class="line">                 ╱                  ╲</span><br><span class="line">        ┌───────────────┐       ┌─────┐</span><br><span class="line">        │    tools       │       │ END │</span><br><span class="line">        │ (人工审核拦截)  │       └─────┘</span><br><span class="line">        └───────┬───────┘</span><br><span class="line">                │</span><br><span class="line">                ▼</span><br><span class="line">         ┌─────────────┐</span><br><span class="line">         │   chatbot    │  ← 工具结果返回后继续对话</span><br><span class="line">         └─────────────┘</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>chatbot 节点</strong>：调用 LLM，判断是否需要使用工具</li>
+<li><strong>tools 节点</strong>：执行 MCP 工具，可选地进行人工审核拦截</li>
+<li><strong>条件边</strong>：根据 LLM 返回是否有 <code>tool_calls</code> 决定下一步走向</li>
+</ul>
+<hr />
+<h2 id="一-mcp-工具层-mcp_utilpy"><a class="markdownIt-Anchor" href="#一-mcp-工具层-mcp_utilpy"></a> 一、MCP 工具层 —— <code>mcp_util.py</code></h2>
+<p>这是整个项目的基础设施层，负责 <strong>连接 MCP 工具服务</strong> 和 <strong>异步执行工具调用</strong>。</p>
+<h3 id="11-mcp-客户端配置"><a class="markdownIt-Anchor" href="#11-mcp-客户端配置"></a> 1.1 MCP 客户端配置</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> langchain_mcp_adapters.client <span class="keyword">import</span> MultiServerMCPClient</span><br><span class="line"></span><br><span class="line">mcp_12306_config = &#123;</span><br><span class="line">    <span class="string">&#x27;url&#x27;</span>: <span class="string">&#x27;https://mcp.api-inference.modelscope.net/3d15a0e300934b/sse&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;transport&#x27;</span>: <span class="string">&#x27;sse&#x27;</span>,   <span class="comment"># 使用 Server-Sent Events 传输协议</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">mcp_chat_config = &#123;</span><br><span class="line">    <span class="string">&#x27;url&#x27;</span>: <span class="string">&#x27;https://mcp.api-inference.modelscope.net/503858d8b74f40/sse&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;transport&#x27;</span>: <span class="string">&#x27;sse&#x27;</span>,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 通过 MultiServerMCPClient 统一管理多个 MCP 服务</span></span><br><span class="line">mcp_client = MultiServerMCPClient(&#123;</span><br><span class="line">    <span class="string">&#x27;chart_mcp&#x27;</span>: mcp_chat_config,</span><br><span class="line">    <span class="string">&#x27;12306_mcp&#x27;</span>: mcp_12306_config</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p><strong>说明</strong>：<code>MultiServerMCPClient</code> 支持同时接入多个 MCP 服务端，通过字典的形式注册。每个服务使用 <strong>SSE（Server-Sent Events）</strong> 协议通信，这是一种轻量级的单向实时通信方式，适合 MCP 这种请求-响应场景。</p>
+<p>调用 <code>mcp_client.get_tools()</code> 即可获取所有已注册服务提供的工具列表，返回的工具对象与 LangChain 的 Tool 接口完全兼容，可以直接用 <code>llm.bind_tools(tools)</code> 绑定给大模型。</p>
+<h3 id="12-异步工具节点-basictoolsnode"><a class="markdownIt-Anchor" href="#12-异步工具节点-basictoolsnode"></a> 1.2 异步工具节点 <code>BasicToolsNode</code></h3>
+<p>这是整个项目最核心的类之一，替代了 LangGraph 内置的 <code>ToolNode</code>，提供了更灵活的控制能力：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">BasicToolsNode</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, tools: <span class="built_in">list</span></span>):</span><br><span class="line">        <span class="comment"># 建立工具名 → 工具对象的索引字典，O(1) 查找</span></span><br><span class="line">        <span class="variable language_">self</span>.tools_by_name = &#123;tool.name: tool <span class="keyword">for</span> tool <span class="keyword">in</span> tools&#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">__call__</span>(<span class="params">self, state</span>):</span><br><span class="line">        <span class="comment"># 取出最后一条 AI 消息</span></span><br><span class="line">        message = state[<span class="string">&quot;messages&quot;</span>][-<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line">        <span class="comment"># ⚠️ 人工审核拦截逻辑（进阶版才使用）</span></span><br><span class="line">        <span class="keyword">if</span> message.tool_calls:</span><br><span class="line">            need_interrupt = <span class="built_in">any</span>(</span><br><span class="line">                tool_call[<span class="string">&#x27;name&#x27;</span>] == <span class="string">&#x27;get-tickets&#x27;</span></span><br><span class="line">                <span class="keyword">for</span> tool_call <span class="keyword">in</span> message.tool_calls</span><br><span class="line">            )</span><br><span class="line">            <span class="comment"># ... 拦截处理 ...</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># 并发执行所有工具调用</span></span><br><span class="line">        outputs = <span class="keyword">await</span> <span class="variable language_">self</span>._execute_tools_calls(message.tool_calls)</span><br><span class="line">        <span class="keyword">return</span> &#123;<span class="string">&quot;messages&quot;</span>: outputs&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>为什么不直接用内置的 <code>ToolNode</code>？</strong></p>
+<p>LangGraph 自带的 <code>ToolNode</code> 会无条件执行所有工具调用。但在实际生产中，我们可能需要对某些敏感操作（如查询车票、下单等）进行 <strong>人工审核</strong>。自定义 <code>BasicToolsNode</code> 让我们可以在工具执行前插入任意拦截逻辑。</p>
+<h3 id="13-并发工具调用"><a class="markdownIt-Anchor" href="#13-并发工具调用"></a> 1.3 并发工具调用</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">_execute_tools_calls</span>(<span class="params">self, tool_calls</span>):</span><br><span class="line">    <span class="comment"># 使用 asyncio.gather 并发执行所有工具调用</span></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">await</span> asyncio.gather(*[_invoke_tool(tc) <span class="keyword">for</span> tc <span class="keyword">in</span> tool_calls])</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">_invoke_tool</span>(<span class="params">self, tool_call</span>):</span><br><span class="line">    tool = <span class="variable language_">self</span>.tools_by_name.get(tool_call[<span class="string">&#x27;name&#x27;</span>])</span><br><span class="line">    <span class="comment"># 自动适配同步/异步工具</span></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">hasattr</span>(tool, <span class="string">&#x27;ainvoke&#x27;</span>):</span><br><span class="line">        tool_result = <span class="keyword">await</span> tool.ainvoke(tool_call[<span class="string">&#x27;args&#x27;</span>])</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        loop = asyncio.get_running_loop()</span><br><span class="line">        tool_result = <span class="keyword">await</span> loop.run_in_executor(</span><br><span class="line">            <span class="literal">None</span>, tool.invoke, tool_call[<span class="string">&#x27;args&#x27;</span>]</span><br><span class="line">        )</span><br><span class="line">    <span class="keyword">return</span> ToolMessage(</span><br><span class="line">        content=json.dumps(tool_result, ensure_ascii=<span class="literal">False</span>),</span><br><span class="line">        name=tool_call[<span class="string">&#x27;name&#x27;</span>],</span><br><span class="line">        tool_call_id=tool_call[<span class="string">&#x27;id&#x27;</span>],</span><br><span class="line">    )</span><br></pre></td></tr></table></figure>
+<p><strong>关键设计点</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>设计</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>asyncio.gather</code></td>
+<td>所有工具并发执行，而非串行，显著降低总耗时</td>
+</tr>
+<tr>
+<td>同步/异步自适应</td>
+<td>通过 <code>hasattr</code> 检测 <code>ainvoke</code> 方法，对同步工具用 <code>run_in_executor</code> 包裹，保证不阻塞事件循环</td>
+</tr>
+<tr>
+<td><code>ToolMessage</code> 封装</td>
+<td>每个工具调用结果封装为标准的 <code>ToolMessage</code>，携带 <code>tool_call_id</code> 以便 LLM 关联请求与响应</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="二-基础版-graphpy纯工具调用"><a class="markdownIt-Anchor" href="#二-基础版-graphpy纯工具调用"></a> 二、基础版 —— <code>graph.py</code>（纯工具调用）</h2>
+<p>这是学习阶段的基础实现，展示了 LangGraph 接入 MCP 工具的最小完整流程。</p>
+<h3 id="21-定义状态与条件路由"><a class="markdownIt-Anchor" href="#21-定义状态与条件路由"></a> 2.1 定义状态与条件路由</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> langgraph.graph <span class="keyword">import</span> MessagesState, StateGraph</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">State</span>(<span class="title class_ inherited__">MessagesState</span>):</span><br><span class="line">    <span class="keyword">pass</span></span><br></pre></td></tr></table></figure>
+<p><code>MessagesState</code> 是 LangGraph 内置的状态类，默认包含一个 <code>messages</code> 字段（<code>Annotated[list, add_messages]</code>），自动管理消息的追加。我们继承它并直接使用，无需额外定义字段。</p>
+<h3 id="22-条件路由函数"><a class="markdownIt-Anchor" href="#22-条件路由函数"></a> 2.2 条件路由函数</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">route_tools_func</span>(<span class="params">state: State</span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;判断 AI 最后一条消息是否包含工具调用&quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">isinstance</span>(state, <span class="built_in">list</span>):</span><br><span class="line">        ai_message = state[-<span class="number">1</span>]</span><br><span class="line">    <span class="keyword">elif</span> messages := state.get(<span class="string">&#x27;messages&#x27;</span>, []):</span><br><span class="line">        ai_message = messages[-<span class="number">1</span>]</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">raise</span> ValueError(<span class="string">f&quot;输入的数据未找到message:<span class="subst">&#123;state&#125;</span>&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">hasattr</span>(ai_message, <span class="string">&#x27;tool_calls&#x27;</span>) <span class="keyword">and</span> <span class="built_in">len</span>(ai_message.tool_calls) &gt; <span class="number">0</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&#x27;tools&#x27;</span></span><br><span class="line">    <span class="keyword">return</span> END</span><br></pre></td></tr></table></figure>
+<p>这个函数在 chatbot 节点执行后被调用，决定下一步走向：</p>
+<ul>
+<li>如果 LLM 返回了 <code>tool_calls</code>（即决定调用工具），则路由到 <code>tools</code> 节点</li>
+<li>否则直接结束（<code>END</code>）</li>
+</ul>
+<blockquote>
+<p><strong>LangGraph 也提供了内置的 <code>tools_condition</code> 函数</strong>（<code>from langgraph.prebuilt import tools_condition</code>），功能相同。这里手动实现是为了更清晰地理解路由机制。</p>
+</blockquote>
+<h3 id="23-构建图"><a class="markdownIt-Anchor" href="#23-构建图"></a> 2.3 构建图</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">create_graph</span>():</span><br><span class="line">    tools = <span class="keyword">await</span> mcp_client.get_tools()</span><br><span class="line">    builder = StateGraph(State)</span><br><span class="line">    llm_with_tools = llm.bind_tools(tools)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">chatbot</span>(<span class="params">state: State</span>):</span><br><span class="line">        <span class="keyword">return</span> &#123;<span class="string">&#x27;messages&#x27;</span>: [<span class="keyword">await</span> llm_with_tools.ainvoke(state[<span class="string">&quot;messages&quot;</span>])]&#125;</span><br><span class="line"></span><br><span class="line">    builder.add_node(<span class="string">&#x27;chatbot&#x27;</span>, chatbot)</span><br><span class="line">    builder.add_node(<span class="string">&#x27;tools&#x27;</span>, BasicToolsNode(tools))</span><br><span class="line"></span><br><span class="line">    builder.add_conditional_edges(<span class="string">&quot;chatbot&quot;</span>, route_tools_func,</span><br><span class="line">                                  &#123;<span class="string">&#x27;tools&#x27;</span>: <span class="string">&#x27;tools&#x27;</span>, END: END&#125;)</span><br><span class="line">    builder.add_edge(<span class="string">&#x27;tools&#x27;</span>, <span class="string">&#x27;chatbot&#x27;</span>)</span><br><span class="line">    builder.add_edge(START, <span class="string">&#x27;chatbot&#x27;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> builder.<span class="built_in">compile</span>()</span><br></pre></td></tr></table></figure>
+<p><strong>图的边连接逻辑</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">START → chatbot → (有tool_calls) → tools → chatbot → ...</span><br><span class="line">                  (无tool_calls) → END</span><br></pre></td></tr></table></figure>
+<p><code>tools</code> 执行完毕后回到 <code>chatbot</code>，让 LLM 根据工具结果继续生成回复或发起新的工具调用，形成 <strong>工具调用的循环链</strong>。</p>
+<h3 id="24-执行方式"><a class="markdownIt-Anchor" href="#24-执行方式"></a> 2.4 执行方式</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">agent = asyncio.run(create_graph())</span><br></pre></td></tr></table></figure>
+<p>基础版在模块加载时即创建图实例，适合简单的单次调用或调试场景。</p>
+<hr />
+<h2 id="三-进阶版-graph2py人工审核-token-统计"><a class="markdownIt-Anchor" href="#三-进阶版-graph2py人工审核-token-统计"></a> 三、进阶版 —— <code>graph2.py</code>（人工审核 + Token 统计）</h2>
+<p>进阶版在基础版之上增加了两个重要能力：</p>
+<ol>
+<li><strong>Human-in-the-Loop</strong>：对敏感工具调用进行人工审核拦截</li>
+<li><strong>Token 用量统计</strong>：实时追踪每次 LLM 调用的 Token 消耗</li>
+</ol>
+<h3 id="31-人工审核机制"><a class="markdownIt-Anchor" href="#31-人工审核机制"></a> 3.1 人工审核机制</h3>
+<h4 id="原理interrupt-command-checkpointer"><a class="markdownIt-Anchor" href="#原理interrupt-command-checkpointer"></a> 原理：<code>interrupt</code> + <code>Command</code> + <code>checkpointer</code></h4>
+<p>LangGraph 提供了 <code>interrupt()</code> 函数，它可以让图的执行在任意节点中 <strong>暂停</strong>，等待外部输入后恢复。这是实现 Human-in-the-Loop 的核心机制。</p>
+<p>要使用 <code>interrupt</code>，必须同时配置 <code>checkpointer</code>（检查点），因为暂停时需要保存当前状态，恢复时需要从检查点加载。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> langgraph.checkpoint.memory <span class="keyword">import</span> MemorySaver</span><br><span class="line"><span class="keyword">from</span> langgraph.types <span class="keyword">import</span> interrupt, Command</span><br><span class="line"></span><br><span class="line"><span class="comment"># 在 create_graph 中配置检查点</span></span><br><span class="line">memory = MemorySaver()</span><br><span class="line">graph = builder.<span class="built_in">compile</span>(checkpointer=memory)</span><br></pre></td></tr></table></figure>
+<h4 id="工具拦截流程"><a class="markdownIt-Anchor" href="#工具拦截流程"></a> 工具拦截流程</h4>
+<p>在 <code>BasicToolsNode.__call__</code> 中：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> message.tool_calls:</span><br><span class="line">    <span class="comment"># 遍历所有 tool_calls，检查是否包含需要审核的工具</span></span><br><span class="line">    need_interrupt = <span class="built_in">any</span>(</span><br><span class="line">        tool_call[<span class="string">&#x27;name&#x27;</span>] == <span class="string">&#x27;get-tickets&#x27;</span></span><br><span class="line">        <span class="keyword">for</span> tool_call <span class="keyword">in</span> message.tool_calls</span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> need_interrupt:</span><br><span class="line">    <span class="comment"># 图执行在此暂停，等待用户输入</span></span><br><span class="line">    response = interrupt(</span><br><span class="line">        <span class="string">f&quot;AI尝试调用get-tickets工具\n&quot;</span></span><br><span class="line">        <span class="string">&quot;请审核并确认(y)是否允许调用该工具&quot;</span></span><br><span class="line">    )</span><br><span class="line">    <span class="comment"># 用户确认后，图从此处恢复执行</span></span><br><span class="line">    <span class="keyword">if</span> response[<span class="string">&quot;answer&quot;</span>] == <span class="string">&quot;y&quot;</span>:</span><br><span class="line">        <span class="keyword">pass</span>  <span class="comment"># 继续执行工具调用</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="comment"># 用户拒绝，返回一个 ToolMessage 告知 LLM 工具被拒绝</span></span><br><span class="line">        <span class="keyword">return</span> &#123;<span class="string">&quot;messages&quot;</span>: [ToolMessage(</span><br><span class="line">            content=<span class="string">f&quot;拒绝调用工具,给出的理由或者答案是<span class="subst">&#123;response[<span class="string">&#x27;answer&#x27;</span>]&#125;</span>&quot;</span>,</span><br><span class="line">            name=<span class="string">&#x27;get_tickets&#x27;</span>,</span><br><span class="line">            tool_call_id=<span class="built_in">next</span>(</span><br><span class="line">                (tc[<span class="string">&#x27;id&#x27;</span>] <span class="keyword">for</span> tc <span class="keyword">in</span> message.tool_calls</span><br><span class="line">                 <span class="keyword">if</span> tc[<span class="string">&#x27;name&#x27;</span>] == <span class="string">&#x27;get-tickets&#x27;</span>), <span class="literal">None</span></span><br><span class="line">            )</span><br><span class="line">        )]&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>流程图</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">tools 节点检测到 get-tickets</span><br><span class="line">         │</span><br><span class="line">         ▼</span><br><span class="line">    interrupt() 暂停图执行</span><br><span class="line">         │</span><br><span class="line">         ▼</span><br><span class="line">    图状态保存到 checkpointer</span><br><span class="line">         │</span><br><span class="line">         ▼</span><br><span class="line">    返回中断信息给用户</span><br><span class="line">         │</span><br><span class="line">    ┌────┴────┐</span><br><span class="line">    │         │</span><br><span class="line">   &quot;y&quot;     其他输入</span><br><span class="line">    │         │</span><br><span class="line">    ▼         ▼</span><br><span class="line"> 继续执行   返回 ToolMessage</span><br><span class="line"> 工具调用   (告知 LLM 被拒绝)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><strong>注意</strong>：当用户拒绝时，必须返回一个 <code>ToolMessage</code>，并且其 <code>tool_call_id</code> 必须与被拒绝的工具调用 ID 匹配。否则 LLM 会因为收不到对应工具的响应而进入错误状态。</p>
+</blockquote>
+<h4 id="恢复执行的逻辑"><a class="markdownIt-Anchor" href="#恢复执行的逻辑"></a> 恢复执行的逻辑</h4>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">execute_graph</span>(<span class="params">user_input: <span class="built_in">str</span></span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">    result = <span class="string">&#x27;&#x27;</span></span><br><span class="line">    current_state = graph.get_state(config)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> current_state.<span class="built_in">next</span>:</span><br><span class="line">        <span class="comment"># 图在中断状态，使用 Command 恢复执行</span></span><br><span class="line">        human_command = Command(resume=&#123;<span class="string">&#x27;answer&#x27;</span>: user_input&#125;)</span><br><span class="line">        <span class="keyword">async</span> <span class="keyword">for</span> chunk <span class="keyword">in</span> graph.astream(human_command, config, stream_mode=<span class="string">&#x27;values&#x27;</span>):</span><br><span class="line">            result = print_message(chunk, result)</span><br><span class="line">        <span class="keyword">return</span> result</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="comment"># 图在空闲状态，发起新的对话</span></span><br><span class="line">        <span class="keyword">async</span> <span class="keyword">for</span> chunk <span class="keyword">in</span> graph.astream(</span><br><span class="line">            &#123;<span class="string">&#x27;messages&#x27;</span>: (<span class="string">&#x27;user&#x27;</span>, user_input)&#125;, config, stream_mode=<span class="string">&#x27;values&#x27;</span></span><br><span class="line">        ):</span><br><span class="line">            result = print_message(chunk, result)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 检查执行后是否又被中断</span></span><br><span class="line">    current_state = graph.get_state(config)</span><br><span class="line">    <span class="keyword">if</span> current_state.<span class="built_in">next</span>:</span><br><span class="line">        result = current_state.interrupts[<span class="number">0</span>].value</span><br><span class="line">    <span class="keyword">return</span> result</span><br></pre></td></tr></table></figure>
+<p><strong>关键点解析</strong>：</p>
+<ul>
+<li><code>graph.get_state(config)</code> —— 获取当前图的执行状态。<code>current_state.next</code> 不为空说明图被 <code>interrupt</code> 暂停了</li>
+<li><code>Command(resume={'answer': user_input})</code> —— 构造恢复命令，将用户输入作为 <code>resume</code> 值传回 <code>interrupt()</code> 的返回值</li>
+<li><code>stream_mode='values'</code> —— 流式输出，每次返回完整的状态快照（而非增量更新）</li>
+</ul>
+<h3 id="32-token-用量统计"><a class="markdownIt-Anchor" href="#32-token-用量统计"></a> 3.2 Token 用量统计</h3>
+<p>在 <code>chatbot</code> 节点中提取并累计 Token 消耗：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">total_usage = &#123;<span class="string">&quot;prompt_tokens&quot;</span>: <span class="number">0</span>, <span class="string">&quot;completion_tokens&quot;</span>: <span class="number">0</span>, <span class="string">&quot;total_tokens&quot;</span>: <span class="number">0</span>&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">chatbot</span>(<span class="params">state: State</span>):</span><br><span class="line">    response = <span class="keyword">await</span> llm_with_tools.ainvoke(state[<span class="string">&quot;messages&quot;</span>])</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 提取 token 用量（兼容不同 LLM 的返回格式）</span></span><br><span class="line">    usage = <span class="built_in">getattr</span>(response, <span class="string">&quot;response_metadata&quot;</span>, &#123;&#125;).get(<span class="string">&quot;token_usage&quot;</span>, <span class="literal">None</span>)</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> usage:</span><br><span class="line">        usage = <span class="built_in">getattr</span>(response, <span class="string">&quot;usage_metadata&quot;</span>, &#123;&#125;)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> usage:</span><br><span class="line">        total_usage[<span class="string">&quot;prompt_tokens&quot;</span>] += usage.get(<span class="string">&quot;prompt_tokens&quot;</span>, <span class="number">0</span>)</span><br><span class="line">        total_usage[<span class="string">&quot;completion_tokens&quot;</span>] += usage.get(<span class="string">&quot;completion_tokens&quot;</span>, <span class="number">0</span>)</span><br><span class="line">        total_usage[<span class="string">&quot;total_tokens&quot;</span>] += usage.get(<span class="string">&quot;total_tokens&quot;</span>, <span class="number">0</span>)</span><br><span class="line">        <span class="comment"># 实时打印</span></span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;\n本次调用 Token: 输入=<span class="subst">&#123;usage.get(<span class="string">&#x27;prompt_tokens&#x27;</span>, <span class="number">0</span>)&#125;</span>, ...&quot;</span>)</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;累计 Token: 输入=<span class="subst">&#123;total_usage[<span class="string">&#x27;prompt_tokens&#x27;</span>]&#125;</span>, ...\n&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> &#123;<span class="string">&#x27;messages&#x27;</span>: [response]&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>兼容性说明</strong>：</p>
+<p>不同 LLM 提供商对 Token 用量的返回字段不同：</p>
+<table>
+<thead>
+<tr>
+<th>提供商</th>
+<th>Token 用量字段</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OpenAI</td>
+<td><code>response_metadata.token_usage</code></td>
+</tr>
+<tr>
+<td>通义千问</td>
+<td><code>usage_metadata</code></td>
+</tr>
+<tr>
+<td>Anthropic</td>
+<td><code>response_metadata.usage</code></td>
+</tr>
+</tbody>
+</table>
+<p>代码中使用 <code>getattr</code> + 降级查找的策略，先尝试 <code>response_metadata.token_usage</code>，找不到再尝试 <code>usage_metadata</code>，保证最大兼容性。</p>
+<h3 id="33-交互式主循环"><a class="markdownIt-Anchor" href="#33-交互式主循环"></a> 3.3 交互式主循环</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">run_graph</span>():</span><br><span class="line">    graph = <span class="keyword">await</span> create_graph()</span><br><span class="line">    config = &#123;<span class="string">&quot;configurable&quot;</span>: &#123;<span class="string">&quot;thread_id&quot;</span>: <span class="string">&#x27;123&#x27;</span>&#125;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        user_input = <span class="built_in">input</span>(<span class="string">&quot;用户:&quot;</span>)</span><br><span class="line">        <span class="keyword">if</span> user_input == <span class="string">&#x27;exit&#x27;</span>:</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line"></span><br><span class="line">        total_usage = &#123;<span class="string">&quot;prompt_tokens&quot;</span>: <span class="number">0</span>, <span class="string">&quot;completion_tokens&quot;</span>: <span class="number">0</span>, <span class="string">&quot;total_tokens&quot;</span>: <span class="number">0</span>&#125;</span><br><span class="line">        result = <span class="keyword">await</span> execute_graph(user_input)</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;AI:<span class="subst">&#123;result&#125;</span>&quot;</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 打印本轮总消耗</span></span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;\n<span class="subst">&#123;<span class="string">&#x27;=&#x27;</span> * <span class="number">50</span>&#125;</span>&quot;</span>)</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;本轮对话总消耗: <span class="subst">&#123;total_usage[<span class="string">&#x27;total_tokens&#x27;</span>]&#125;</span> tokens&quot;</span>)</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;<span class="subst">&#123;<span class="string">&#x27;=&#x27;</span> * <span class="number">50</span>&#125;</span>\n&quot;</span>)</span><br></pre></td></tr></table></figure>
+<p><code>thread_id</code> 是 LangGraph 检查点的唯一标识，相同 <code>thread_id</code> 的对话会共享记忆。这使得多轮对话中 <code>interrupt</code> 暂停和恢复的上下文得以保持。</p>
+<hr />
+<h2 id="踩坑记录"><a class="markdownIt-Anchor" href="#踩坑记录"></a> 踩坑记录</h2>
+<p>在开发过程中遇到了几个值得记录的问题：</p>
+<h3 id="1-unboundlocalerror-cannot-access-local-variable-result"><a class="markdownIt-Anchor" href="#1-unboundlocalerror-cannot-access-local-variable-result"></a> 1. <code>UnboundLocalError: cannot access local variable 'result'</code></h3>
+<p><strong>原因</strong>：<code>execute_graph</code> 函数中，<code>result</code> 在 <code>if current_state.next</code> 的分支内被赋值，但在 <code>else</code> 分支中未被初始化。当走 <code>else</code> 分支时，后续代码引用 <code>result</code> 会报错。</p>
+<p><strong>解决</strong>：在函数开头初始化 <code>result = ''</code>。</p>
+<h3 id="2-工具拦截未触发-工具名不匹配"><a class="markdownIt-Anchor" href="#2-工具拦截未触发-工具名不匹配"></a> 2. 工具拦截未触发 —— 工具名不匹配</h3>
+<p><strong>原因</strong>：MCP 注册的工具名是 <code>get-tickets</code>（连字符），但代码中硬编码的是 <code>get_tickets</code>（下划线），字符串比较永远为 <code>False</code>。</p>
+<p><strong>解决</strong>：将比较字符串改为 <code>'get-tickets'</code>。更好的做法是配置一个需要审核的工具名列表，而非硬编码。</p>
+<h3 id="3-typeerror-cannot-instantiate-typingunion-command-导入错误"><a class="markdownIt-Anchor" href="#3-typeerror-cannot-instantiate-typingunion-command-导入错误"></a> 3. <code>TypeError: Cannot instantiate typing.Union</code> —— <code>Command</code> 导入错误</h3>
+<p><strong>原因</strong>：<code>Command</code> 被错误地从 <code>langchain_protocol</code> 导入，该包的 <code>Command</code> 类型定义与 LangGraph 不兼容。</p>
+<p><strong>解决</strong>：使用 <code>from langgraph.types import Command</code>，与 <code>interrupt</code> 保持同一导入来源。</p>
+<h3 id="4-拒绝工具调用后-llm-进入异常状态"><a class="markdownIt-Anchor" href="#4-拒绝工具调用后-llm-进入异常状态"></a> 4. 拒绝工具调用后 LLM 进入异常状态</h3>
+<p><strong>原因</strong>：拒绝时返回的 <code>ToolMessage</code> 没有携带正确的 <code>tool_call_id</code>，LLM 无法将响应对应到原始工具调用。</p>
+<p><strong>解决</strong>：通过 <code>next()</code> 找到匹配工具调用的 ID：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">tool_call_id=<span class="built_in">next</span>(</span><br><span class="line">    (tc[<span class="string">&#x27;id&#x27;</span>] <span class="keyword">for</span> tc <span class="keyword">in</span> message.tool_calls</span><br><span class="line">     <span class="keyword">if</span> tc[<span class="string">&#x27;name&#x27;</span>] == <span class="string">&#x27;get-tickets&#x27;</span>), <span class="literal">None</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<hr />
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<table>
+<thead>
+<tr>
+<th>能力</th>
+<th style="text-align:center"><a target="_blank" rel="noopener" href="http://graph.py">graph.py</a></th>
+<th style="text-align:center"><a target="_blank" rel="noopener" href="http://graph2.py">graph2.py</a></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MCP 工具调用</td>
+<td style="text-align:center">✅</td>
+<td style="text-align:center">✅</td>
+</tr>
+<tr>
+<td>异步并发工具执行</td>
+<td style="text-align:center">✅</td>
+<td style="text-align:center">✅</td>
+</tr>
+<tr>
+<td>人工审核拦截</td>
+<td style="text-align:center">❌</td>
+<td style="text-align:center">✅</td>
+</tr>
+<tr>
+<td>对话记忆（checkpointer）</td>
+<td style="text-align:center">❌</td>
+<td style="text-align:center">✅</td>
+</tr>
+<tr>
+<td>Token 用量统计</td>
+<td style="text-align:center">❌</td>
+<td style="text-align:center">✅</td>
+</tr>
+<tr>
+<td>交互式多轮对话</td>
+<td style="text-align:center">❌</td>
+<td style="text-align:center">✅</td>
+</tr>
+</tbody>
+</table>
+<p>从 <code>graph.py</code> 到 <code>graph2.py</code> 的升级过程，本质上是从 <strong>“让 AI 自由使用工具”</strong> 到 <strong>“在关键节点引入人类判断”</strong> 的演进。<code>interrupt</code> + <code>Command</code> + <code>checkpointer</code> 三件套是 LangGraph 实现 Human-in-the-Loop 的标准模式，掌握这套机制后，可以灵活地控制 Agent 的行为边界。</p>
+<p><strong>项目依赖</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">langgraph</span><br><span class="line">langchain-core</span><br><span class="line">langchain-community</span><br><span class="line">langchain-mcp-adapters</span><br></pre></td></tr></table></figure>
+<p><strong>参考</strong>：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://langchain-ai.github.io/langgraph/">LangGraph 官方文档</a></li>
+<li><a target="_blank" rel="noopener" href="https://modelcontextprotocol.io/">MCP 协议规范</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/langchain-ai/langchain-mcp-adapters">langchain-mcp-adapters</a></li>
+</ul>
+
+    </div>
+    <footer class="article-footer">
+        <blockquote class="article-copyright">
+    <p><strong><span class="icon-user icon"></span>本文作者：</strong>羡笙</p>
+    <p><strong><span class="icon-link icon"></span>本文链接：</strong><a href="https://envysage.github.io/XS-Blog/2026/05/04/mcp%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8%E6%A8%A1%E5%9E%8B/">https://envysage.github.io/XS-Blog/2026/05/04/mcp%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8%E6%A8%A1%E5%9E%8B/</a></p>
+    <p><strong><span class="icon-pencil icon"></span>本文标题：</strong>「LangGraph 学习笔记：mcp工具调用以及基础人工审查」</p>
+    <p><strong><span class="icon-calendar icon"></span>本文发布时间：</strong>2026-05-04 00:47:36</p>
+    
+    <p><strong><span class="icon-copyright icon"></span>本文版权：</strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener nofollow noreferrer" target="_blank"><span class="icon-creative-commons"></span>BY-NC-SA</a> 许可协议。转载请注明出处！</p>
+    <span class="icon-creative-commons article-copyright-bg"></span>
+  </blockquote>
+        <div class="share-wrapper">
+    <a href="https://connect.qq.com/widget/shareqq/index.html?url=https%3A%2F%2Fenvysage.github.io%2FXS-Blog%2F2026%2F05%2F04%2Fmcp%25E5%25B7%25A5%25E5%2585%25B7%25E8%25B0%2583%25E7%2594%25A8%25E6%25A8%25A1%25E5%259E%258B%2F&amp;title=LangGraph%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%9Amcp%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8%E4%BB%A5%E5%8F%8A%E5%9F%BA%E7%A1%80%E4%BA%BA%E5%B7%A5%E5%AE%A1%E6%9F%A5&amp;desc=LangGraph%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%9Amcp%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8%E4%BB%A5%E5%8F%8A%E5%9F%BA%E7%A1%80%E4%BA%BA%E5%B7%A5%E5%AE%A1%E6%9F%A5&amp;source=https%3A%2F%2Fenvysage.github.io%2FXS-Blog" target="_blank" rel="noopener noreferrer" title="LangGraph 学习笔记：mcp工具调用以及基础人工审查">
+      <div class="share-icon icon icon-qq">
+      </div>
+    </a>
+</div>
+        <a class="article-category-link" href="/XS-Blog/categories/AI/" title="AI" data-aos="zoom-in">AI</a>
+
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+    <div class="article-nav-link-wrap right">
+          <img data-src="https://envysage.github.io/XS-Blog/images/covers/bg4.webp" data-sizes="auto" alt="用 LangGraph 打造循环优化的笑话生成器" class="lazyload">
+      <a href="/XS-Blog/2026/05/03/%E7%94%A8%20LangGraph%20%E6%89%93%E9%80%A0%E5%BE%AA%E7%8E%AF%E4%BC%98%E5%8C%96%E7%9A%84%E7%AC%91%E8%AF%9D%E7%94%9F%E6%88%90%E5%99%A8/" aria-label="后一篇: 用 LangGraph 打造循环优化的笑话生成器"  title="后一篇: 用 LangGraph 打造循环优化的笑话生成器"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          用 LangGraph 打造循环优化的笑话生成器
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2026
+        <span class="footer-info-sep rotate"></span>
+      羡笙
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        22.6k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        01:43
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8E-langgraph-mcp-%E6%9E%84%E5%BB%BA-12306-%E8%BD%A6%E7%A5%A8%E6%9F%A5%E8%AF%A2-agent-%E4%BB%8E%E5%9F%BA%E7%A1%80%E8%B0%83%E7%94%A8%E5%88%B0%E4%BA%BA%E5%B7%A5%E5%AE%A1%E6%A0%B8%E6%8B%A6%E6%88%AA"><span class="toc-text"> 基于 LangGraph + MCP 构建 12306 车票查询 Agent —— 从基础调用到人工审核拦截</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%AE%E5%BD%95"><span class="toc-text"> 目录</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A1%B9%E7%9B%AE%E8%83%8C%E6%99%AF"><span class="toc-text"> 项目背景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E6%9E%B6%E6%9E%84%E6%A6%82%E8%A7%88"><span class="toc-text"> 核心架构概览</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80-mcp-%E5%B7%A5%E5%85%B7%E5%B1%82-mcp_utilpy"><span class="toc-text"> 一、MCP 工具层 —— mcp_util.py</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#11-mcp-%E5%AE%A2%E6%88%B7%E7%AB%AF%E9%85%8D%E7%BD%AE"><span class="toc-text"> 1.1 MCP 客户端配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#12-%E5%BC%82%E6%AD%A5%E5%B7%A5%E5%85%B7%E8%8A%82%E7%82%B9-basictoolsnode"><span class="toc-text"> 1.2 异步工具节点 BasicToolsNode</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#13-%E5%B9%B6%E5%8F%91%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8"><span class="toc-text"> 1.3 并发工具调用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C-%E5%9F%BA%E7%A1%80%E7%89%88-graphpy%E7%BA%AF%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8"><span class="toc-text"> 二、基础版 —— graph.py（纯工具调用）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#21-%E5%AE%9A%E4%B9%89%E7%8A%B6%E6%80%81%E4%B8%8E%E6%9D%A1%E4%BB%B6%E8%B7%AF%E7%94%B1"><span class="toc-text"> 2.1 定义状态与条件路由</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#22-%E6%9D%A1%E4%BB%B6%E8%B7%AF%E7%94%B1%E5%87%BD%E6%95%B0"><span class="toc-text"> 2.2 条件路由函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#23-%E6%9E%84%E5%BB%BA%E5%9B%BE"><span class="toc-text"> 2.3 构建图</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#24-%E6%89%A7%E8%A1%8C%E6%96%B9%E5%BC%8F"><span class="toc-text"> 2.4 执行方式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89-%E8%BF%9B%E9%98%B6%E7%89%88-graph2py%E4%BA%BA%E5%B7%A5%E5%AE%A1%E6%A0%B8-token-%E7%BB%9F%E8%AE%A1"><span class="toc-text"> 三、进阶版 —— graph2.py（人工审核 + Token 统计）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#31-%E4%BA%BA%E5%B7%A5%E5%AE%A1%E6%A0%B8%E6%9C%BA%E5%88%B6"><span class="toc-text"> 3.1 人工审核机制</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%9F%E7%90%86interrupt-command-checkpointer"><span class="toc-text"> 原理：interrupt + Command + checkpointer</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B7%A5%E5%85%B7%E6%8B%A6%E6%88%AA%E6%B5%81%E7%A8%8B"><span class="toc-text"> 工具拦截流程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%81%A2%E5%A4%8D%E6%89%A7%E8%A1%8C%E7%9A%84%E9%80%BB%E8%BE%91"><span class="toc-text"> 恢复执行的逻辑</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#32-token-%E7%94%A8%E9%87%8F%E7%BB%9F%E8%AE%A1"><span class="toc-text"> 3.2 Token 用量统计</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#33-%E4%BA%A4%E4%BA%92%E5%BC%8F%E4%B8%BB%E5%BE%AA%E7%8E%AF"><span class="toc-text"> 3.3 交互式主循环</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95"><span class="toc-text"> 踩坑记录</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-unboundlocalerror-cannot-access-local-variable-result"><span class="toc-text"> 1. UnboundLocalError: cannot access local variable &#39;result&#39;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%B7%A5%E5%85%B7%E6%8B%A6%E6%88%AA%E6%9C%AA%E8%A7%A6%E5%8F%91-%E5%B7%A5%E5%85%B7%E5%90%8D%E4%B8%8D%E5%8C%B9%E9%85%8D"><span class="toc-text"> 2. 工具拦截未触发 —— 工具名不匹配</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-typeerror-cannot-instantiate-typingunion-command-%E5%AF%BC%E5%85%A5%E9%94%99%E8%AF%AF"><span class="toc-text"> 3. TypeError: Cannot instantiate typing.Union —— Command 导入错误</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E6%8B%92%E7%BB%9D%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8%E5%90%8E-llm-%E8%BF%9B%E5%85%A5%E5%BC%82%E5%B8%B8%E7%8A%B6%E6%80%81"><span class="toc-text"> 4. 拒绝工具调用后 LLM 进入异常状态</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-text"> 总结</span></a></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/XS-Blog/avatar/avatar.webp" data-sizes="auto" alt="羡笙" class="lazyload">
+  <div class="sidebar-author-name">羡笙</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">12</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">3</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/EnvySage itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/XS-Blog/images/reimu.png" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/XS-Blog/js/script.js"></script>
+
+
+  
+<script src="/XS-Blog/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/XS-Blog/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/XS-Blog/js/generator_search.js" defer></script>
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+  
+<script src="https://npm.webcache.cn/theme-shokax-pjax@0.0.3/dist/index.umd.js" integrity="sha384-xneY1WY8hOfUzswrE4CrYq35N4BdVcxqxwHPr9zawE&#x2F;jMSCxD+jAPU55x&#x2F;jj3wlf" crossorigin="anonymous"></script>
+
+  
+<script src="/XS-Blog/js/pjax.js"></script>
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "羡笙",
+          title: "LangGraph 学习笔记：mcp工具调用以及基础人工审查",
+          url: "https://envysage.github.io/XS-Blog/2026/05/04/mcp%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8%E6%A8%A1%E5%9E%8B/",
+          excerpt: "",
+          description: "",
+          stripContent: " 基于 LangGraph + MCP 构建 12306 车票查询 Agent —— 从基础调用到人工审核拦截  本文记录了如何使用 LangGraph 状态图编排 + MCP（Model Context Protocol） 协议接入外部工具，构建一个具备 Human-in-the-Loop（人工审核） 能力的 12306 车票查询 Agent。我们将从最基础的工具调用开始，逐步演进到带人工审核拦截的生产级方案。    目录  项目背景 核心架构概览 一、MCP 工具层 —— mcp_util.",
+          date: "Mon May 04 2026 00:47:36 GMT+0800",
+          updated: "Mon May 04 2026 00:48:21 GMT+0800",
+          cover: "/XS-Blog/images/banner.webp",
+        };
+      </script>
+        
+<script src="/XS-Blog/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/XS-Blog/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+    <script>
+    var setupAPlayer = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        if (window.matchMedia('(max-width: 959px)').matches) {
+          const aplayer = _$('#aplayer');
+          if (aplayer) {
+            const aside = aplayer.parentNode?.parentNode;
+            if (aside?.tagName === 'ASIDE') {
+              aplayer.removeAttribute('data-aos');
+              aplayer.parentNode.removeChild(aplayer);
+              document.body.appendChild(aplayer);
+            }
+          }
+        }
+        new APlayer({
+          theme: "var(--color-link)",
+          container: document.getElementById('aplayer'),
+          audio: [{"name":"忆夏思乡","artist":"MoreanP","url":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/music/MoreanP%20-%20%E5%BF%86%E5%A4%8F%E6%80%9D%E4%B9%A1.mp3","cover":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/cover/MoreanP%20-%20%E5%BF%86%E5%A4%8F%E6%80%9D%E4%B9%A1.jpeg"},{"name":"かくれんぼ","artist":"AliA","url":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/music/AliA%20-%20%E3%81%8B%E3%81%8F%E3%82%8C%E3%82%93%E3%81%BC.mp3","cover":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/cover/AliA%20-%20%E3%81%8B%E3%81%8F%E3%82%8C%E3%82%93%E3%81%BC.jpeg","lrc":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/lyric/%E3%81%8B%E3%81%8F%E3%82%8C%E3%82%93%E3%81%BC%20-%20AliA.lrc"}] || [],
+          fixed: isMobile ? true : (false || false),
+          autoplay: false || false,
+          loop: 'all' || 'all',
+          order: 'list' || 'list',
+          preload: 'auto' || 'auto',
+          volume: 0.4 || 0.7,
+          mutex: true || true,
+          listFolded: false || false,
+          lrcType: 0 || 0,
+        });
+      }
+    }
+    </script>
+  
+<script src="https://npm.webcache.cn/aplayer@1.10.1/dist/APlayer.min.js" integrity="sha384-gdGYZwHnfJM54evoZhpO0s6ZF5BQiybkiyW7VXr+h5UfruuRL&#x2F;aORyw+5+HZoU6e" crossorigin="anonymous" defer onload="setupAPlayer()"></script>
+
+
+
+  </body>
+  </html>
