@@ -1,0 +1,856 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+    <script async src="https://hm.baidu.com/hm.js?true"></script>
+  <script data-pjax>
+    var _hmt = _hmt || [];
+    _hmt.push(["_trackPageview", location.pathname]);
+  </script>
+
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_a0oqhord1y';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://envysage.github.io/XS-Blog';window.REIMU_CONFIG.relative = '/XS-Blog/';</script>
+  <title>
+    算法日记（二）：双指针同走、BFS 框架与二分边界 | 羡笙の窝
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_a0oqhord1y.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/XS-Blog/css/loader.css">
+
+    <meta name="description" content="算法日记（二）：双指针同走、BFS 框架与二分边界  学习周期：2026.09.16 ～ 2026.09.18（Day 16 ～ Day 20） 使用语言：Python 3 内容：承接《算法日记（一）》，从&quot;两棵树同步行走&quot;讲到 BFS 层序遍历与二分查找">
+<meta property="og:type" content="article">
+<meta property="og:title" content="算法日记（二）：双指针同走、BFS 框架与二分边界">
+<meta property="og:url" content="https://envysage.github.io/XS-Blog/2026/09/20/algorithm-diary-part2/index.html">
+<meta property="og:site_name" content="羡笙の窝">
+<meta property="og:description" content="算法日记（二）：双指针同走、BFS 框架与二分边界  学习周期：2026.09.16 ～ 2026.09.18（Day 16 ～ Day 20） 使用语言：Python 3 内容：承接《算法日记（一）》，从&quot;两棵树同步行走&quot;讲到 BFS 层序遍历与二分查找">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-09-20T12:30:00.000Z">
+<meta property="article:modified_time" content="2026-09-20T15:55:54.040Z">
+<meta property="article:author" content="羡笙">
+<meta name="twitter:card" content="summary">
+    <link rel="alternate" href="/XS-Blog/atom.xml" title="羡笙の窝" type="application/atom+xml">
+    <link rel="shortcut icon" href="/XS-Blog/images/favicon.ico">
+  
+<link rel="stylesheet" href="/XS-Blog/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+      <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/katex@0.16.24/dist/katex.min.css" integrity="sha384-tTgKLjMYmJr94v8qu2PE5MUGSMbyN2xiH266JUB3gpm8vnnJywd1dWSOEfrFz+YI" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+    <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/aplayer@1.10.1/dist/APlayer.min.css" integrity="sha384-tLMkTWh2pfXNWGFlUS0w1TFtRG5xZ9lPWFOooj+vDDLIL+xBGQU/voDBY5XE2lVh" crossorigin="anonymous">
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/XS-Blog/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/XS-Blog/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/XS-Blog/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/XS-Blog/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/XS-Blog/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/XS-Blog/images/banner.webp" alt="算法日记（二）：双指针同走、BFS 框架与二分边界">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">算法日记（二）：双指针同走、BFS 框架与二分边界</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+              <span id="subtitle"> 算法日记（二）：双指针同走、BFS 框架与二分边界
+
+学习周期：2026.09.16 ～ 2026.09.18（Day 16 ～ Day 20）
+使用语言：Python 3
+内容：承接《算法日记（一）》，从&amp;quot;两棵树同步行走&amp;quot;讲到 BFS 层序遍历与二分查找
+</span>
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content" class="sidebar-left"  >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+      <div id="aplayer" theme="var(--color-link)" data-aos="fade-up"></div>
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AE%97%E6%B3%95%E6%97%A5%E8%AE%B0%E4%BA%8C%E5%8F%8C%E6%8C%87%E9%92%88%E5%90%8C%E8%B5%B0-bfs-%E6%A1%86%E6%9E%B6%E4%B8%8E%E4%BA%8C%E5%88%86%E8%BE%B9%E7%95%8C"><span class="toc-text"> 算法日记（二）：双指针同走、BFS 框架与二分边界</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80-day-16572-%E5%8F%A6%E4%B8%80%E6%A3%B5%E6%A0%91%E7%9A%84%E5%AD%90%E6%A0%91%E6%88%91%E4%BB%A5%E4%B8%BA%E6%88%91%E7%9C%8B%E6%87%82%E4%BA%86%E9%80%92%E5%BD%922026-09-16"><span class="toc-text"> 一、Day 16｜#572 另一棵树的子树：我以为我看懂了递归（2026-09-16）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8A%E6%97%A5%E9%A2%98%E7%9B%AE"><span class="toc-text"> 今日题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF%E6%BC%94%E8%BF%9B"><span class="toc-text"> 思路演进</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95"><span class="toc-text"> 踩坑记录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9F%A5%E8%AF%86%E7%82%B9%E7%AC%94%E8%AE%B0"><span class="toc-text"> 知识点笔记</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BE%E4%B8%80%E5%8F%8D%E4%B8%89"><span class="toc-text"> 举一反三</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E5%8F%A5%E8%AF%9D%E5%B8%A6%E8%B5%B0"><span class="toc-text"> 一句话带走</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C-day-16%E4%B8%8B617-%E5%90%88%E5%B9%B6%E4%BA%8C%E5%8F%89%E6%A0%91%E4%BB%8E%E7%94%A8-self-%E6%94%92%E6%A0%91%E5%88%B0%E8%BF%94%E5%9B%9E%E5%80%BC%E5%B0%B1%E6%98%AF%E4%BA%A4%E4%BB%98%E7%89%A9"><span class="toc-text"> 二、Day 16（下）｜#617 合并二叉树：从&quot;用 self 攒树&quot;到&quot;返回值就是交付物&quot;</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8A%E6%97%A5%E9%A2%98%E7%9B%AE-2"><span class="toc-text"> 今日题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF%E6%BC%94%E8%BF%9B-2"><span class="toc-text"> 思路演进</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95-2"><span class="toc-text"> 踩坑记录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9F%A5%E8%AF%86%E7%82%B9%E7%AC%94%E8%AE%B0-2"><span class="toc-text"> 知识点笔记</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BE%E4%B8%80%E5%8F%8D%E4%B8%89-2"><span class="toc-text"> 举一反三</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E5%8F%A5%E8%AF%9D%E5%B8%A6%E8%B5%B0-2"><span class="toc-text"> 一句话带走</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89-day-16-%E6%80%BB%E5%A4%8D%E7%9B%98"><span class="toc-text"> 三、Day 16 总复盘</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B-day-17102-%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E5%B1%82%E5%BA%8F%E9%81%8D%E5%8E%86%E4%BB%8E-dfs-%E8%B7%A8%E5%88%B0-bfs2026-09-17"><span class="toc-text"> 四、Day 17｜#102 二叉树的层序遍历：从 DFS 跨到 BFS（2026-09-17）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8A%E6%97%A5%E9%A2%98%E7%9B%AE-3"><span class="toc-text"> 今日题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF%E6%BC%94%E8%BF%9B-3"><span class="toc-text"> 思路演进</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E4%BB%A3%E7%A0%81"><span class="toc-text"> 关键代码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95-3"><span class="toc-text"> 踩坑记录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9F%A5%E8%AF%86%E7%82%B9%E7%AC%94%E8%AE%B0-3"><span class="toc-text"> 知识点笔记</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BE%E4%B8%80%E5%8F%8D%E4%B8%89-3"><span class="toc-text"> 举一反三</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E5%8F%A5%E8%AF%9D%E5%B8%A6%E8%B5%B0-3"><span class="toc-text"> 一句话带走</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94-day-18111-%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E6%9C%80%E5%B0%8F%E6%B7%B1%E5%BA%A62026-09-17"><span class="toc-text"> 五、Day 18｜#111 二叉树的最小深度（2026-09-17）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8A%E6%97%A5%E9%A2%98%E7%9B%AE-4"><span class="toc-text"> 今日题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF%E6%BC%94%E8%BF%9B-4"><span class="toc-text"> 思路演进</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95-4"><span class="toc-text"> 踩坑记录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9F%A5%E8%AF%86%E7%82%B9%E7%AC%94%E8%AE%B0-4"><span class="toc-text"> 知识点笔记</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BE%E4%B8%80%E5%8F%8D%E4%B8%89-4"><span class="toc-text"> 举一反三</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E5%8F%A5%E8%AF%9D%E5%B8%A6%E8%B5%B0-4"><span class="toc-text"> 一句话带走</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD-day-19199-%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E5%8F%B3%E8%A7%86%E5%9B%BE2026-09-18"><span class="toc-text"> 六、Day 19｜#199 二叉树的右视图（2026-09-18）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8A%E6%97%A5%E9%A2%98%E7%9B%AE-5"><span class="toc-text"> 今日题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF%E6%BC%94%E8%BF%9B-5"><span class="toc-text"> 思路演进</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9F%A5%E8%AF%86%E7%82%B9%E7%AC%94%E8%AE%B0-5"><span class="toc-text"> 知识点笔记</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BE%E4%B8%80%E5%8F%8D%E4%B8%89-5"><span class="toc-text"> 举一反三</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E5%8F%A5%E8%AF%9D%E5%B8%A6%E8%B5%B0-5"><span class="toc-text"> 一句话带走</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83-day-20704-%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE%E7%AC%AC%E4%B8%80%E6%AC%A1%E7%A2%B0%E8%BE%B9%E7%95%8C%E6%9D%A1%E4%BB%B62026-09-18"><span class="toc-text"> 七、Day 20｜#704 二分查找：第一次碰边界条件（2026-09-18）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8A%E6%97%A5%E9%A2%98%E7%9B%AE-6"><span class="toc-text"> 今日题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF%E6%BC%94%E8%BF%9B-6"><span class="toc-text"> 思路演进</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95-5"><span class="toc-text"> 踩坑记录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E4%BB%A3%E7%A0%81-2"><span class="toc-text"> 关键代码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9F%A5%E8%AF%86%E7%82%B9%E7%AC%94%E8%AE%B0-6"><span class="toc-text"> 知识点笔记</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BE%E4%B8%80%E5%8F%8D%E4%B8%89-6"><span class="toc-text"> 举一反三</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E5%8F%A5%E8%AF%9D%E5%B8%A6%E8%B5%B0-6"><span class="toc-text"> 一句话带走</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AB-%E7%B3%BB%E5%88%97%E5%B0%8F%E7%BB%93"><span class="toc-text"> 八、系列小结</span></a></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/XS-Blog/avatar/avatar.webp" data-sizes="auto" alt="羡笙" class="lazyload">
+  <div class="sidebar-author-name">羡笙</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">14</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">4</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/EnvySage itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-algorithm-diary-part2" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-09-20T12:30:00.000Z" itemprop="datePublished">2026-09-20</time>
+    <time style="display: none;" id="post-update-time">2026-09-20</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="算法日记二双指针同走-bfs-框架与二分边界"><a class="markdownIt-Anchor" href="#算法日记二双指针同走-bfs-框架与二分边界"></a> 算法日记（二）：双指针同走、BFS 框架与二分边界</h1>
+<blockquote>
+<p>学习周期：2026.09.16 ～ 2026.09.18（Day 16 ～ Day 20）<br />
+使用语言：Python 3<br />
+内容：承接《算法日记（一）》，从&quot;两棵树同步行走&quot;讲到 BFS 层序遍历与二分查找</p>
+</blockquote>
+<span id="more"></span>
+<hr />
+<h2 id="一-day-16572-另一棵树的子树我以为我看懂了递归2026-09-16"><a class="markdownIt-Anchor" href="#一-day-16572-另一棵树的子树我以为我看懂了递归2026-09-16"></a> 一、Day 16｜#572 另一棵树的子树：我以为我看懂了递归（2026-09-16）</h2>
+<h3 id="今日题目"><a class="markdownIt-Anchor" href="#今日题目"></a> 今日题目</h3>
+<p>给你两棵树，判断 <code>subRoot</code> 是不是 <code>root</code> 的子树——所谓子树，是指 root 里<strong>存在某个节点，它带着自己下面整棵挂着的结构</strong>，和 <code>subRoot</code> 一模一样。</p>
+<p>选它是因为它是 #100「相同的树」的直接复用：昨天我已经会判断&quot;两棵树是否相同&quot;了，今天只多一件事——<strong>在哪些位置调用这个判断</strong>。听起来简单，今天在这上面绕了整整一小时。</p>
+<h3 id="思路演进"><a class="markdownIt-Anchor" href="#思路演进"></a> 思路演进</h3>
+<p><strong>第一反应</strong>：我写了个 <code>if root == subRoot: return True</code>，觉得理所当然——两个变量存的树一样，不就是相等吗？</p>
+<p>被打回现实：Python 的 <code>==</code> 对 <code>TreeNode</code> 比的是&quot;是不是同一个对象&quot;，不是&quot;长得像不像&quot;。LeetCode 没给它定义 <code>__eq__</code>，所以两棵结构完全相同的树照样不相等。判结构，只能老老实实调用自己的 <code>isSameTree</code>。</p>
+<p><strong>第二关：我把昨天写对的 #100 改坏了。</strong> 今天重写的版本是：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> root <span class="keyword">or</span> <span class="keyword">not</span> subRoot:</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> root <span class="keyword">and</span> <span class="keyword">not</span> subRoot:   <span class="comment"># 死代码，永远走不到</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">True</span></span><br></pre></td></tr></table></figure>
+<p><code>or</code> 那行在前，把&quot;两个都空&quot;顺手判成了 <code>False</code>，<code>and</code> 那行成为永远不执行的死代码。修法就是上下调换顺序：先认&quot;都空 = True&quot;，再认&quot;一空 = False&quot;。</p>
+<p><strong>然后我卡在了一个更根本的问题上</strong>：为什么两个 <code>None</code> 要返回 <code>True</code>？“它只确认了结构，没确认值啊？”</p>
+<p>这个问题问得好，答案要画一棵树才讲得清。root 和 subRoot 都是 <code>[1,2]</code>：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">   1            1</span><br><span class="line">  /            /</span><br><span class="line"> 2            2</span><br><span class="line"></span><br><span class="line">isSameTree(A1, B1)          ← 在这层比 1 == 1 ✓</span><br><span class="line">├─ isSameTree(A2, B2)       ← 在这层比 2 == 2 ✓</span><br><span class="line">│  ├─ isSameTree(None,None) → True   ← 叶子没孩子，空 vs 空，没值可欠</span><br><span class="line">│  └─ isSameTree(None,None) → True</span><br><span class="line">└─ isSameTree(None,None)    → True</span><br></pre></td></tr></table></figure>
+<p>关键在于：<strong>每个节点的值，是由&quot;它自己被传进 <code>isSameTree</code> 的那一层&quot;负责比掉的</strong>。往下递归传 <code>None</code> 时，那个位置本来就没有节点，没有任何数字等待被比较，问的只是&quot;这片空地方和那片空地方一样吗&quot;——当然一样。</p>
+<p>反过来说，如果两个 <code>None</code> 返回 <code>False</code>，那每棵树的每个叶子都会因为&quot;它的空孩子不相同&quot;而失败，<strong>天下没有两棵树是相同的</strong>。递归总得有个地方交代&quot;空树之间彼此相等&quot;，这就是基准情形存在的理由。</p>
+<p><strong>第三关：守卫式写法让我以为自己漏写了判断。</strong> 我盯着代码说&quot;全程没看到比值相等的条件，只有 <code>!=</code> 那一行&quot;：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> root.val != subRoot.val:</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line"><span class="comment"># 走到这里 = 上面的 if 没进 = 相等已确认</span></span><br></pre></td></tr></table></figure>
+<p>就像门口保安喊&quot;不满 18 的出去&quot;——他没喊&quot;满 18 的进&quot;，但<strong>留在屋里的人全都合格</strong>。没被 <code>return</code> 掉的，都是相等的。等价的显式写法是把 <code>if 相等: ... else: return False</code> 写全，只是啰嗦。</p>
+<p><strong>最后一关</strong>：总算写到主函数，我交了这么一版：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">return</span> <span class="variable language_">self</span>.isSameTree(root.left, subRoot) <span class="keyword">or</span> <span class="variable language_">self</span>.isSameTree(root.right, subRoot)</span><br></pre></td></tr></table></figure>
+<p>两个毛病：一，从根到尾没检查过 root 自己（漏了&quot;存在某个节点&quot;里的根节点）；二，我补的那个条件写成了 <code>root.val == subRoot.val</code>——只比一个值不管结构，<code>root=[1,2]</code> 对 <code>subRoot=[1]</code> 会误判 <code>True</code>。</p>
+<h3 id="踩坑记录"><a class="markdownIt-Anchor" href="#踩坑记录"></a> 踩坑记录</h3>
+<ol>
+<li><code>root == subRoot</code> 判不了两树相同：Python 默认比对象身份，<code>TreeNode</code> 无 <code>__eq__</code>。判结构必须显式调用比较函数。</li>
+<li>基准情形顺序：<code>or</code> 写在 <code>and</code> 前面会截胡&quot;都空&quot;的情况，让 <code>and</code> 那行变成死代码。</li>
+<li>漏查根节点自己：递归下探之前，当前节点首先是一个候选。</li>
+<li>值相等 ≠ 子树相等：检查候选必须整座比，不能只比一个 <code>val</code>。</li>
+<li>递归时把遍历写成了 <code>isSameTree(root.left, ...)</code>：往下找候选是 <code>isSubtree</code> 的活，<code>isSameTree</code> 只负责&quot;从这一层往下整座比&quot;。</li>
+</ol>
+<h3 id="知识点笔记"><a class="markdownIt-Anchor" href="#知识点笔记"></a> 知识点笔记</h3>
+<p><strong>双递归的分工模式</strong>：一个函数负责&quot;找候选&quot;（遍历整棵树），一个函数负责&quot;验结构&quot;（同时下探两棵树）。前者对每个节点做三件事：验自己、去左边找、去右边找：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">return</span> <span class="variable language_">self</span>.isSameTree(root, subRoot) <span class="keyword">or</span> \</span><br><span class="line">       <span class="variable language_">self</span>.isSubtree(root.left, subRoot) <span class="keyword">or</span> \</span><br><span class="line">       <span class="variable language_">self</span>.isSubtree(root.right, subRoot)</span><br></pre></td></tr></table></figure>
+<p>这种&quot;两个指针同时往下走&quot;的骨架，就是 #100、#101、#572 共用的那一副。</p>
+<p><strong>递归的心法</strong>：想清一层干什么 + 基准情形是什么，然后信任黑盒。别试图在脑子里展开整棵调用树，拿一棵两三个节点的小树手动 trace 就够验证逻辑了。</p>
+<h3 id="举一反三"><a class="markdownIt-Anchor" href="#举一反三"></a> 举一反三</h3>
+<ul>
+<li>#100 相同的树——本日的验证黑盒</li>
+<li>#101 对称二叉树——同样两指针同走，只是走法镜像</li>
+<li>#617 合并二叉树——下一题：两指针同走，从&quot;判断&quot;变&quot;构造&quot;</li>
+<li>链表版的同套路：判断回文链表也可以用&quot;找 + 验&quot;分工</li>
+</ul>
+<h3 id="一句话带走"><a class="markdownIt-Anchor" href="#一句话带走"></a> 一句话带走</h3>
+<blockquote>
+<p>遍历用 <code>isSubtree</code>，验证用 <code>isSameTree</code>；当前验一下，左右各找一遍。</p>
+</blockquote>
+<p>绕晕了就念这句，再画一棵两个节点的小树走一遍。</p>
+<hr />
+<h2 id="二-day-16下617-合并二叉树从用-self-攒树到返回值就是交付物"><a class="markdownIt-Anchor" href="#二-day-16下617-合并二叉树从用-self-攒树到返回值就是交付物"></a> 二、Day 16（下）｜#617 合并二叉树：从&quot;用 self 攒树&quot;到&quot;返回值就是交付物&quot;</h2>
+<h3 id="今日题目-2"><a class="markdownIt-Anchor" href="#今日题目-2"></a> 今日题目</h3>
+<p>给两棵二叉树，重叠位置的节点值相加，不重叠的位置直接把那边的子树搬过来，返回合并后的树。昨天预告过的题——#572 那副&quot;两指针同时往下走&quot;的骨架，今天从<strong>判断</strong>变<strong>构造</strong>。</p>
+<h3 id="思路演进-2"><a class="markdownIt-Anchor" href="#思路演进-2"></a> 思路演进</h3>
+<p><strong>第一版我的思路对了一半</strong>：合并规则自己抓得很准（都在 → 相加，只有一边 → 拿那一边），但写法是：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable language_">self</span>.resultTree = TreeNode()</span><br><span class="line"><span class="keyword">if</span> root1 <span class="keyword">and</span> root2:</span><br><span class="line">    <span class="variable language_">self</span>.resultTree.val = root1.val + root2.val</span><br><span class="line">    <span class="variable language_">self</span>.resultTree.left = <span class="variable language_">self</span>.mergeTrees(root1.left, root2.left)</span><br><span class="line"><span class="keyword">if</span> root1 <span class="keyword">and</span> <span class="keyword">not</span> root2:</span><br><span class="line">    <span class="variable language_">self</span>.resultTree.val = root1.val</span><br><span class="line">    <span class="variable language_">self</span>.resultTree.left = <span class="variable language_">self</span>.mergeTrees(root1.left, root2.left)  <span class="comment"># ❌ root2 是 None！</span></span><br></pre></td></tr></table></figure>
+<p>两个错，一个比一个根本：</p>
+<ol>
+<li><strong>症状</strong>：<code>root2</code> 明明是 <code>None</code> 还写 <code>root2.left</code>——<code>AttributeError</code>。这不是新坑，是一小时前 #572 里刚踩过的，同一天左右手互搏。</li>
+<li><strong>病根</strong>：想用一个 <code>self.resultTree</code> 攒出整棵树。#543 的 <code>self.maxDiameter</code> 好用，因为它是个<strong>数字</strong>，各层往同一变量上刷最大值就行；但这里每层产的是<strong>一个节点</strong>，全局只有一个节点可以刷，父子层的产出全挤在一个点上互相覆盖。</li>
+</ol>
+<p><strong>真正的认知升级就一句话</strong>：树有多个节点，每个节点都得有人接住——<strong>构造类递归的交付通道是返回值，不是成员变量</strong>。每层 <code>return node</code>，上一层用 <code>node.left = ...</code> 接住，树在&quot;返回 → 挂接&quot;的链上自己长出来。</p>
+<p><strong>第二种写法是&quot;直接改 root1&quot;</strong>：不新建节点，<code>root1.val += root2.val</code>，结果写回旧树再返回。LeetCode 不要求保留原树，这版更省。当时给它们编号&quot;模式一 / 模式二&quot;，二十分钟后回想&quot;模式二是什么&quot;已经答不上来——刚讲的分类当场蒸发。（教训自查：不该起无语义编号，&quot;造新树 / 改旧树&quot;才是记得住的叫法。）</p>
+<p><strong>最后合上窗口凭记忆默写&quot;改旧树&quot;版，一次全对</strong>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> root1: <span class="keyword">return</span> root2</span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> root2: <span class="keyword">return</span> root1</span><br><span class="line">root1.val += root2.val</span><br><span class="line">root1.left = <span class="variable language_">self</span>.mergeTrees(root1.left, root2.left)</span><br><span class="line">root1.right = <span class="variable language_">self</span>.mergeTrees(root1.right, root2.right)</span><br><span class="line"><span class="keyword">return</span> root1</span><br></pre></td></tr></table></figure>
+<h3 id="踩坑记录-2"><a class="markdownIt-Anchor" href="#踩坑记录-2"></a> 踩坑记录</h3>
+<ol>
+<li><strong><code>None</code> 面前无属性</strong>（二犯）：递归进空子树前先看一眼你在对谁取 <code>.left</code>。#572 的守卫写法今天原样能救命：一边空就<strong>直接 return 另一边</strong>，连判断都不需要往下钻。</li>
+<li><strong><code>self</code> 攒树塌缩</strong>：成员变量适合&quot;一个标量、各层取极值&quot;，不适合&quot;多个节点、逐个组装&quot;。用错通道，树全被覆盖成一个点。</li>
+<li><strong>无语义编号记不住</strong>：“模式一 / 二&quot;这种临时命名等于没命名，以后全用&quot;造新树 / 改旧树”。</li>
+</ol>
+<h3 id="知识点笔记-2"><a class="markdownIt-Anchor" href="#知识点笔记-2"></a> 知识点笔记</h3>
+<p><strong>递归的三种交付方式</strong>（到今天集齐了）：</p>
+<table>
+<thead>
+<tr>
+<th>产出</th>
+<th>通道</th>
+<th>例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>布尔判断</td>
+<td>返回值 <code>or</code> / <code>and</code> 串联</td>
+<td>#100 / #101 / #572</td>
+</tr>
+<tr>
+<td>一个极值</td>
+<td><code>self</code> 成员边遍历边刷</td>
+<td>#543</td>
+</tr>
+<tr>
+<td>一棵新结构</td>
+<td>返回值逐层挂接</td>
+<td>#617</td>
+</tr>
+</tbody>
+</table>
+<p><strong>构造类递归模板</strong>：空手兜底（<code>if not x: return y</code>）→ 造 / 改当前节点 → 左右递归挂上 → <code>return</code>。</p>
+<h3 id="举一反三-2"><a class="markdownIt-Anchor" href="#举一反三-2"></a> 举一反三</h3>
+<ul>
+<li>同骨架前置：#100 → #572 → #617，两指针同走，只是&quot;当前层干什么&quot;从比、到验、到造。</li>
+<li>#226 翻转二叉树也是构造类，只是原地改，走的&quot;改旧树&quot;路线。</li>
+</ul>
+<h3 id="一句话带走-2"><a class="markdownIt-Anchor" href="#一句话带走-2"></a> 一句话带走</h3>
+<blockquote>
+<p>判断走返回值，极值走 <code>self</code>，建树——还是走返回值，一层接一层。</p>
+</blockquote>
+<hr />
+<h2 id="三-day-16-总复盘"><a class="markdownIt-Anchor" href="#三-day-16-总复盘"></a> 三、Day 16 总复盘</h2>
+<p>今天才是真正吃透&quot;两棵树同步行走&quot;的一天：上午 #572 学会<strong>用</strong>它做判断，下午 #617 学会<strong>换掉</strong>判断那一层换成构造。双守卫的顺序（先 both-None 后 either-None，或直接空手兜底）在两个题里都出现过两次，一次写对一次写崩，值得警惕。</p>
+<hr />
+<h2 id="四-day-17102-二叉树的层序遍历从-dfs-跨到-bfs2026-09-17"><a class="markdownIt-Anchor" href="#四-day-17102-二叉树的层序遍历从-dfs-跨到-bfs2026-09-17"></a> 四、Day 17｜#102 二叉树的层序遍历：从 DFS 跨到 BFS（2026-09-17）</h2>
+<h3 id="今日题目-3"><a class="markdownIt-Anchor" href="#今日题目-3"></a> 今日题目</h3>
+<p>给你一棵二叉树，返回每一层的节点值，按层从上到下。经典的 BFS 入门题，也是 Blind 75 必做。</p>
+<h3 id="思路演进-3"><a class="markdownIt-Anchor" href="#思路演进-3"></a> 思路演进</h3>
+<p><strong>第一反应是硬套递归</strong>。前面做了 7 道树题全是递归 DFS，习惯性地写了 <code>self.levelOrder(root.left)</code> + <code>self.levelOrder(root.right)</code>，想让递归&quot;自己返回每一层的结果&quot;。写出来一堆 <code>return stack.append()</code>（<code>append</code> 返回 <code>None</code>，直接炸），<code>nodeLeft + nodeRight</code> 拿到的是 <code>None + None</code> → <code>TypeError</code>。<strong>不是代码写错了，是工具选错了</strong>——递归天然一路钻到底再回头，不擅长&quot;一层一层平铺&quot;。</p>
+<p><strong>卡点一：队列里存的是什么？</strong> 这是最关键的认知跃迁。一开始以为队列里存的是&quot;值&quot;（数字），那 pop 出来之后队列就空了，怎么继续？答案是：<strong>队列里存的是整个节点对象</strong>。取出来一个节点，用 <code>.left</code>、<code>.right</code> 找到它的孩子，再 append 进去。pop 出来一个，append 进去可能零个、一个、两个——队列里的&quot;人&quot;换了，但不是空了。像排队买奶茶，你走了，你带的小孩排到队尾了。</p>
+<p><strong>卡点二：怎么知道这一层有几个节点？</strong> 在开始处理某一层之前，<code>len(queue)</code> 恰好就是这一层的节点数。因为上一层处理完后，只有上一层的节点才会往队列里加孩子——这些新加的孩子，正好就是下一层的全部。先记长度，再按这个数量循环取，取完刚好处理完一层。</p>
+<h3 id="关键代码"><a class="markdownIt-Anchor" href="#关键代码"></a> 关键代码</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> deque</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">levelOrder</span>(<span class="params">self, root</span>):</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> root:</span><br><span class="line">        <span class="keyword">return</span> []</span><br><span class="line">    result = []</span><br><span class="line">    queue = deque([root])           <span class="comment"># 一开始只有根节点</span></span><br><span class="line">    <span class="keyword">while</span> queue:</span><br><span class="line">        level = []</span><br><span class="line">        <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(queue)):  <span class="comment"># 只跑当前层的节点数</span></span><br><span class="line">            node = queue.popleft()   <span class="comment"># 取出队首</span></span><br><span class="line">            level.append(node.val)</span><br><span class="line">            <span class="keyword">if</span> node.left:</span><br><span class="line">                queue.append(node.left)   <span class="comment"># 孩子入队</span></span><br><span class="line">            <span class="keyword">if</span> node.right:</span><br><span class="line">                queue.append(node.right)</span><br><span class="line">        result.append(level)        <span class="comment"># 当前层处理完</span></span><br><span class="line">    <span class="keyword">return</span> result</span><br></pre></td></tr></table></figure>
+<h3 id="踩坑记录-3"><a class="markdownIt-Anchor" href="#踩坑记录-3"></a> 踩坑记录</h3>
+<ol>
+<li><code>return stack.append()</code>——<code>append</code> 返回 <code>None</code>，别拿 <code>append</code> 当返回值。</li>
+<li>以为队列存的是值 → pop 之后就空了。实际上存的是节点对象，才能用 <code>.left</code> / <code>.right</code> 继续探路。</li>
+<li>一开始想用递归做 BFS，工具选错了。递归 = DFS，BFS 需要队列。</li>
+</ol>
+<h3 id="知识点笔记-3"><a class="markdownIt-Anchor" href="#知识点笔记-3"></a> 知识点笔记</h3>
+<p><strong>DFS vs BFS 对比</strong>：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>DFS（递归 / 栈）</th>
+<th>BFS（队列）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>工具</td>
+<td>递归调用栈</td>
+<td><code>deque</code> 队列</td>
+</tr>
+<tr>
+<td>走法</td>
+<td>一路钻到底再回头</td>
+<td>一层扫完再下一层</td>
+</tr>
+<tr>
+<td>适用场景</td>
+<td>深度、路径、回溯</td>
+<td>层级、最短距离</td>
+</tr>
+</tbody>
+</table>
+<p><strong>BFS 框架（一句话）</strong>：队列存节点，<code>while</code> 循环，每轮先记长度再按长度取，取的时候把孩子丢进去。</p>
+<p><strong>队列 vs 列表</strong>：Python 的 <code>deque</code> 出队 O(1)，<code>list.pop(0)</code> 是 O(n)，做 BFS 永远用 <code>deque</code>。</p>
+<h3 id="举一反三-3"><a class="markdownIt-Anchor" href="#举一反三-3"></a> 举一反三</h3>
+<ul>
+<li>这个 BFS 框架是所有层序遍历变体的基础（锯齿形、右视图、最大层宽）——改的只是 <code>for</code> 循环里面做什么</li>
+<li>下一步可以做 #199 二叉树的右视图（BFS 取每层最后一个）</li>
+</ul>
+<h3 id="一句话带走-3"><a class="markdownIt-Anchor" href="#一句话带走-3"></a> 一句话带走</h3>
+<blockquote>
+<p>队列存节点，先问 <code>len</code> 再按数取，pop 一个 append 孩子，层就换了一波。</p>
+</blockquote>
+<hr />
+<h2 id="五-day-18111-二叉树的最小深度2026-09-17"><a class="markdownIt-Anchor" href="#五-day-18111-二叉树的最小深度2026-09-17"></a> 五、Day 18｜#111 二叉树的最小深度（2026-09-17）</h2>
+<h3 id="今日题目-4"><a class="markdownIt-Anchor" href="#今日题目-4"></a> 今日题目</h3>
+<p>给一棵二叉树，返回最小深度——从根到最近叶子的最短路径上的节点数。和 #102 层序遍历同一天做，是 BFS 框架的第一个变体。</p>
+<h3 id="思路演进-4"><a class="markdownIt-Anchor" href="#思路演进-4"></a> 思路演进</h3>
+<p><strong>框架直接搬 #102。</strong> 队列存节点，按层展开，每层 <code>len(queue)</code> 定长度。唯一区别：不收集所有层的值，而是<strong>找到第一个叶子就 return</strong>。BFS 天然按距离从近到远展开，第一个碰到的叶子一定是最浅的。</p>
+<p>代码一次通过，零修改。核心就一行判断：<code>if not node.left and not node.right: return result</code>。</p>
+<h3 id="踩坑记录-4"><a class="markdownIt-Anchor" href="#踩坑记录-4"></a> 踩坑记录</h3>
+<p>无。BFS 框架熟练后，这类变体就是改 <code>for</code> 循环里的判断条件。</p>
+<h3 id="知识点笔记-4"><a class="markdownIt-Anchor" href="#知识点笔记-4"></a> 知识点笔记</h3>
+<ul>
+<li><strong>BFS 的优势</strong>：天然最短路径。需要&quot;最近&quot;“最小深度”&quot;最短距离&quot;类答案时，BFS 一找就是最优。</li>
+<li><strong>提前 return</strong>：不需要遍历整棵树，找到目标立刻收工。#102 要遍历完，#111 找到就跑。</li>
+</ul>
+<h3 id="举一反三-4"><a class="markdownIt-Anchor" href="#举一反三-4"></a> 举一反三</h3>
+<ul>
+<li>#102 层序遍历 → #111 最小深度（加 early return）→ #199 右视图（取每层最后一个）</li>
+<li>#637 各层平均值（BFS + 求平均）</li>
+</ul>
+<h3 id="一句话带走-4"><a class="markdownIt-Anchor" href="#一句话带走-4"></a> 一句话带走</h3>
+<blockquote>
+<p>BFS 从近到远展开，找最近的叶子，找到就跑。</p>
+</blockquote>
+<hr />
+<h2 id="六-day-19199-二叉树的右视图2026-09-18"><a class="markdownIt-Anchor" href="#六-day-19199-二叉树的右视图2026-09-18"></a> 六、Day 19｜#199 二叉树的右视图（2026-09-18）</h2>
+<h3 id="今日题目-5"><a class="markdownIt-Anchor" href="#今日题目-5"></a> 今日题目</h3>
+<p>从右边看一棵二叉树，返回你能看到的节点值。本质是 #102 的变体：每层只取最右边那个。</p>
+<h3 id="思路演进-5"><a class="markdownIt-Anchor" href="#思路演进-5"></a> 思路演进</h3>
+<p>框架完全搬 #102，只改了 <code>for</code> 循环里收集的逻辑：不存整层，直接 <code>level[-1]</code> 拿最后一个。代码一次通过。</p>
+<p>当时的点评很精准：“完全就是把 102 的数据再处理一下”——对，这就是框架的价值：<strong>骨架不变，换零件</strong>。</p>
+<h3 id="知识点笔记-5"><a class="markdownIt-Anchor" href="#知识点笔记-5"></a> 知识点笔记</h3>
+<ul>
+<li><strong>BFS 变体的套路</strong>：框架固定（队列存节点、按层展开），变化只在 <code>for</code> 循环里：收集什么、什么时候返回、取哪个位置。</li>
+<li><strong>空间优化思路</strong>：可以不存整个 <code>level</code>，<code>for</code> 循环里不断覆盖一个变量，循环结束时那个变量就是最后一个。但存 list 再取 <code>[-1]</code> 更直观，没问题。</li>
+</ul>
+<h3 id="举一反三-5"><a class="markdownIt-Anchor" href="#举一反三-5"></a> 举一反三</h3>
+<ul>
+<li>#637 各层平均值（BFS + <code>sum / len</code>）</li>
+<li>#515 每行最大值（BFS + <code>max</code>）</li>
+<li>#429 N 叉树层序遍历（队列框架通用，只是孩子是个 list）</li>
+</ul>
+<h3 id="一句话带走-5"><a class="markdownIt-Anchor" href="#一句话带走-5"></a> 一句话带走</h3>
+<blockquote>
+<p>骨架不变，换零件。按层收集是 #102，取最后一个是 #199，找到就跑是 #111。</p>
+</blockquote>
+<hr />
+<h2 id="七-day-20704-二分查找第一次碰边界条件2026-09-18"><a class="markdownIt-Anchor" href="#七-day-20704-二分查找第一次碰边界条件2026-09-18"></a> 七、Day 20｜#704 二分查找：第一次碰边界条件（2026-09-18）</h2>
+<h3 id="今日题目-6"><a class="markdownIt-Anchor" href="#今日题目-6"></a> 今日题目</h3>
+<p>有序数组里找一个数，返回索引；没找到返回 -1。O(log n) 时间，二分查找的入门题。</p>
+<h3 id="思路演进-6"><a class="markdownIt-Anchor" href="#思路演进-6"></a> 思路演进</h3>
+<p><strong>第一版写法完全跑偏。</strong> 没有维护 <code>l</code> 和 <code>r</code> 两个边界，而是试图直接算出新 <code>index</code>。边界从头到尾没动过，导致 target 不在数组时 <code>index</code> 在某个值上来回跳 → 死循环。另外用了 <code>/</code> 浮点除法，<code>index</code> 变成 1.5 这种小数当列表下标直接 <code>TypeError</code>。还有一个永远走不到的 <code>else: return -1</code>（<code>==</code>、<code>&gt;</code>、<code>&lt;</code> 已经覆盖所有情况）。</p>
+<p><strong>核心纠偏：二分不是&quot;算新位置&quot;，而是&quot;砍边界&quot;。</strong> 每次比较后，要么 <code>r = m - 1</code>（右边界左移），要么 <code>l = m + 1</code>（左边界右移）。搜索范围每次砍一半，所以是 O(log n)。</p>
+<p><strong>默写一次通过。</strong> 理解了&quot;动边界再算中间值&quot;的逻辑后，标准模板就写出来了。</p>
+<h3 id="踩坑记录-5"><a class="markdownIt-Anchor" href="#踩坑记录-5"></a> 踩坑记录</h3>
+<ol>
+<li><strong>边界不动 = 死循环</strong>：<code>l</code> 和 <code>r</code> 必须在比较后更新，不然搜索范围永远不变。</li>
+<li><strong>Python 3 的 <code>/</code> 是浮点除法</strong>：整数除法用 <code>//</code>，否则 index 变 float，列表下标报 <code>TypeError</code>。</li>
+<li><strong><code>else: return -1</code> 是死代码</strong>：<code>==</code> / <code>&gt;</code> / <code>&lt;</code> 三路已经全覆盖，不需要 else。</li>
+</ol>
+<h3 id="关键代码-2"><a class="markdownIt-Anchor" href="#关键代码-2"></a> 关键代码</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">l, r = <span class="number">0</span>, <span class="built_in">len</span>(nums) - <span class="number">1</span></span><br><span class="line"><span class="keyword">while</span> l &lt;= r:</span><br><span class="line">    m = (l + r) // <span class="number">2</span></span><br><span class="line">    <span class="keyword">if</span> nums[m] == target:</span><br><span class="line">        <span class="keyword">return</span> m</span><br><span class="line">    <span class="keyword">elif</span> nums[m] &gt; target:</span><br><span class="line">        r = m - <span class="number">1</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        l = m + <span class="number">1</span></span><br><span class="line"><span class="keyword">return</span> -<span class="number">1</span></span><br></pre></td></tr></table></figure>
+<h3 id="知识点笔记-6"><a class="markdownIt-Anchor" href="#知识点笔记-6"></a> 知识点笔记</h3>
+<p><strong>为什么用 <code>l &lt;= r</code> 而不是 <code>l &lt; r</code>？</strong></p>
+<ul>
+<li><code>l &lt;= r</code>：区间 <code>[l, r]</code> 还有元素就继续，<code>l</code> 和 <code>r</code> 重合时那个位置也要查</li>
+<li><code>l &lt; r</code>：区间只剩一个元素时跳过，需要额外处理</li>
+</ul>
+<p><strong>边界更新为什么要 <code>m - 1</code> / <code>m + 1</code>？</strong></p>
+<ul>
+<li><code>nums[m] != target</code> 已经确认 <code>m</code> 不是答案</li>
+<li>不把 <code>m</code> 排除掉的话，搜索范围不缩小 → 死循环</li>
+</ul>
+<p><strong>整数除法防溢出（了解即可）：</strong></p>
+<ul>
+<li><code>(l + r) // 2</code> 在 <code>l</code> 和 <code>r</code> 都很大时可能溢出（Python 不怕，但 Java / C++ 要注意）</li>
+<li>安全写法：<code>l + (r - l) // 2</code></li>
+</ul>
+<h3 id="举一反三-6"><a class="markdownIt-Anchor" href="#举一反三-6"></a> 举一反三</h3>
+<ul>
+<li>#704 是基础模板，后续变体：#35 搜索插入位置、#34 查找左右边界、#33 搜索旋转排序数组</li>
+<li>共同骨架：维护 <code>l</code> / <code>r</code>，循环里算 <code>m</code>，按比较结果砍边界</li>
+</ul>
+<h3 id="一句话带走-6"><a class="markdownIt-Anchor" href="#一句话带走-6"></a> 一句话带走</h3>
+<blockquote>
+<p>二分的核心是砍边界，不是算位置。动 <code>l</code> 或 <code>r</code>，再取中间值。</p>
+</blockquote>
+<hr />
+<h2 id="八-系列小结"><a class="markdownIt-Anchor" href="#八-系列小结"></a> 八、系列小结</h2>
+<p>Day 16 ～ 20 的关键词是<strong>框架</strong>：</p>
+<ul>
+<li>递归的三种交付方式（返回值 / <code>self</code> / 返回值挂接）——什么时候用哪个，这几天才真正分清</li>
+<li>两指针同走：同一副骨架，当前层从&quot;比&quot;到&quot;验&quot;到&quot;造&quot;</li>
+<li>BFS：队列存节点、先记 <code>len</code> 再按数取；变体只换 <code>for</code> 循环里的零件</li>
+<li>二分：核心是砍边界，不是算位置</li>
+</ul>
+<p>下一站：BFS 家族剩下的变体（#637 / #515 / #429），以及二分的边界系列（#35 / #34 / #33）。</p>
+<hr />
+<p><em>本文档由 AI（Hermes Agent）根据当日对话实录整理生成，题目讲解部分经本人独立思考和默写验证。</em></p>
+
+    </div>
+    <footer class="article-footer">
+        <blockquote class="article-copyright">
+    <p><strong><span class="icon-user icon"></span>本文作者：</strong>羡笙</p>
+    <p><strong><span class="icon-link icon"></span>本文链接：</strong><a href="https://envysage.github.io/XS-Blog/2026/09/20/algorithm-diary-part2/">https://envysage.github.io/XS-Blog/2026/09/20/algorithm-diary-part2/</a></p>
+    <p><strong><span class="icon-pencil icon"></span>本文标题：</strong>「算法日记（二）：双指针同走、BFS 框架与二分边界」</p>
+    <p><strong><span class="icon-calendar icon"></span>本文发布时间：</strong>2026-09-20 20:30:00</p>
+    
+    <p><strong><span class="icon-copyright icon"></span>本文版权：</strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener nofollow noreferrer" target="_blank"><span class="icon-creative-commons"></span>BY-NC-SA</a> 许可协议。转载请注明出处！</p>
+    <span class="icon-creative-commons article-copyright-bg"></span>
+  </blockquote>
+        <div class="share-wrapper">
+    <a href="https://connect.qq.com/widget/shareqq/index.html?url=https%3A%2F%2Fenvysage.github.io%2FXS-Blog%2F2026%2F09%2F20%2Falgorithm-diary-part2%2F&amp;title=%E7%AE%97%E6%B3%95%E6%97%A5%E8%AE%B0%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9A%E5%8F%8C%E6%8C%87%E9%92%88%E5%90%8C%E8%B5%B0%E3%80%81BFS%20%E6%A1%86%E6%9E%B6%E4%B8%8E%E4%BA%8C%E5%88%86%E8%BE%B9%E7%95%8C&amp;desc=%20%E7%AE%97%E6%B3%95%E6%97%A5%E8%AE%B0%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9A%E5%8F%8C%E6%8C%87%E9%92%88%E5%90%8C%E8%B5%B0%E3%80%81BFS%20%E6%A1%86%E6%9E%B6%E4%B8%8E%E4%BA%8C%E5%88%86%E8%BE%B9%E7%95%8C%0A%0A%E5%AD%A6%E4%B9%A0%E5%91%A8%E6%9C%9F%EF%BC%9A2026.09.16%20%EF%BD%9E%202026.09.18%EF%BC%88Day%2016%20%EF%BD%9E%20Day%2020%EF%BC%89%0A%E4%BD%BF%E7%94%A8%E8%AF%AD%E8%A8%80%EF%BC%9APython%203%0A%E5%86%85%E5%AE%B9%EF%BC%9A%E6%89%BF%E6%8E%A5%E3%80%8A%E7%AE%97%E6%B3%95%E6%97%A5%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89%E3%80%8B%EF%BC%8C%E4%BB%8E%26quot%3B%E4%B8%A4%E6%A3%B5%E6%A0%91%E5%90%8C%E6%AD%A5%E8%A1%8C%E8%B5%B0%26quot%3B%E8%AE%B2%E5%88%B0%20BFS%20%E5%B1%82%E5%BA%8F%E9%81%8D%E5%8E%86%E4%B8%8E%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE%0A&amp;source=https%3A%2F%2Fenvysage.github.io%2FXS-Blog" target="_blank" rel="noopener noreferrer" title="算法日记（二）：双指针同走、BFS 框架与二分边界">
+      <div class="share-icon icon icon-qq">
+      </div>
+    </a>
+</div>
+        <a class="article-category-link" href="/XS-Blog/categories/%E7%AE%97%E6%B3%95/" title="算法" data-aos="zoom-in">算法</a>
+
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+    <div class="article-nav-link-wrap right">
+          <img data-src="https://envysage.github.io/XS-Blog/images/covers/bg3.webp" data-sizes="auto" alt="算法日记（一）：哈希表、链表与递归——把递归当黑盒用" class="lazyload">
+      <a href="/XS-Blog/2026/09/20/algorithm-diary-part1/" aria-label="后一篇: 算法日记（一）：哈希表、链表与递归——把递归当黑盒用"  title="后一篇: 算法日记（一）：哈希表、链表与递归——把递归当黑盒用"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          算法日记（一）：哈希表、链表与递归——把递归当黑盒用
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2026
+        <span class="footer-info-sep rotate"></span>
+      羡笙
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        30.3k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        02:13
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AE%97%E6%B3%95%E6%97%A5%E8%AE%B0%E4%BA%8C%E5%8F%8C%E6%8C%87%E9%92%88%E5%90%8C%E8%B5%B0-bfs-%E6%A1%86%E6%9E%B6%E4%B8%8E%E4%BA%8C%E5%88%86%E8%BE%B9%E7%95%8C"><span class="toc-text"> 算法日记（二）：双指针同走、BFS 框架与二分边界</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80-day-16572-%E5%8F%A6%E4%B8%80%E6%A3%B5%E6%A0%91%E7%9A%84%E5%AD%90%E6%A0%91%E6%88%91%E4%BB%A5%E4%B8%BA%E6%88%91%E7%9C%8B%E6%87%82%E4%BA%86%E9%80%92%E5%BD%922026-09-16"><span class="toc-text"> 一、Day 16｜#572 另一棵树的子树：我以为我看懂了递归（2026-09-16）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8A%E6%97%A5%E9%A2%98%E7%9B%AE"><span class="toc-text"> 今日题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF%E6%BC%94%E8%BF%9B"><span class="toc-text"> 思路演进</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95"><span class="toc-text"> 踩坑记录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9F%A5%E8%AF%86%E7%82%B9%E7%AC%94%E8%AE%B0"><span class="toc-text"> 知识点笔记</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BE%E4%B8%80%E5%8F%8D%E4%B8%89"><span class="toc-text"> 举一反三</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E5%8F%A5%E8%AF%9D%E5%B8%A6%E8%B5%B0"><span class="toc-text"> 一句话带走</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C-day-16%E4%B8%8B617-%E5%90%88%E5%B9%B6%E4%BA%8C%E5%8F%89%E6%A0%91%E4%BB%8E%E7%94%A8-self-%E6%94%92%E6%A0%91%E5%88%B0%E8%BF%94%E5%9B%9E%E5%80%BC%E5%B0%B1%E6%98%AF%E4%BA%A4%E4%BB%98%E7%89%A9"><span class="toc-text"> 二、Day 16（下）｜#617 合并二叉树：从&quot;用 self 攒树&quot;到&quot;返回值就是交付物&quot;</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8A%E6%97%A5%E9%A2%98%E7%9B%AE-2"><span class="toc-text"> 今日题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF%E6%BC%94%E8%BF%9B-2"><span class="toc-text"> 思路演进</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95-2"><span class="toc-text"> 踩坑记录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9F%A5%E8%AF%86%E7%82%B9%E7%AC%94%E8%AE%B0-2"><span class="toc-text"> 知识点笔记</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BE%E4%B8%80%E5%8F%8D%E4%B8%89-2"><span class="toc-text"> 举一反三</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E5%8F%A5%E8%AF%9D%E5%B8%A6%E8%B5%B0-2"><span class="toc-text"> 一句话带走</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89-day-16-%E6%80%BB%E5%A4%8D%E7%9B%98"><span class="toc-text"> 三、Day 16 总复盘</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B-day-17102-%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E5%B1%82%E5%BA%8F%E9%81%8D%E5%8E%86%E4%BB%8E-dfs-%E8%B7%A8%E5%88%B0-bfs2026-09-17"><span class="toc-text"> 四、Day 17｜#102 二叉树的层序遍历：从 DFS 跨到 BFS（2026-09-17）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8A%E6%97%A5%E9%A2%98%E7%9B%AE-3"><span class="toc-text"> 今日题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF%E6%BC%94%E8%BF%9B-3"><span class="toc-text"> 思路演进</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E4%BB%A3%E7%A0%81"><span class="toc-text"> 关键代码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95-3"><span class="toc-text"> 踩坑记录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9F%A5%E8%AF%86%E7%82%B9%E7%AC%94%E8%AE%B0-3"><span class="toc-text"> 知识点笔记</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BE%E4%B8%80%E5%8F%8D%E4%B8%89-3"><span class="toc-text"> 举一反三</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E5%8F%A5%E8%AF%9D%E5%B8%A6%E8%B5%B0-3"><span class="toc-text"> 一句话带走</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94-day-18111-%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E6%9C%80%E5%B0%8F%E6%B7%B1%E5%BA%A62026-09-17"><span class="toc-text"> 五、Day 18｜#111 二叉树的最小深度（2026-09-17）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8A%E6%97%A5%E9%A2%98%E7%9B%AE-4"><span class="toc-text"> 今日题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF%E6%BC%94%E8%BF%9B-4"><span class="toc-text"> 思路演进</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95-4"><span class="toc-text"> 踩坑记录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9F%A5%E8%AF%86%E7%82%B9%E7%AC%94%E8%AE%B0-4"><span class="toc-text"> 知识点笔记</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BE%E4%B8%80%E5%8F%8D%E4%B8%89-4"><span class="toc-text"> 举一反三</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E5%8F%A5%E8%AF%9D%E5%B8%A6%E8%B5%B0-4"><span class="toc-text"> 一句话带走</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD-day-19199-%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E5%8F%B3%E8%A7%86%E5%9B%BE2026-09-18"><span class="toc-text"> 六、Day 19｜#199 二叉树的右视图（2026-09-18）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8A%E6%97%A5%E9%A2%98%E7%9B%AE-5"><span class="toc-text"> 今日题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF%E6%BC%94%E8%BF%9B-5"><span class="toc-text"> 思路演进</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9F%A5%E8%AF%86%E7%82%B9%E7%AC%94%E8%AE%B0-5"><span class="toc-text"> 知识点笔记</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BE%E4%B8%80%E5%8F%8D%E4%B8%89-5"><span class="toc-text"> 举一反三</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E5%8F%A5%E8%AF%9D%E5%B8%A6%E8%B5%B0-5"><span class="toc-text"> 一句话带走</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83-day-20704-%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE%E7%AC%AC%E4%B8%80%E6%AC%A1%E7%A2%B0%E8%BE%B9%E7%95%8C%E6%9D%A1%E4%BB%B62026-09-18"><span class="toc-text"> 七、Day 20｜#704 二分查找：第一次碰边界条件（2026-09-18）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8A%E6%97%A5%E9%A2%98%E7%9B%AE-6"><span class="toc-text"> 今日题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF%E6%BC%94%E8%BF%9B-6"><span class="toc-text"> 思路演进</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95-5"><span class="toc-text"> 踩坑记录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E4%BB%A3%E7%A0%81-2"><span class="toc-text"> 关键代码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9F%A5%E8%AF%86%E7%82%B9%E7%AC%94%E8%AE%B0-6"><span class="toc-text"> 知识点笔记</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BE%E4%B8%80%E5%8F%8D%E4%B8%89-6"><span class="toc-text"> 举一反三</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E5%8F%A5%E8%AF%9D%E5%B8%A6%E8%B5%B0-6"><span class="toc-text"> 一句话带走</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AB-%E7%B3%BB%E5%88%97%E5%B0%8F%E7%BB%93"><span class="toc-text"> 八、系列小结</span></a></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/XS-Blog/avatar/avatar.webp" data-sizes="auto" alt="羡笙" class="lazyload">
+  <div class="sidebar-author-name">羡笙</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">14</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">4</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/EnvySage itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/XS-Blog/images/reimu.png" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/XS-Blog/js/script.js"></script>
+
+
+  
+<script src="/XS-Blog/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/XS-Blog/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/XS-Blog/js/generator_search.js" defer></script>
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+  
+<script src="https://npm.webcache.cn/theme-shokax-pjax@0.0.3/dist/index.umd.js" integrity="sha384-xneY1WY8hOfUzswrE4CrYq35N4BdVcxqxwHPr9zawE&#x2F;jMSCxD+jAPU55x&#x2F;jj3wlf" crossorigin="anonymous"></script>
+
+  
+<script src="/XS-Blog/js/pjax.js"></script>
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "羡笙",
+          title: "算法日记（二）：双指针同走、BFS 框架与二分边界",
+          url: "https://envysage.github.io/XS-Blog/2026/09/20/algorithm-diary-part2/",
+          excerpt: " 算法日记（二）：双指针同走、BFS 框架与二分边界  学习周期：2026.09.16 ～ 2026.09.18（Day 16 ～ Day 20） 使用语言：Python 3 内容：承接《算法日记（一）》，从&amp;quot;两棵树同步行走&amp;quot;讲到 BFS 层序遍历与二分查找 ",
+          description: "",
+          stripContent: " 算法日记（二）：双指针同走、BFS 框架与二分边界  学习周期：2026.09.16 ～ 2026.09.18（Day 16 ～ Day 20） 使用语言：Python 3 内容：承接《算法日记（一）》，从&amp;quot;两棵树同步行走&amp;quot;讲到 BFS 层序遍历与二分查找     一、Day 16｜#572 另一棵树的子树：我以为我看懂了递归（2026-09-16）  今日题目 给你两棵树，判断 subRoot 是不是 root 的子树——所谓子树，是指 root 里存在某个节点，它带着自",
+          date: "Sun Sep 20 2026 20:30:00 GMT+0800",
+          updated: "Sun Sep 20 2026 23:55:54 GMT+0800",
+          cover: "/XS-Blog/images/banner.webp",
+        };
+      </script>
+        
+<script src="/XS-Blog/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/XS-Blog/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+    <script>
+    var setupAPlayer = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        if (window.matchMedia('(max-width: 959px)').matches) {
+          const aplayer = _$('#aplayer');
+          if (aplayer) {
+            const aside = aplayer.parentNode?.parentNode;
+            if (aside?.tagName === 'ASIDE') {
+              aplayer.removeAttribute('data-aos');
+              aplayer.parentNode.removeChild(aplayer);
+              document.body.appendChild(aplayer);
+            }
+          }
+        }
+        new APlayer({
+          theme: "var(--color-link)",
+          container: document.getElementById('aplayer'),
+          audio: [{"name":"忆夏思乡","artist":"MoreanP","url":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/music/MoreanP%20-%20%E5%BF%86%E5%A4%8F%E6%80%9D%E4%B9%A1.mp3","cover":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/cover/MoreanP%20-%20%E5%BF%86%E5%A4%8F%E6%80%9D%E4%B9%A1.jpeg"},{"name":"かくれんぼ","artist":"AliA","url":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/music/AliA%20-%20%E3%81%8B%E3%81%8F%E3%82%8C%E3%82%93%E3%81%BC.mp3","cover":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/cover/AliA%20-%20%E3%81%8B%E3%81%8F%E3%82%8C%E3%82%93%E3%81%BC.jpeg","lrc":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/lyric/%E3%81%8B%E3%81%8F%E3%82%8C%E3%82%93%E3%81%BC%20-%20AliA.lrc"}] || [],
+          fixed: isMobile ? true : (false || false),
+          autoplay: false || false,
+          loop: 'all' || 'all',
+          order: 'list' || 'list',
+          preload: 'auto' || 'auto',
+          volume: 0.4 || 0.7,
+          mutex: true || true,
+          listFolded: false || false,
+          lrcType: 0 || 0,
+        });
+      }
+    }
+    </script>
+  
+<script src="https://npm.webcache.cn/aplayer@1.10.1/dist/APlayer.min.js" integrity="sha384-gdGYZwHnfJM54evoZhpO0s6ZF5BQiybkiyW7VXr+h5UfruuRL&#x2F;aORyw+5+HZoU6e" crossorigin="anonymous" defer onload="setupAPlayer()"></script>
+
+
+
+  </body>
+  </html>

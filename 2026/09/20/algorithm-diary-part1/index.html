@@ -1,0 +1,773 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+    <script async src="https://hm.baidu.com/hm.js?true"></script>
+  <script data-pjax>
+    var _hmt = _hmt || [];
+    _hmt.push(["_trackPageview", location.pathname]);
+  </script>
+
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_a0oqhord1y';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://envysage.github.io/XS-Blog';window.REIMU_CONFIG.relative = '/XS-Blog/';</script>
+  <title>
+    算法日记（一）：哈希表、链表与递归——把递归当黑盒用 | 羡笙の窝
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_a0oqhord1y.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/XS-Blog/css/loader.css">
+
+    <meta name="description" content="算法日记（一）：哈希表、链表与递归——把递归当黑盒用  学习周期：2026.08.30 ～ 2026.09.15（Day 0 ～ Day 15） 使用语言：Python 3 内容：从零开始刷 LeetCode 的过程记录——哈希表、链表、二叉树，以及第一次真正理解递归">
+<meta property="og:type" content="article">
+<meta property="og:title" content="算法日记（一）：哈希表、链表与递归——把递归当黑盒用">
+<meta property="og:url" content="https://envysage.github.io/XS-Blog/2026/09/20/algorithm-diary-part1/index.html">
+<meta property="og:site_name" content="羡笙の窝">
+<meta property="og:description" content="算法日记（一）：哈希表、链表与递归——把递归当黑盒用  学习周期：2026.08.30 ～ 2026.09.15（Day 0 ～ Day 15） 使用语言：Python 3 内容：从零开始刷 LeetCode 的过程记录——哈希表、链表、二叉树，以及第一次真正理解递归">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-09-20T12:00:00.000Z">
+<meta property="article:modified_time" content="2026-09-20T15:55:40.117Z">
+<meta property="article:author" content="羡笙">
+<meta name="twitter:card" content="summary">
+    <link rel="alternate" href="/XS-Blog/atom.xml" title="羡笙の窝" type="application/atom+xml">
+    <link rel="shortcut icon" href="/XS-Blog/images/favicon.ico">
+  
+<link rel="stylesheet" href="/XS-Blog/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+      <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/katex@0.16.24/dist/katex.min.css" integrity="sha384-tTgKLjMYmJr94v8qu2PE5MUGSMbyN2xiH266JUB3gpm8vnnJywd1dWSOEfrFz+YI" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+    <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/aplayer@1.10.1/dist/APlayer.min.css" integrity="sha384-tLMkTWh2pfXNWGFlUS0w1TFtRG5xZ9lPWFOooj+vDDLIL+xBGQU/voDBY5XE2lVh" crossorigin="anonymous">
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/XS-Blog/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/XS-Blog/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/XS-Blog/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/XS-Blog/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/XS-Blog/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/XS-Blog/images/banner.webp" alt="算法日记（一）：哈希表、链表与递归——把递归当黑盒用">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">算法日记（一）：哈希表、链表与递归——把递归当黑盒用</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+              <span id="subtitle"> 算法日记（一）：哈希表、链表与递归——把递归当黑盒用
+
+学习周期：2026.08.30 ～ 2026.09.15（Day 0 ～ Day 15）
+使用语言：Python 3
+内容：从零开始刷 LeetCode 的过程记录——哈希表、链表、二叉树，以及第一次真正理解递归
+</span>
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content" class="sidebar-left"  >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+      <div id="aplayer" theme="var(--color-link)" data-aos="fade-up"></div>
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AE%97%E6%B3%95%E6%97%A5%E8%AE%B0%E4%B8%80%E5%93%88%E5%B8%8C%E8%A1%A8-%E9%93%BE%E8%A1%A8%E4%B8%8E%E9%80%92%E5%BD%92%E6%8A%8A%E9%80%92%E5%BD%92%E5%BD%93%E9%BB%91%E7%9B%92%E7%94%A8"><span class="toc-text"> 算法日记（一）：哈希表、链表与递归——把递归当黑盒用</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80-day-0python-%E5%9F%BA%E7%A1%80-two-sum-%E9%A2%84%E4%B9%A02026-08-30"><span class="toc-text"> 一、Day 0｜Python 基础 + Two Sum 预习（2026-08-30）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8A%E6%97%A5%E5%86%85%E5%AE%B9"><span class="toc-text"> 今日内容</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%A6%E5%88%B0%E7%9A%84%E4%B8%9C%E8%A5%BF"><span class="toc-text"> 学到的东西</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#two-sum-%E6%80%9D%E8%B7%AF%E6%80%BB%E7%BB%93"><span class="toc-text"> Two Sum 思路总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95"><span class="toc-text"> 踩坑记录</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C-day-1%E5%93%88%E5%B8%8C%E8%A1%A8%E4%B8%89%E8%BF%9E2026-08-31"><span class="toc-text"> 二、Day 1｜哈希表三连（2026-08-31）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8A%E6%97%A5%E6%8F%90%E4%BA%A4%E4%B8%80%E5%A4%A9%E5%AE%8C%E6%88%90"><span class="toc-text"> 今日提交（一天完成）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%A6%E5%88%B0%E7%9A%84%E4%B8%9C%E8%A5%BF-2"><span class="toc-text"> 学到的东西</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%98%8E%E5%A4%A9%E8%AE%A1%E5%88%92"><span class="toc-text"> 明天计划</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89-day-12~14%E9%93%BE%E8%A1%A8%E4%B8%89%E9%A2%98-%E7%AC%AC%E4%B8%80%E6%AC%A1%E6%91%B8%E5%88%B0%E9%80%92%E5%BD%922026-09-07-~-09-09"><span class="toc-text"> 三、Day 12～14｜链表三题 + 第一次摸到递归（2026-09-07 ～ 09-09）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%99%E5%87%A0%E5%A4%A9%E5%9C%A8%E5%AD%A6%E4%BB%80%E4%B9%88"><span class="toc-text"> 这几天在学什么</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B8%A9%E5%9D%91%E4%B8%8E%E6%94%B6%E8%8E%B7%E5%9B%9E%E6%BA%AF"><span class="toc-text"> 踩坑与收获（回溯）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B-day-15%E9%80%92%E5%BD%92%E4%B8%93%E9%A2%98%E4%BB%8E%E8%B7%9F%E7%9D%80%E9%93%BE%E8%B7%AF%E8%B5%B0%E4%BC%9A%E7%BB%95%E6%99%95%E5%88%B0%E4%BF%A1%E4%BB%BB%E9%BB%91%E7%9B%922026-09-14-~-09-15"><span class="toc-text"> 四、Day 15｜递归专题：从&quot;跟着链路走会绕晕&quot;到&quot;信任黑盒&quot;（2026-09-14 ～ 09-15）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8A%E6%97%A5%E9%A2%98%E7%9B%AE"><span class="toc-text"> 今日题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF%E6%BC%94%E8%BF%9B"><span class="toc-text"> 思路演进</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95-2"><span class="toc-text"> 踩坑记录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9F%A5%E8%AF%86%E7%82%B9%E7%AC%94%E8%AE%B0"><span class="toc-text"> 知识点笔记</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BE%E4%B8%80%E5%8F%8D%E4%B8%89"><span class="toc-text"> 举一反三</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E5%8F%A5%E8%AF%9D%E5%B8%A6%E8%B5%B0"><span class="toc-text"> 一句话带走</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94-%E4%B8%8A%E7%AF%87%E5%B0%8F%E7%BB%93"><span class="toc-text"> 五、上篇小结</span></a></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/XS-Blog/avatar/avatar.webp" data-sizes="auto" alt="羡笙" class="lazyload">
+  <div class="sidebar-author-name">羡笙</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">14</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">4</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/EnvySage itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-algorithm-diary-part1" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-09-20T12:00:00.000Z" itemprop="datePublished">2026-09-20</time>
+    <time style="display: none;" id="post-update-time">2026-09-20</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="算法日记一哈希表-链表与递归把递归当黑盒用"><a class="markdownIt-Anchor" href="#算法日记一哈希表-链表与递归把递归当黑盒用"></a> 算法日记（一）：哈希表、链表与递归——把递归当黑盒用</h1>
+<blockquote>
+<p>学习周期：2026.08.30 ～ 2026.09.15（Day 0 ～ Day 15）<br />
+使用语言：Python 3<br />
+内容：从零开始刷 LeetCode 的过程记录——哈希表、链表、二叉树，以及第一次真正理解递归</p>
+</blockquote>
+<span id="more"></span>
+<hr />
+<h2 id="一-day-0python-基础-two-sum-预习2026-08-30"><a class="markdownIt-Anchor" href="#一-day-0python-基础-two-sum-预习2026-08-30"></a> 一、Day 0｜Python 基础 + Two Sum 预习（2026-08-30）</h2>
+<h3 id="今日内容"><a class="markdownIt-Anchor" href="#今日内容"></a> 今日内容</h3>
+<p>正式开启算法学习计划。今天没做题，先把 Python 和 Java 的差异搞清楚，为 Day 1 的 Two Sum 做准备。</p>
+<h3 id="学到的东西"><a class="markdownIt-Anchor" href="#学到的东西"></a> 学到的东西</h3>
+<p><strong>1. Python 基本数据结构</strong></p>
+<ul>
+<li>列表 <code>[]</code> ≈ Java 的 <code>ArrayList</code>，一个类型通吃</li>
+<li>字典 <code>{}</code> ≈ Java 的 <code>HashMap</code></li>
+<li><code>m.get(key, 默认值)</code> 比 <code>m[key]</code> 安全，不会抛 <code>KeyError</code></li>
+</ul>
+<p><strong>2. <code>enumerate</code> 是什么</strong></p>
+<ul>
+<li><code>for i, v in enumerate(nums)</code>：<code>enumerate</code> 把索引和元素打包成一对，按顺序拆给两个变量</li>
+<li>不是什么魔法，就是省得自己写 <code>nums[i]</code></li>
+</ul>
+<p><strong>3. 字典推导式</strong></p>
+<ul>
+<li><code>{v: i for i, v in enumerate(nums)}</code>：本质就是 for 循环压缩成一行</li>
+<li>读法从中间往两边：<code>{key: value for 变量 in 可迭代对象}</code></li>
+<li>key 和 value 的顺序由自己决定，不是 <code>enumerate</code> 决定的</li>
+</ul>
+<p><strong>4. 字典 key 的选择</strong></p>
+<ul>
+<li><strong>你想查什么，就把什么放在 key 的位置</strong></li>
+<li>Two Sum 的需求是&quot;给我一个值，告诉我它在哪&quot;，所以值当 key、索引当 value</li>
+<li>索引当 key 几乎没用，因为数组 <code>nums[i]</code> 本身就是&quot;索引 → 值&quot;的映射</li>
+</ul>
+<h3 id="two-sum-思路总结"><a class="markdownIt-Anchor" href="#two-sum-思路总结"></a> Two Sum 思路总结</h3>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">建字典：&#123;值: 索引&#125;</span><br><span class="line">循环：对每个值 v，算 target - v，查字典里有没有，有且不是自己 → 找到</span><br></pre></td></tr></table></figure>
+<h3 id="踩坑记录"><a class="markdownIt-Anchor" href="#踩坑记录"></a> 踩坑记录</h3>
+<ol>
+<li>一开始加了 <code>v == target</code> 和 <code>v &lt; target</code> 的判断——错误，题目要求的是两个数相加</li>
+<li>只 append 了一个索引，忘了加上当前的 <code>i</code>——题目要返回两个索引</li>
+<li>没有判断 <code>m[sub] != i</code>——可能配对到自己</li>
+</ol>
+<hr />
+<h2 id="二-day-1哈希表三连2026-08-31"><a class="markdownIt-Anchor" href="#二-day-1哈希表三连2026-08-31"></a> 二、Day 1｜哈希表三连（2026-08-31）</h2>
+<h3 id="今日提交一天完成"><a class="markdownIt-Anchor" href="#今日提交一天完成"></a> 今日提交（一天完成）</h3>
+<table>
+<thead>
+<tr>
+<th>题号</th>
+<th>题目</th>
+<th>状态</th>
+<th>方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>#1</td>
+<td>Two Sum</td>
+<td>✅</td>
+<td>哈希表存&quot;值 → 索引&quot;，遍历查配对</td>
+</tr>
+<tr>
+<td>#217</td>
+<td>Contains Duplicate</td>
+<td>✅</td>
+<td>边遍历边存 set，遇到重复返回 true</td>
+</tr>
+<tr>
+<td>#242</td>
+<td>Valid Anagram</td>
+<td>✅</td>
+<td>字典计数，s 加 t 减，全归零就对</td>
+</tr>
+</tbody>
+</table>
+<h3 id="学到的东西-2"><a class="markdownIt-Anchor" href="#学到的东西-2"></a> 学到的东西</h3>
+<p><strong>1. “先建再查” vs “边建边查”</strong></p>
+<ul>
+<li>Two Sum：先建完整字典，再遍历查 → 因为要排除自己，需要完整信息</li>
+<li>Contains Duplicate：边遍历边建 → 因为碰到重复就要立刻返回</li>
+</ul>
+<p><strong>2. <code>dict.get(key, 默认值)</code></strong></p>
+<ul>
+<li>替代 <code>if key in dict</code> 的判断，一行搞定&quot;没有就用默认值&quot;</li>
+</ul>
+<p><strong>3. 字典 key 选择原则</strong></p>
+<ul>
+<li>你要查什么，就把什么放 key</li>
+<li>数组本身就是&quot;索引 → 值&quot;，所以很少把索引当 key</li>
+</ul>
+<p><strong>4. 学习偏好确认</strong></p>
+<ul>
+<li>不要语言特有的工具（如 <code>Counter</code>），只用跨语言通用写法</li>
+<li>不要直接给思路和答案，先让自己想</li>
+</ul>
+<h3 id="明天计划"><a class="markdownIt-Anchor" href="#明天计划"></a> 明天计划</h3>
+<p>Day 2 —— Valid Parentheses（栈），第一个不是哈希表的题。</p>
+<hr />
+<h2 id="三-day-12~14链表三题-第一次摸到递归2026-09-07-~-09-09"><a class="markdownIt-Anchor" href="#三-day-12~14链表三题-第一次摸到递归2026-09-07-~-09-09"></a> 三、Day 12～14｜链表三题 + 第一次摸到递归（2026-09-07 ～ 09-09）</h2>
+<blockquote>
+<p><strong>说明</strong>：这几天当时没有逐字记录，以下根据计划表笔记和进度记录回溯重建，细节从简；Day 15 起有完整对话可考。</p>
+</blockquote>
+<h3 id="这几天在学什么"><a class="markdownIt-Anchor" href="#这几天在学什么"></a> 这几天在学什么</h3>
+<p>从数组跨到链表，再跨到二叉树——正好是从&quot;下标&quot;到&quot;指针&quot;再到&quot;递归&quot;的三级跳。</p>
+<h3 id="踩坑与收获回溯"><a class="markdownIt-Anchor" href="#踩坑与收获回溯"></a> 踩坑与收获（回溯）</h3>
+<p><strong>#141 环形链表——链表对象模型是第一道坎。</strong> 之前学数据结构都是在纸上画指针，真写代码才发现自己说不清：<code>head</code> 到底存的是什么？<code>node = head</code> 是引用不是复制——链表不像数组切片，赋值只是多了一个名字指向同一个节点。第一次接触链表必须先画图再上代码，脑内没有节点对象模型，写什么都是蒙。</p>
+<p>快慢指针的结论：slow 走一步、fast 走两步，有环必相遇，没环 fast 先到 <code>None</code>。遍历链表的铁律是<strong>先判断再移动</strong>（<code>while curr and curr.next</code>），防止 <code>None</code> 越界。</p>
+<p><strong>#206 反转链表——三指针套路。</strong> <code>prev</code> / <code>curr</code> / <code>next_node</code>：先把下一个节点存下来（不然一改指向就断链、找不回来了），再反转指向，最后整体前移。这题的&quot;先存后改&quot;是链表题的通用保命习惯。</p>
+<p><strong>#104 最大深度——递归的第一课。</strong> 当时还不会递归，用迭代写（<code>while</code> 一路往下走），写到&quot;叶子走死了想回溯上一个节点&quot;就卡住了——迭代回溯要自己维护栈，太麻烦。递归三行：空树返回 0，否则 <code>1 + max(左, 右)</code>。这个&quot;迭代写不下去 → 递归降维打击&quot;的体感，为 Day 15 的递归专题埋了伏笔。</p>
+<hr />
+<h2 id="四-day-15递归专题从跟着链路走会绕晕到信任黑盒2026-09-14-~-09-15"><a class="markdownIt-Anchor" href="#四-day-15递归专题从跟着链路走会绕晕到信任黑盒2026-09-14-~-09-15"></a> 四、Day 15｜递归专题：从&quot;跟着链路走会绕晕&quot;到&quot;信任黑盒&quot;（2026-09-14 ～ 09-15）</h2>
+<h3 id="今日题目"><a class="markdownIt-Anchor" href="#今日题目"></a> 今日题目</h3>
+<p>#226 翻转二叉树 → #100 相同的树 → #101 对称二叉树 → #543 二叉树的直径。一天四题，全是递归，是计划里第一次正经碰&quot;函数调用自己&quot;这个东西。</p>
+<h3 id="思路演进"><a class="markdownIt-Anchor" href="#思路演进"></a> 思路演进</h3>
+<p><strong>开局就撞上 Day 14 留下的墙。</strong> 我想给 #104 补一个迭代版（<code>while</code> 往下钻、height 计数），钻到叶子发现没有回头路，于是问：&quot;怎么回溯上一个节点？&quot;答案是：迭代回溯得自己用栈存路径，而<strong>递归的调用栈就是那个栈，回溯是自动的</strong>。这句话后来成了理解递归的钥匙。</p>
+<p><strong>真正的坎在思维方式</strong>，当时的原话是：“跟着递归链路去思考的话会给自己绕蒙了。”</p>
+<p>对，那就别跟。递归的正确打开方式不是模拟 CPU，而是<strong>三步框架</strong>：</p>
+<ol>
+<li><strong>这个函数做什么？</strong>——一句话定义，把参数和返回值说清楚</li>
+<li><strong>什么时候停？</strong>——不用递归就能直接回答的情况</li>
+<li><strong>当前层做什么？</strong>——假设子调用都会做对，我只处理我这一层</li>
+</ol>
+<p>配套心法一句话：<strong>不要想&quot;它怎么递归下去的&quot;，只想&quot;它返回后我怎么用结果&quot;。</strong> 就像用 <code>max(a, b)</code> 不会去想 max 内部怎么比较——把递归函数当黑盒用。</p>
+<p><strong>#226 我写的第一版</strong>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">temp = root</span><br><span class="line">temp.left, temp.right = temp.right, temp.left   <span class="comment"># 先交换</span></span><br><span class="line"><span class="variable language_">self</span>.invertTree(temp.left)</span><br><span class="line"><span class="variable language_">self</span>.invertTree(temp.right)                      <span class="comment"># 再递归</span></span><br></pre></td></tr></table></figure>
+<p>能跑，但&quot;交换后 left 已经是原来的 right 了，我递归的到底是哪个？&quot;——顺序一乱脑子就打结。改成<strong>先递归翻转左右子树，再交换，最后返回</strong>，逻辑上等价，人读起来就顺了。</p>
+<p>教训：递归代码不仅要对，还要让自己不晕，顺序按&quot;先问别人、再办自己的事&quot;来摆。</p>
+<p><strong>#100 卡在停止条件</strong>：“不知道怎么思考停止条件”。判据是：<strong>停止条件 = 不用递归就能直接返回答案的情况</strong>。比较两棵树，“都是 <code>None</code>”、&quot;一个是 <code>None</code> 一个不是&quot;这两种当场能答，就是基准情形；&quot;都不是 <code>None</code>&quot;才需要往下问。顺带看懂了 <code>return p.val == q.val and self.isSameTree(...) and self.isSameTree(...)</code> 这种一行 <code>and</code> 链——拆成三个变量分别赋值更清楚，<strong>清楚优先</strong>。</p>
+<p><strong>#101 交出来的第一版</strong>栽在函数定义上：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">left_same = <span class="variable language_">self</span>.isSymmetric(root.left)    <span class="comment"># ❌</span></span><br><span class="line">right_same = <span class="variable language_">self</span>.isSymmetric(root.right)</span><br><span class="line"><span class="keyword">if</span> root.left == root.right: ...</span><br></pre></td></tr></table></figure>
+<p><code>isSymmetric(x)</code> 的语义是&quot;x 这棵树自己对称吗&quot;，但镜像比较需要的是&quot;<strong>两棵</strong>子树是否互为镜像&quot;——函数签名里压根没有第二个参数可用。所以必须<strong>另开一个辅助函数</strong> <code>isMirror(left, right)</code> 接收两个节点，主函数只负责调用它。</p>
+<p>这天的骨架填空练习（<code>if not left and not right: return ???</code>）做完，当时的原话是&quot;莫名其妙写出来蒙对了，我都没想明白&quot;——其实每一行都有出处：三行守卫就是&quot;自己能判断的&quot;，最后一行 <code>and</code> 就是&quot;外配外、里配里&quot;，只是用 #100 的骨架改了配对方向而已。后来要求逐行讲解，拿这棵对称树：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">    1</span><br><span class="line">   / \</span><br><span class="line">  2   2</span><br><span class="line"> / \ / \</span><br><span class="line">3  4 4  3</span><br></pre></td></tr></table></figure>
+<p>走了一遍 <code>isMirror(2,2) → (3,3) + (4,4)</code> 的调用链才真正落地。</p>
+<p><strong>#543 直径</strong>是当天最绕的，但绕的方向变了。一开始质疑提示：“直径 = 左深 + 右深，那不是一般都会通过根节点？”——好质疑，反例是一棵歪树（根只有左链，最长路径 5→3→2→4→6 经过节点 2 根本不碰根），所以要<strong>遍历每个节点、拿它当转折点各试一遍</strong>，于是需要全局状态 <code>self.maxDiameter</code> 边走边更新。</p>
+<p>代码上连撞三个 Python 的坑：</p>
+<ol>
+<li><strong>嵌套函数多写了 <code>self</code> 参数</strong>：<code>def depth(self, node)</code> 嵌在方法里再手动传就错位了——<strong>函数嵌在哪，参数就按谁算</strong>，嵌套函数不是方法，没有隐式 <code>self</code>。</li>
+<li><strong><code>depth</code> 定义在类缩进级别却被当方法调用</strong>，报 <code>takes exactly 1 argument (2 given)</code>——定义在类里就要 <code>def depth(self, node)</code> + <code>self.depth(node)</code> 成对出现，少一边都报错。顺带搞清了 <code>self</code> 指的不是 class，而是<strong>调用方法的那个实例对象</strong>（<code>s = Solution()</code> 里的 <code>s</code>），所以 <code>self.maxDiameter</code> 存的值在两次调用之间不会丢——这就是&quot;全局状态维护&quot;在 LeetCode 类模板里的写法。</li>
+<li><strong>质疑&quot;记录直径和返回深度是不是功能重复&quot;</strong>——不重复：<code>maxDiameter = max(md, left + right)</code> 是<strong>以我为转折点的完整路径</strong>（到为止，不往上传）；<code>return 1 + max(left, right)</code> 是<strong>我往下的单侧深度</strong>（必须往上传给爸爸用）。一个消费，一个供货。</li>
+</ol>
+<p>写完发现这题&quot;还能动态规划&quot;——其实<strong>这个递归本身就是树形 DP</strong>：子问题的解（深度）被上一层复用。DP 和递归的关系也顺手理清了：递归是编程技术，DP 是&quot;拆子问题 + 记住子问题的解&quot;的思想，递归可以是 DP 的实现方式，但 #226 那种&quot;翻完就走、结果不复用&quot;的就不算 DP。</p>
+<h3 id="踩坑记录-2"><a class="markdownIt-Anchor" href="#踩坑记录-2"></a> 踩坑记录</h3>
+<ol>
+<li>迭代回溯难写：树/链的&quot;回头&quot;需要栈，递归的调用栈免费送，别硬写迭代。</li>
+<li>先交换再递归（#226）：代码能过但人读晕，&quot;先问别人再办自己&quot;的顺序更防呆。</li>
+<li>停止条件不会想：找&quot;不用递归就能直接回答&quot;的情况，就是它。</li>
+<li>用 <code>isSymmetric(左)</code> + <code>isSymmetric(右)</code> 做镜像比较（#101）：函数签名对不上需求，双节点比较必须开辅助函数。</li>
+<li>嵌套函数写 <code>self</code>、类方法漏 <code>self</code>：参数错位两连错，定义和调用必须成套。</li>
+<li><code>depth</code> 忘记 <code>return 1 + max(left, right)</code>：递归函数<strong>没有返回值等于黑盒拒绝交货</strong>，上一层拿到的就是 <code>None</code>。</li>
+</ol>
+<h3 id="知识点笔记"><a class="markdownIt-Anchor" href="#知识点笔记"></a> 知识点笔记</h3>
+<ul>
+<li><strong>递归三步框架</strong>：一句话定义 → 停止条件（当场能答的）→ 当前层逻辑（信任黑盒）。全程不展开调用链，验证只拿两三个节点的小树手动 trace。</li>
+<li><strong>辅助函数模式</strong>：一个签名解决不了两种语义时（自己对称 vs 两棵互镜），拆出去。</li>
+<li><strong>全局状态维护</strong>：递归外挂号变量（<code>self.xxx</code> 或嵌套函数 + <code>nonlocal</code>），一边下探一边更新，&quot;路径不过根&quot;类问题的通用解。</li>
+<li><strong>树形 DP 初体验</strong>：返回值往上传子问题解，顺便在局部消费组合答案，就是 DP 的雏形。</li>
+</ul>
+<h3 id="举一反三"><a class="markdownIt-Anchor" href="#举一反三"></a> 举一反三</h3>
+<ul>
+<li>#104 最大深度（Day 14）→ #543 直径（深度复用 + 全局状态）</li>
+<li>#100 相同的树 → #101 对称（配对方向镜像）→ #572 子树（下一天的&quot;找 + 验&quot;双递归）</li>
+<li>迭代 vs 递归的选择：需要回溯优先递归；LeetCode 类模板里跨调用存数据用 <code>self.xxx</code></li>
+</ul>
+<h3 id="一句话带走"><a class="markdownIt-Anchor" href="#一句话带走"></a> 一句话带走</h3>
+<blockquote>
+<p>三步框架：定义一句话，基准当场答，当前层只管&quot;问完怎么用&quot;——别当 CPU，当产品经理。</p>
+</blockquote>
+<hr />
+<h2 id="五-上篇小结"><a class="markdownIt-Anchor" href="#五-上篇小结"></a> 五、上篇小结</h2>
+<p>Day 0 ～ 15 走完了&quot;数组 → 链表 → 树 → 递归&quot;这条线，真正带走的其实只有四句话：</p>
+<ul>
+<li>想查什么，什么就放 key（哈希表）</li>
+<li>先存后改、先判断再移动（链表）</li>
+<li>定义一句话、基准当场答、信任黑盒（递归）</li>
+<li>只有值得跨调用维护的状态才挂 <code>self</code>（全局状态）</li>
+</ul>
+<p>下篇《算法日记（二）：双指针同走、BFS 框架与二分边界》从 #572「另一棵树的子树」开始：同一副&quot;两指针同时往下走&quot;的骨架，怎么从<strong>判断</strong>一路长成<strong>构造</strong>，再跨到 BFS 和二分查找。</p>
+
+    </div>
+    <footer class="article-footer">
+        <blockquote class="article-copyright">
+    <p><strong><span class="icon-user icon"></span>本文作者：</strong>羡笙</p>
+    <p><strong><span class="icon-link icon"></span>本文链接：</strong><a href="https://envysage.github.io/XS-Blog/2026/09/20/algorithm-diary-part1/">https://envysage.github.io/XS-Blog/2026/09/20/algorithm-diary-part1/</a></p>
+    <p><strong><span class="icon-pencil icon"></span>本文标题：</strong>「算法日记（一）：哈希表、链表与递归——把递归当黑盒用」</p>
+    <p><strong><span class="icon-calendar icon"></span>本文发布时间：</strong>2026-09-20 20:00:00</p>
+    
+    <p><strong><span class="icon-copyright icon"></span>本文版权：</strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener nofollow noreferrer" target="_blank"><span class="icon-creative-commons"></span>BY-NC-SA</a> 许可协议。转载请注明出处！</p>
+    <span class="icon-creative-commons article-copyright-bg"></span>
+  </blockquote>
+        <div class="share-wrapper">
+    <a href="https://connect.qq.com/widget/shareqq/index.html?url=https%3A%2F%2Fenvysage.github.io%2FXS-Blog%2F2026%2F09%2F20%2Falgorithm-diary-part1%2F&amp;title=%E7%AE%97%E6%B3%95%E6%97%A5%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%93%88%E5%B8%8C%E8%A1%A8%E3%80%81%E9%93%BE%E8%A1%A8%E4%B8%8E%E9%80%92%E5%BD%92%E2%80%94%E2%80%94%E6%8A%8A%E9%80%92%E5%BD%92%E5%BD%93%E9%BB%91%E7%9B%92%E7%94%A8&amp;desc=%20%E7%AE%97%E6%B3%95%E6%97%A5%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%93%88%E5%B8%8C%E8%A1%A8%E3%80%81%E9%93%BE%E8%A1%A8%E4%B8%8E%E9%80%92%E5%BD%92%E2%80%94%E2%80%94%E6%8A%8A%E9%80%92%E5%BD%92%E5%BD%93%E9%BB%91%E7%9B%92%E7%94%A8%0A%0A%E5%AD%A6%E4%B9%A0%E5%91%A8%E6%9C%9F%EF%BC%9A2026.08.30%20%EF%BD%9E%202026.09.15%EF%BC%88Day%200%20%EF%BD%9E%20Day%2015%EF%BC%89%0A%E4%BD%BF%E7%94%A8%E8%AF%AD%E8%A8%80%EF%BC%9APython%203%0A%E5%86%85%E5%AE%B9%EF%BC%9A%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E5%88%B7%20LeetCode%20%E7%9A%84%E8%BF%87%E7%A8%8B%E8%AE%B0%E5%BD%95%E2%80%94%E2%80%94%E5%93%88%E5%B8%8C%E8%A1%A8%E3%80%81%E9%93%BE%E8%A1%A8%E3%80%81%E4%BA%8C%E5%8F%89%E6%A0%91%EF%BC%8C%E4%BB%A5%E5%8F%8A%E7%AC%AC%E4%B8%80%E6%AC%A1%E7%9C%9F%E6%AD%A3%E7%90%86%E8%A7%A3%E9%80%92%E5%BD%92%0A&amp;source=https%3A%2F%2Fenvysage.github.io%2FXS-Blog" target="_blank" rel="noopener noreferrer" title="算法日记（一）：哈希表、链表与递归——把递归当黑盒用">
+      <div class="share-icon icon icon-qq">
+      </div>
+    </a>
+</div>
+        <a class="article-category-link" href="/XS-Blog/categories/%E7%AE%97%E6%B3%95/" title="算法" data-aos="zoom-in">算法</a>
+
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="https://envysage.github.io/XS-Blog/images/covers/bg5.webp" data-sizes="auto" alt="算法日记（二）：双指针同走、BFS 框架与二分边界" class="lazyload">
+        <a href="/XS-Blog/2026/09/20/algorithm-diary-part2/" aria-label="前一篇: 算法日记（二）：双指针同走、BFS 框架与二分边界" title="前一篇: 算法日记（二）：双指针同走、BFS 框架与二分边界"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            算法日记（二）：双指针同走、BFS 框架与二分边界
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="https://envysage.github.io/XS-Blog/images/covers/bg2.webp" data-sizes="auto" alt="LangGraph 学习笔记：mcp工具调用以及基础人工审查" class="lazyload">
+      <a href="/XS-Blog/2026/05/04/mcp%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8%E6%A8%A1%E5%9E%8B/" aria-label="后一篇: LangGraph 学习笔记：mcp工具调用以及基础人工审查"  title="后一篇: LangGraph 学习笔记：mcp工具调用以及基础人工审查"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          LangGraph 学习笔记：mcp工具调用以及基础人工审查
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2026
+        <span class="footer-info-sep rotate"></span>
+      羡笙
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        30.3k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        02:13
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AE%97%E6%B3%95%E6%97%A5%E8%AE%B0%E4%B8%80%E5%93%88%E5%B8%8C%E8%A1%A8-%E9%93%BE%E8%A1%A8%E4%B8%8E%E9%80%92%E5%BD%92%E6%8A%8A%E9%80%92%E5%BD%92%E5%BD%93%E9%BB%91%E7%9B%92%E7%94%A8"><span class="toc-text"> 算法日记（一）：哈希表、链表与递归——把递归当黑盒用</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80-day-0python-%E5%9F%BA%E7%A1%80-two-sum-%E9%A2%84%E4%B9%A02026-08-30"><span class="toc-text"> 一、Day 0｜Python 基础 + Two Sum 预习（2026-08-30）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8A%E6%97%A5%E5%86%85%E5%AE%B9"><span class="toc-text"> 今日内容</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%A6%E5%88%B0%E7%9A%84%E4%B8%9C%E8%A5%BF"><span class="toc-text"> 学到的东西</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#two-sum-%E6%80%9D%E8%B7%AF%E6%80%BB%E7%BB%93"><span class="toc-text"> Two Sum 思路总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95"><span class="toc-text"> 踩坑记录</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C-day-1%E5%93%88%E5%B8%8C%E8%A1%A8%E4%B8%89%E8%BF%9E2026-08-31"><span class="toc-text"> 二、Day 1｜哈希表三连（2026-08-31）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8A%E6%97%A5%E6%8F%90%E4%BA%A4%E4%B8%80%E5%A4%A9%E5%AE%8C%E6%88%90"><span class="toc-text"> 今日提交（一天完成）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%A6%E5%88%B0%E7%9A%84%E4%B8%9C%E8%A5%BF-2"><span class="toc-text"> 学到的东西</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%98%8E%E5%A4%A9%E8%AE%A1%E5%88%92"><span class="toc-text"> 明天计划</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89-day-12~14%E9%93%BE%E8%A1%A8%E4%B8%89%E9%A2%98-%E7%AC%AC%E4%B8%80%E6%AC%A1%E6%91%B8%E5%88%B0%E9%80%92%E5%BD%922026-09-07-~-09-09"><span class="toc-text"> 三、Day 12～14｜链表三题 + 第一次摸到递归（2026-09-07 ～ 09-09）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%99%E5%87%A0%E5%A4%A9%E5%9C%A8%E5%AD%A6%E4%BB%80%E4%B9%88"><span class="toc-text"> 这几天在学什么</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B8%A9%E5%9D%91%E4%B8%8E%E6%94%B6%E8%8E%B7%E5%9B%9E%E6%BA%AF"><span class="toc-text"> 踩坑与收获（回溯）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B-day-15%E9%80%92%E5%BD%92%E4%B8%93%E9%A2%98%E4%BB%8E%E8%B7%9F%E7%9D%80%E9%93%BE%E8%B7%AF%E8%B5%B0%E4%BC%9A%E7%BB%95%E6%99%95%E5%88%B0%E4%BF%A1%E4%BB%BB%E9%BB%91%E7%9B%922026-09-14-~-09-15"><span class="toc-text"> 四、Day 15｜递归专题：从&quot;跟着链路走会绕晕&quot;到&quot;信任黑盒&quot;（2026-09-14 ～ 09-15）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8A%E6%97%A5%E9%A2%98%E7%9B%AE"><span class="toc-text"> 今日题目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF%E6%BC%94%E8%BF%9B"><span class="toc-text"> 思路演进</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95-2"><span class="toc-text"> 踩坑记录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9F%A5%E8%AF%86%E7%82%B9%E7%AC%94%E8%AE%B0"><span class="toc-text"> 知识点笔记</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BE%E4%B8%80%E5%8F%8D%E4%B8%89"><span class="toc-text"> 举一反三</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E5%8F%A5%E8%AF%9D%E5%B8%A6%E8%B5%B0"><span class="toc-text"> 一句话带走</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94-%E4%B8%8A%E7%AF%87%E5%B0%8F%E7%BB%93"><span class="toc-text"> 五、上篇小结</span></a></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/XS-Blog/avatar/avatar.webp" data-sizes="auto" alt="羡笙" class="lazyload">
+  <div class="sidebar-author-name">羡笙</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">14</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">4</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/EnvySage itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/XS-Blog/images/reimu.png" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/XS-Blog/js/script.js"></script>
+
+
+  
+<script src="/XS-Blog/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/XS-Blog/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/XS-Blog/js/generator_search.js" defer></script>
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+  
+<script src="https://npm.webcache.cn/theme-shokax-pjax@0.0.3/dist/index.umd.js" integrity="sha384-xneY1WY8hOfUzswrE4CrYq35N4BdVcxqxwHPr9zawE&#x2F;jMSCxD+jAPU55x&#x2F;jj3wlf" crossorigin="anonymous"></script>
+
+  
+<script src="/XS-Blog/js/pjax.js"></script>
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "羡笙",
+          title: "算法日记（一）：哈希表、链表与递归——把递归当黑盒用",
+          url: "https://envysage.github.io/XS-Blog/2026/09/20/algorithm-diary-part1/",
+          excerpt: " 算法日记（一）：哈希表、链表与递归——把递归当黑盒用  学习周期：2026.08.30 ～ 2026.09.15（Day 0 ～ Day 15） 使用语言：Python 3 内容：从零开始刷 LeetCode 的过程记录——哈希表、链表、二叉树，以及第一次真正理解递归 ",
+          description: "",
+          stripContent: " 算法日记（一）：哈希表、链表与递归——把递归当黑盒用  学习周期：2026.08.30 ～ 2026.09.15（Day 0 ～ Day 15） 使用语言：Python 3 内容：从零开始刷 LeetCode 的过程记录——哈希表、链表、二叉树，以及第一次真正理解递归     一、Day 0｜Python 基础 + Two Sum 预习（2026-08-30）  今日内容 正式开启算法学习计划。今天没做题，先把 Python 和 Java 的差异搞清楚，为 Day 1 的 Two Sum 做准",
+          date: "Sun Sep 20 2026 20:00:00 GMT+0800",
+          updated: "Sun Sep 20 2026 23:55:40 GMT+0800",
+          cover: "/XS-Blog/images/banner.webp",
+        };
+      </script>
+        
+<script src="/XS-Blog/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/XS-Blog/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+    <script>
+    var setupAPlayer = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        if (window.matchMedia('(max-width: 959px)').matches) {
+          const aplayer = _$('#aplayer');
+          if (aplayer) {
+            const aside = aplayer.parentNode?.parentNode;
+            if (aside?.tagName === 'ASIDE') {
+              aplayer.removeAttribute('data-aos');
+              aplayer.parentNode.removeChild(aplayer);
+              document.body.appendChild(aplayer);
+            }
+          }
+        }
+        new APlayer({
+          theme: "var(--color-link)",
+          container: document.getElementById('aplayer'),
+          audio: [{"name":"忆夏思乡","artist":"MoreanP","url":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/music/MoreanP%20-%20%E5%BF%86%E5%A4%8F%E6%80%9D%E4%B9%A1.mp3","cover":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/cover/MoreanP%20-%20%E5%BF%86%E5%A4%8F%E6%80%9D%E4%B9%A1.jpeg"},{"name":"かくれんぼ","artist":"AliA","url":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/music/AliA%20-%20%E3%81%8B%E3%81%8F%E3%82%8C%E3%82%93%E3%81%BC.mp3","cover":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/cover/AliA%20-%20%E3%81%8B%E3%81%8F%E3%82%8C%E3%82%93%E3%81%BC.jpeg","lrc":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/lyric/%E3%81%8B%E3%81%8F%E3%82%8C%E3%82%93%E3%81%BC%20-%20AliA.lrc"}] || [],
+          fixed: isMobile ? true : (false || false),
+          autoplay: false || false,
+          loop: 'all' || 'all',
+          order: 'list' || 'list',
+          preload: 'auto' || 'auto',
+          volume: 0.4 || 0.7,
+          mutex: true || true,
+          listFolded: false || false,
+          lrcType: 0 || 0,
+        });
+      }
+    }
+    </script>
+  
+<script src="https://npm.webcache.cn/aplayer@1.10.1/dist/APlayer.min.js" integrity="sha384-gdGYZwHnfJM54evoZhpO0s6ZF5BQiybkiyW7VXr+h5UfruuRL&#x2F;aORyw+5+HZoU6e" crossorigin="anonymous" defer onload="setupAPlayer()"></script>
+
+
+
+  </body>
+  </html>
