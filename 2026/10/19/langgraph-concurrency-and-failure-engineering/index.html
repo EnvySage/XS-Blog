@@ -1,0 +1,812 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+    <script async src="https://hm.baidu.com/hm.js?true"></script>
+  <script data-pjax>
+    var _hmt = _hmt || [];
+    _hmt.push(["_trackPageview", location.pathname]);
+  </script>
+
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_a0oqhord1y';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://envysage.github.io/XS-Blog';window.REIMU_CONFIG.relative = '/XS-Blog/';</script>
+  <title>
+    别把 max_concurrency 当成研究员并发数：LangGraph 并发与失败工程笔记 | 羡笙の窝
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_a0oqhord1y.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/XS-Blog/css/loader.css">
+
+    <meta name="description" content="别把 max_concurrency 当成研究员并发数：LangGraph 并发与失败工程笔记  学习日期：2026年10月19日 项目：deepsearch（从零重建 open_deep_research） 环境：LangGraph 1.2.15 &#x2F; Python 3.11   写在前面 前一阵子把 open_deep_research 的核心架构从零重建了一遍：StateGraph、ReAc">
+<meta property="og:type" content="article">
+<meta property="og:title" content="别把 max_concurrency 当成研究员并发数：LangGraph 并发与失败工程笔记">
+<meta property="og:url" content="https://envysage.github.io/XS-Blog/2026/10/19/langgraph-concurrency-and-failure-engineering/index.html">
+<meta property="og:site_name" content="羡笙の窝">
+<meta property="og:description" content="别把 max_concurrency 当成研究员并发数：LangGraph 并发与失败工程笔记  学习日期：2026年10月19日 项目：deepsearch（从零重建 open_deep_research） 环境：LangGraph 1.2.15 &#x2F; Python 3.11   写在前面 前一阵子把 open_deep_research 的核心架构从零重建了一遍：StateGraph、ReAc">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-10-19T12:00:00.000Z">
+<meta property="article:modified_time" content="2026-10-19T10:25:10.880Z">
+<meta property="article:author" content="羡笙">
+<meta name="twitter:card" content="summary">
+    <link rel="alternate" href="/XS-Blog/atom.xml" title="羡笙の窝" type="application/atom+xml">
+    <link rel="shortcut icon" href="/XS-Blog/images/favicon.ico">
+  
+<link rel="stylesheet" href="/XS-Blog/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+      <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/katex@0.16.24/dist/katex.min.css" integrity="sha384-tTgKLjMYmJr94v8qu2PE5MUGSMbyN2xiH266JUB3gpm8vnnJywd1dWSOEfrFz+YI" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+    <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/aplayer@1.10.1/dist/APlayer.min.css" integrity="sha384-tLMkTWh2pfXNWGFlUS0w1TFtRG5xZ9lPWFOooj+vDDLIL+xBGQU/voDBY5XE2lVh" crossorigin="anonymous">
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/XS-Blog/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/XS-Blog/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/XS-Blog/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/XS-Blog/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/XS-Blog/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/XS-Blog/images/banner.webp" alt="别把 max_concurrency 当成研究员并发数：LangGraph 并发与失败工程笔记">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">别把 max_concurrency 当成研究员并发数：LangGraph 并发与失败工程笔记</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content" class="sidebar-left"  >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+      <div id="aplayer" theme="var(--color-link)" data-aos="fade-up"></div>
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%88%AB%E6%8A%8A-max_concurrency-%E5%BD%93%E6%88%90%E7%A0%94%E7%A9%B6%E5%91%98%E5%B9%B6%E5%8F%91%E6%95%B0langgraph-%E5%B9%B6%E5%8F%91%E4%B8%8E%E5%A4%B1%E8%B4%A5%E5%B7%A5%E7%A8%8B%E7%AC%94%E8%AE%B0"><span class="toc-text"> 别把 max_concurrency 当成研究员并发数：LangGraph 并发与失败工程笔记</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%99%E5%9C%A8%E5%89%8D%E9%9D%A2"><span class="toc-text"> 写在前面</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80-max_concurrency-%E4%B8%8D%E6%98%AF%E7%A0%94%E7%A9%B6%E5%91%98%E5%B9%B6%E5%8F%91%E6%95%B0"><span class="toc-text"> 一、max_concurrency 不是“研究员并发数”</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C"><span class="toc-text"> 实验</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BA%90%E7%A0%81%E9%87%8C%E6%98%AF%E4%BB%80%E4%B9%88"><span class="toc-text"> 源码里是什么</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%92%8C%E4%B8%8A%E6%B8%B8%E7%9A%84-max_concurrent_research_units-%E4%B8%8D%E6%98%AF%E4%B8%80%E5%9B%9E%E4%BA%8B"><span class="toc-text"> 和上游的 max_concurrent_research_units 不是一回事</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C-%E9%87%8D%E8%AF%95%E4%BC%9A%E5%8D%A0%E7%9D%80%E5%B9%B6%E5%8F%91%E5%90%8D%E9%A2%9D"><span class="toc-text"> 二、重试会占着并发名额</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E9%87%8D%E8%AF%95%E6%9C%9F%E9%97%B4%E4%BB%8D%E5%8D%A0%E5%B9%B6%E5%8F%91%E5%90%8D%E9%A2%9D"><span class="toc-text"> 1. 重试期间仍占并发名额</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%89%AF%E4%BD%9C%E7%94%A8%E5%BF%85%E9%A1%BB%E5%B9%82%E7%AD%89"><span class="toc-text"> 2. 副作用必须幂等</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E5%AE%A2%E6%88%B7%E7%AB%AF%E9%87%8D%E8%AF%95%E5%92%8C%E8%8A%82%E7%82%B9%E9%87%8D%E8%AF%95%E4%BC%9A%E7%9B%B8%E4%B9%98"><span class="toc-text"> 3. 客户端重试和节点重试会相乘</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%93%AA%E4%BA%9B%E5%BC%82%E5%B8%B8%E4%BC%9A%E9%87%8D%E8%AF%95"><span class="toc-text"> 哪些异常会重试</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89-error_handler-%E8%BF%94%E5%9B%9E-dict%E5%88%86%E6%94%AF%E5%B0%B1%E7%BB%93%E6%9D%9F%E4%BA%86"><span class="toc-text"> 三、error_handler 返回 dict，分支就结束了</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B-timeout-%E5%8F%AA%E5%AF%B9%E5%BC%82%E6%AD%A5%E8%8A%82%E7%82%B9%E6%9C%89%E6%95%88"><span class="toc-text"> 四、timeout 只对异步节点有效</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94-%E4%B8%80%E4%B8%AA%E6%9B%B4%E9%9A%90%E8%94%BD%E7%9A%84-bugcontent-%E4%B8%8D%E4%B8%80%E5%AE%9A%E6%98%AF-text-%E5%9D%97"><span class="toc-text"> 五、一个更隐蔽的 bug：content 不一定是 text 块</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BF%AE%E6%B3%95"><span class="toc-text"> 修法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BF%AE%E5%A4%8D%E5%89%8D%E5%90%8E%E7%9A%84%E6%95%B0%E5%AD%97"><span class="toc-text"> 修复前后的数字</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD-%E7%94%A8-astream_events-%E7%9C%8B%E6%B8%85%E4%B8%80%E6%AC%A1%E8%BF%90%E8%A1%8C"><span class="toc-text"> 六、用 astream_events 看清一次运行</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%80%E5%90%8E%E7%9A%84%E4%B8%89%E4%B8%AA%E7%BB%93%E8%AE%BA"><span class="toc-text"> 最后的三个结论</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%8B%E4%B8%80%E6%AD%A5"><span class="toc-text"> 下一步</span></a></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/XS-Blog/avatar/avatar.webp" data-sizes="auto" alt="羡笙" class="lazyload">
+  <div class="sidebar-author-name">羡笙</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">15</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">4</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/EnvySage itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-langgraph-concurrency-and-failure-engineering" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-10-19T12:00:00.000Z" itemprop="datePublished">2026-10-19</time>
+    <time style="display: none;" id="post-update-time">2026-10-19</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="别把-max_concurrency-当成研究员并发数langgraph-并发与失败工程笔记"><a class="markdownIt-Anchor" href="#别把-max_concurrency-当成研究员并发数langgraph-并发与失败工程笔记"></a> 别把 max_concurrency 当成研究员并发数：LangGraph 并发与失败工程笔记</h1>
+<blockquote>
+<p>学习日期：2026年10月19日<br />
+项目：deepsearch（从零重建 open_deep_research）<br />
+环境：LangGraph 1.2.15 / Python 3.11</p>
+</blockquote>
+<h2 id="写在前面"><a class="markdownIt-Anchor" href="#写在前面"></a> 写在前面</h2>
+<p>前一阵子把 <code>open_deep_research</code> 的核心架构从零重建了一遍：StateGraph、ReAct 循环、supervisor 拆题、并行研究员、配置系统、checkpointer 与 interrupt。能跑通之后，我开始做第二阶段——<strong>加深</strong>。</p>
+<p>重建阶段解决的是“能不能跑”；加深阶段解决的是三个更接近生产的问题：</p>
+<ol>
+<li>同时跑几个？谁在控制？</li>
+<li>失败了怎么办？重试、超时、降级怎么配合？</li>
+<li>怎么知道一次运行里到底发生了什么？</li>
+</ol>
+<p>这篇文章记录其中最容易讲错的三个点，以及一个藏得很深的静默 bug。</p>
+<hr />
+<h2 id="一-max_concurrency-不是研究员并发数"><a class="markdownIt-Anchor" href="#一-max_concurrency-不是研究员并发数"></a> 一、max_concurrency 不是“研究员并发数”</h2>
+<p>我一开始以为，给图传 <code>max_concurrency=2</code>，就是“最多两个研究员同时跑”。</p>
+<p>实测之后发现：<strong>它是整张图一次运行的全局信号量</strong>，主管、研究员、压缩、汇总全都走这个闸门。</p>
+<h3 id="实验"><a class="markdownIt-Anchor" href="#实验"></a> 实验</h3>
+<p>用一个不调用模型的图：6 个任务，每个 <code>sleep(0.5)</code>。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MainState</span>(<span class="title class_ inherited__">TypedDict</span>):</span><br><span class="line">    done: Annotated[<span class="built_in">list</span>, operator.add]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">plan</span>(<span class="params">state: MainState</span>) -&gt; Command:</span><br><span class="line">    <span class="keyword">return</span> Command(</span><br><span class="line">        goto=[Send(<span class="string">&quot;worker&quot;</span>, &#123;<span class="string">&quot;topic&quot;</span>: <span class="string">f&quot;t<span class="subst">&#123;i&#125;</span>&quot;</span>&#125;) <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">6</span>)]</span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">worker</span>(<span class="params">state: WorkerState</span>) -&gt; <span class="built_in">dict</span>:</span><br><span class="line">    <span class="keyword">await</span> probe.enter()</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        <span class="keyword">await</span> asyncio.sleep(<span class="number">0.5</span>)</span><br><span class="line">    <span class="keyword">finally</span>:</span><br><span class="line">        <span class="keyword">await</span> probe.leave()</span><br><span class="line">    <span class="keyword">return</span> &#123;<span class="string">&quot;done&quot;</span>: [state[<span class="string">&quot;topic&quot;</span>]]&#125;</span><br></pre></td></tr></table></figure>
+<p>结果：</p>
+<table>
+<thead>
+<tr>
+<th>配置</th>
+<th>峰值并发</th>
+<th>总耗时</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>max_concurrency=1</code></td>
+<td>1</td>
+<td>3.05s</td>
+</tr>
+<tr>
+<td><code>max_concurrency=2</code></td>
+<td>2</td>
+<td>1.52s</td>
+</tr>
+<tr>
+<td><code>max_concurrency=3</code></td>
+<td>3</td>
+<td>1.02s</td>
+</tr>
+<tr>
+<td>不设</td>
+<td>6</td>
+<td>0.51s</td>
+</tr>
+<tr>
+<td><code>asyncio.gather</code> 不设信号量</td>
+<td>6</td>
+<td>0.51s</td>
+</tr>
+<tr>
+<td><code>asyncio.gather</code> + <code>Semaphore(2)</code></td>
+<td>2</td>
+<td>1.52s</td>
+</tr>
+</tbody>
+</table>
+<h3 id="源码里是什么"><a class="markdownIt-Anchor" href="#源码里是什么"></a> 源码里是什么</h3>
+<p>异步执行器给每个任务套了一个 <code>asyncio.Semaphore</code>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># langgraph/pregel/_executor.py</span></span><br><span class="line"><span class="keyword">if</span> max_concurrency := config.get(<span class="string">&quot;max_concurrency&quot;</span>):</span><br><span class="line">    <span class="variable language_">self</span>.semaphore = asyncio.Semaphore(max_concurrency)</span><br></pre></td></tr></table></figure>
+<p>同步路径则把它当成线程池的 <code>max_workers</code>。</p>
+<p>所以：</p>
+<ul>
+<li><code>Send</code> 只负责<strong>派发</strong>，不负责限流</li>
+<li><code>asyncio.gather</code> 本身也不限流，要自己加 <code>Semaphore</code></li>
+<li><code>max_concurrency</code> 限制的是<strong>整张图同时在跑的任务数</strong></li>
+</ul>
+<h3 id="和上游的-max_concurrent_research_units-不是一回事"><a class="markdownIt-Anchor" href="#和上游的-max_concurrent_research_units-不是一回事"></a> 和上游的 max_concurrent_research_units 不是一回事</h3>
+<p>上游 <code>open_deep_research</code> 里还有一个 <code>max_concurrent_research_units</code>。它做的事完全不同：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">allowed = conduct_research_calls[:configurable.max_concurrent_research_units]</span><br><span class="line">overflow = conduct_research_calls[configurable.max_concurrent_research_units:]</span><br></pre></td></tr></table></figure>
+<p>它直接<strong>切掉多余的 tool call</strong>，超出的返回一条错误 ToolMessage。它限制的是“一次允许派出多少个研究分支”，是<strong>扇出宽度</strong>，不是运行时并发。</p>
+<table>
+<thead>
+<tr>
+<th>机制</th>
+<th>限制什么</th>
+<th>超出时</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>max_concurrency</code></td>
+<td>整张图同时在跑的任务数</td>
+<td>排队</td>
+</tr>
+<tr>
+<td><code>gather + Semaphore</code></td>
+<td>某个阶段同时跑的任务数</td>
+<td>排队</td>
+</tr>
+<tr>
+<td><code>max_concurrent_research_units</code></td>
+<td>一次允许派出的研究分支数</td>
+<td>直接拒绝</td>
+</tr>
+</tbody>
+</table>
+<p>这三个概念混在一起，面试时很容易露馅。</p>
+<hr />
+<h2 id="二-重试会占着并发名额"><a class="markdownIt-Anchor" href="#二-重试会占着并发名额"></a> 二、重试会占着并发名额</h2>
+<p>节点级重试用 <code>RetryPolicy</code>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">builder.add_node(</span><br><span class="line">    <span class="string">&quot;researcher_agent&quot;</span>,</span><br><span class="line">    researcher_agent,</span><br><span class="line">    retry_policy=RetryPolicy(</span><br><span class="line">        max_attempts=<span class="number">3</span>,</span><br><span class="line">        initial_interval=<span class="number">0.5</span>,</span><br><span class="line">        backoff_factor=<span class="number">2.0</span>,</span><br><span class="line">        jitter=<span class="literal">True</span>,</span><br><span class="line">        retry_on=(ConnectionError, TimeoutError),</span><br><span class="line">    ),</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>它重试的是<strong>整个节点函数</strong>，不是某一行。</p>
+<p>这带来三个后果。</p>
+<h3 id="1-重试期间仍占并发名额"><a class="markdownIt-Anchor" href="#1-重试期间仍占并发名额"></a> 1. 重试期间仍占并发名额</h3>
+<p>LangGraph 把整个 <code>arun_with_retry</code> 提交给执行器，而执行器在任务外面套了信号量。所以节点在退避等待时，<strong>名额不释放</strong>。</p>
+<p><code>max_concurrency=2</code>，两个节点都在重试等待，第三个节点只能排队。</p>
+<h3 id="2-副作用必须幂等"><a class="markdownIt-Anchor" href="#2-副作用必须幂等"></a> 2. 副作用必须幂等</h3>
+<p>如果节点里先写数据库、再调模型，模型超时后节点重试，数据库会被写两次。重试不是“免费的第二次机会”，它会重跑整个函数。</p>
+<h3 id="3-客户端重试和节点重试会相乘"><a class="markdownIt-Anchor" href="#3-客户端重试和节点重试会相乘"></a> 3. 客户端重试和节点重试会相乘</h3>
+<p><code>ChatAnthropic(max_retries=2)</code> 自己会重试，外面再套 <code>RetryPolicy(max_attempts=3)</code>，最坏情况是 <strong>3 × 3 = 9 次</strong>调用。调参时要把两层乘起来算。</p>
+<h3 id="哪些异常会重试"><a class="markdownIt-Anchor" href="#哪些异常会重试"></a> 哪些异常会重试</h3>
+<p>LangGraph 的默认策略是：</p>
+<ul>
+<li><code>ConnectionError</code>、HTTP 5xx → 重试</li>
+<li><code>ValueError</code>、<code>TypeError</code>、<code>LookupError</code> 等 → <strong>不重试</strong></li>
+</ul>
+<p>别自己写一个 <code>except Exception: retry</code>，那会把永久失败（比如 400 参数错）也重试一遍，纯烧钱。</p>
+<hr />
+<h2 id="三-error_handler-返回-dict分支就结束了"><a class="markdownIt-Anchor" href="#三-error_handler-返回-dict分支就结束了"></a> 三、error_handler 返回 dict，分支就结束了</h2>
+<p>节点重试耗尽后，可以交给 <code>error_handler</code> 兜底：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">slow_error_handler</span>(<span class="params">state, error: NodeError</span>) -&gt; Command:</span><br><span class="line">    <span class="keyword">return</span> Command(</span><br><span class="line">        goto=<span class="string">&quot;fallback&quot;</span>,</span><br><span class="line">        update=&#123;<span class="string">&quot;log&quot;</span>: [<span class="string">f&quot;<span class="subst">&#123;error.node&#125;</span> 失败: <span class="subst">&#123;<span class="built_in">type</span>(error.error).__name__&#125;</span>&quot;</span>]&#125;,</span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line">builder.add_node(<span class="string">&quot;slow&quot;</span>, slow, error_handler=slow_error_handler)</span><br></pre></td></tr></table></figure>
+<p><code>NodeError</code> 会被自动注入，里面有 <code>error.node</code> 和 <code>error.error</code>。</p>
+<p>这里有一个非常反直觉的细节：<strong>如果返回普通 dict，分支就到此结束了，下游节点不会执行。</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">handler</span>(<span class="params">state, error: NodeError</span>):</span><br><span class="line">    <span class="keyword">return</span> &#123;<span class="string">&quot;status&quot;</span>: <span class="string">&quot;failed&quot;</span>&#125;   <span class="comment"># 只更新 state，不再往下走</span></span><br></pre></td></tr></table></figure>
+<p>我实测过：失败节点后面明明有一条边指向 <code>after</code>，但 handler 返回 dict 时，<code>after</code> 根本不会跑。</p>
+<p>想继续走，必须显式写 <code>goto</code>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">return</span> Command(goto=<span class="string">&quot;fallback&quot;</span>, update=&#123;...&#125;)</span><br></pre></td></tr></table></figure>
+<p>如果失败节点后面直接接 <code>END</code>，返回 dict 就够了——分支结束正是你要的。</p>
+<hr />
+<h2 id="四-timeout-只对异步节点有效"><a class="markdownIt-Anchor" href="#四-timeout-只对异步节点有效"></a> 四、timeout 只对异步节点有效</h2>
+<p>给节点加超时：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">builder.add_node(<span class="string">&quot;compress&quot;</span>, compress, timeout=<span class="number">120</span>)</span><br></pre></td></tr></table></figure>
+<p>两个前提：</p>
+<ol>
+<li>节点必须是 <code>async def</code></li>
+<li>外层必须用 <code>await app.ainvoke(...)</code></li>
+</ol>
+<p>同步节点会直接报：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Node timeouts are only supported for async nodes because sync Python execution</span><br><span class="line">cannot be safely cancelled in-process.</span><br></pre></td></tr></table></figure>
+<p>原因是同步函数一旦开始执行，Python 没法安全地从外面掐断；异步函数在 <code>await</code> 处会把控制权交出来，框架才有机会取消它。</p>
+<p>超时后抛 <code>NodeTimeoutError</code>，<code>error_handler</code> 可以在 <code>error.error</code> 里拿到它。</p>
+<p>还有一个坑：<code>NodeTimeoutError</code> <strong>不在默认的“不重试”名单里</strong>。如果你同时给节点配了 <code>RetryPolicy</code>，超时会先被重试到 <code>max_attempts</code>，才进兜底。想让它直接进兜底，就把 <code>retry_on</code> 写清楚。</p>
+<hr />
+<h2 id="五-一个更隐蔽的-bugcontent-不一定是-text-块"><a class="markdownIt-Anchor" href="#五-一个更隐蔽的-bugcontent-不一定是-text-块"></a> 五、一个更隐蔽的 bug：content 不一定是 text 块</h2>
+<p>这是今天最值钱的发现。</p>
+<p>项目跑完后，图没有报错，但最终报告是空的。日志里有一行很可疑：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">synthesize  input_tokens=50  output_tokens=1719</span><br></pre></td></tr></table></figure>
+<p>50 个输入 token，说明 <code>findings</code> 基本是空的；1719 个输出 token，说明模型在对着空气硬写。</p>
+<p>追下去发现，问题出在一个手写的文本提取函数：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">text_of</span>(<span class="params">msg</span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">    content = msg.content</span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">isinstance</span>(content, <span class="built_in">str</span>):</span><br><span class="line">        <span class="keyword">return</span> content</span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;&quot;</span>.join(</span><br><span class="line">        block.get(<span class="string">&quot;text&quot;</span>, <span class="string">&quot;&quot;</span>)</span><br><span class="line">        <span class="keyword">for</span> block <span class="keyword">in</span> content</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">isinstance</span>(block, <span class="built_in">dict</span>) <span class="keyword">and</span> block.get(<span class="string">&quot;type&quot;</span>) == <span class="string">&quot;text&quot;</span></span><br><span class="line">    )</span><br></pre></td></tr></table></figure>
+<p>它只认这种块：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="string">&quot;type&quot;</span>: <span class="string">&quot;text&quot;</span>, <span class="string">&quot;text&quot;</span>: <span class="string">&quot;...&quot;</span>&#125;</span><br></pre></td></tr></table></figure>
+<p>但自定义 Anthropic 兼容端点实际返回的 <code>content</code> 是混合列表：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line">    <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">    &#123;<span class="string">&#x27;type&#x27;</span>: <span class="string">&#x27;thinking&#x27;</span>, <span class="string">&#x27;thinking&#x27;</span>: <span class="string">&#x27;...&#x27;</span>&#125;,</span><br><span class="line">    <span class="string">&#x27;LangGraph 是 LangChain 团队推出的...&#x27;</span>   <span class="comment"># ← 答案在这里，是裸字符串</span></span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>裸字符串既不是 dict，也没有 <code>type</code> 字段，于是被直接跳过。<code>findings</code> 变成 <code>[&quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;]</code>，汇总节点拿到空材料，最后报告为空。</p>
+<h3 id="修法"><a class="markdownIt-Anchor" href="#修法"></a> 修法</h3>
+<p>用 LangChain 1.x 内置的 <code>AIMessage.text</code>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">text_of</span>(<span class="params">msg</span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">str</span>(msg.text)</span><br></pre></td></tr></table></figure>
+<p>它已经处理了字符串、<code>type: &quot;text&quot;</code> 块，以及混合列表里的裸字符串。</p>
+<h3 id="修复前后的数字"><a class="markdownIt-Anchor" href="#修复前后的数字"></a> 修复前后的数字</h3>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>修复前</th>
+<th>修复后</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>synthesize</code> input_tokens</td>
+<td>50</td>
+<td>474</td>
+</tr>
+<tr>
+<td><code>synthesize</code> 耗时</td>
+<td>75.45s</td>
+<td>39.99s</td>
+</tr>
+<tr>
+<td>总耗时</td>
+<td>113.45s</td>
+<td>75.66s</td>
+</tr>
+</tbody>
+</table>
+<p>不是模型变快了，是它终于有材料了，不用凭空编 2000 多个 token。</p>
+<p>这个 bug 最值得记住的地方是：<strong>它不报错</strong>。图正常结束，日志正常打印，只有最终报告是空的。静默失败比直接崩溃更难发现。</p>
+<hr />
+<h2 id="六-用-astream_events-看清一次运行"><a class="markdownIt-Anchor" href="#六-用-astream_events-看清一次运行"></a> 六、用 astream_events 看清一次运行</h2>
+<p><code>print</code> 只能告诉你“我打印了什么”；trace 能告诉你“谁调了谁、各花了多久”。</p>
+<p>LangGraph 的 <code>astream_events</code> 会吐出结构化事件，每个事件带 <code>run_id</code> 和 <code>parent_ids</code>，可以还原成一棵调用树：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="keyword">for</span> event <span class="keyword">in</span> app.astream_events(inputs, version=<span class="string">&quot;v2&quot;</span>, context=runtime_context):</span><br><span class="line">    kind = event[<span class="string">&quot;event&quot;</span>]</span><br><span class="line">    name = event.get(<span class="string">&quot;name&quot;</span>, <span class="string">&quot;&quot;</span>)</span><br><span class="line">    parents = event.get(<span class="string">&quot;parent_ids&quot;</span>, [])</span><br><span class="line">    pad = <span class="string">&quot;  &quot;</span> * <span class="built_in">len</span>(parents)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> kind == <span class="string">&quot;on_chain_start&quot;</span>:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;<span class="subst">&#123;pad&#125;</span>▶ <span class="subst">&#123;name&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="keyword">elif</span> kind == <span class="string">&quot;on_chain_end&quot;</span>:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;<span class="subst">&#123;pad&#125;</span>■ <span class="subst">&#123;name&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="keyword">elif</span> kind == <span class="string">&quot;on_chat_model_end&quot;</span>:</span><br><span class="line">        usage = event[<span class="string">&quot;data&quot;</span>].get(<span class="string">&quot;output&quot;</span>).usage_metadata</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;<span class="subst">&#123;pad&#125;</span>✓ 模型 <span class="subst">&#123;name&#125;</span> usage=<span class="subst">&#123;usage&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="keyword">elif</span> kind == <span class="string">&quot;on_tool_start&quot;</span>:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;<span class="subst">&#123;pad&#125;</span>🔧 工具 <span class="subst">&#123;name&#125;</span>&quot;</span>)</span><br></pre></td></tr></table></figure>
+<p>实际输出大概是这样：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">▶ LangGraph</span><br><span class="line">  ▶ supervisor</span><br><span class="line">    🤖 模型</span><br><span class="line">    ✓ 模型  9.93s  usage=&#123;...&#125;</span><br><span class="line">  ■ supervisor  9.94s</span><br><span class="line">  ▶ researcher</span><br><span class="line">    ▶ researcher_agent</span><br><span class="line">      🤖 模型</span><br><span class="line">      ✓ 模型  1.80s  usage=&#123;...&#125;</span><br><span class="line">    ■ researcher_agent  1.81s</span><br><span class="line">    ▶ researcher_call_tools</span><br><span class="line">      🔧 工具 search</span><br><span class="line">      ✓ 工具 search</span><br><span class="line">    ■ researcher_call_tools  0.01s</span><br><span class="line">    ▶ compress</span><br><span class="line">      🤖 模型</span><br><span class="line">      ✓ 模型  4.41s  usage=&#123;...&#125;</span><br><span class="line">    ■ compress  4.41s</span><br><span class="line">  ■ researcher  16.06s</span><br><span class="line">  ▶ synthesize</span><br><span class="line">    🤖 模型</span><br><span class="line">    ✓ 模型  39.99s  usage=&#123;...&#125;</span><br><span class="line">  ■ synthesize  39.99s</span><br><span class="line">■ LangGraph  75.65s</span><br></pre></td></tr></table></figure>
+<p>有了这棵树，你就能直接回答：</p>
+<ul>
+<li>哪个节点最慢？</li>
+<li>每个研究员调了几次模型？</li>
+<li>工具有没有失败？</li>
+<li>token 花在哪个阶段？</li>
+<li>子图的出口有没有走到？</li>
+</ul>
+<p>trace 不是“更花哨的日志”，它是<strong>带父子关系、耗时和 token 的结构化数据</strong>。打印只是它的一种展示方式。</p>
+<hr />
+<h2 id="最后的三个结论"><a class="markdownIt-Anchor" href="#最后的三个结论"></a> 最后的三个结论</h2>
+<ol>
+<li><strong><code>max_concurrency</code> 是整张图的全局信号量</strong>，不是研究员并发数；<code>max_concurrent_research_units</code> 是扇出宽度上限，两者不是一回事。</li>
+<li><strong>重试会占着并发名额</strong>，退避等待时也不释放；重试还会重跑整个节点，副作用必须幂等。</li>
+<li><strong><code>error_handler</code> 返回 dict 只更新状态、分支结束</strong>；要接着走必须 <code>Command(goto=...)</code>。</li>
+</ol>
+<p>如果只让我留一句，我会留这个：</p>
+<blockquote>
+<p>失败处理的目标不是“让图不崩”，而是“失败可见，并且有一个可预期的出口”。</p>
+</blockquote>
+<p>图活着但报告是空的，和没处理失败差不多。</p>
+<hr />
+<h2 id="下一步"><a class="markdownIt-Anchor" href="#下一步"></a> 下一步</h2>
+<ul>
+<li>跑 3 次基线，记录总耗时和各阶段耗时，取中位数</li>
+<li>做一个小型评估集：5 个固定问题 + 必含要点 + 规则检查 / LLM judge</li>
+<li>把假的搜索工具换成真实搜索，并用评估集证明它确实变好了</li>
+</ul>
+<p>重建是“能不能跑”，加深是“跑得稳不稳、贵不贵、怎么证明它好”。这条路还长，但至少现在，失败不再静默了。</p>
+
+    </div>
+    <footer class="article-footer">
+        <blockquote class="article-copyright">
+    <p><strong><span class="icon-user icon"></span>本文作者：</strong>羡笙</p>
+    <p><strong><span class="icon-link icon"></span>本文链接：</strong><a href="https://envysage.github.io/XS-Blog/2026/10/19/langgraph-concurrency-and-failure-engineering/">https://envysage.github.io/XS-Blog/2026/10/19/langgraph-concurrency-and-failure-engineering/</a></p>
+    <p><strong><span class="icon-pencil icon"></span>本文标题：</strong>「别把 max_concurrency 当成研究员并发数：LangGraph 并发与失败工程笔记」</p>
+    <p><strong><span class="icon-calendar icon"></span>本文发布时间：</strong>2026-10-19 20:00:00</p>
+    
+    <p><strong><span class="icon-copyright icon"></span>本文版权：</strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener nofollow noreferrer" target="_blank"><span class="icon-creative-commons"></span>BY-NC-SA</a> 许可协议。转载请注明出处！</p>
+    <span class="icon-creative-commons article-copyright-bg"></span>
+  </blockquote>
+        <div class="share-wrapper">
+    <a href="https://connect.qq.com/widget/shareqq/index.html?url=https%3A%2F%2Fenvysage.github.io%2FXS-Blog%2F2026%2F10%2F19%2Flanggraph-concurrency-and-failure-engineering%2F&amp;title=%E5%88%AB%E6%8A%8A%20max_concurrency%20%E5%BD%93%E6%88%90%E7%A0%94%E7%A9%B6%E5%91%98%E5%B9%B6%E5%8F%91%E6%95%B0%EF%BC%9ALangGraph%20%E5%B9%B6%E5%8F%91%E4%B8%8E%E5%A4%B1%E8%B4%A5%E5%B7%A5%E7%A8%8B%E7%AC%94%E8%AE%B0&amp;desc=%E5%88%AB%E6%8A%8A%20max_concurrency%20%E5%BD%93%E6%88%90%E7%A0%94%E7%A9%B6%E5%91%98%E5%B9%B6%E5%8F%91%E6%95%B0%EF%BC%9ALangGraph%20%E5%B9%B6%E5%8F%91%E4%B8%8E%E5%A4%B1%E8%B4%A5%E5%B7%A5%E7%A8%8B%E7%AC%94%E8%AE%B0&amp;source=https%3A%2F%2Fenvysage.github.io%2FXS-Blog" target="_blank" rel="noopener noreferrer" title="别把 max_concurrency 当成研究员并发数：LangGraph 并发与失败工程笔记">
+      <div class="share-icon icon icon-qq">
+      </div>
+    </a>
+</div>
+        <a class="article-category-link" href="/XS-Blog/categories/AI/" title="AI" data-aos="zoom-in">AI</a>
+
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+    <div class="article-nav-link-wrap right">
+          <img data-src="https://d-sketon.top/img/_backwebp/bg1.webp" data-sizes="auto" alt="算法日记（二）：双指针同走、BFS 框架与二分边界" class="lazyload">
+      <a href="/XS-Blog/2026/09/20/algorithm-diary-part2/" aria-label="后一篇: 算法日记（二）：双指针同走、BFS 框架与二分边界"  title="后一篇: 算法日记（二）：双指针同走、BFS 框架与二分边界"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          算法日记（二）：双指针同走、BFS 框架与二分边界
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2026
+        <span class="footer-info-sep rotate"></span>
+      羡笙
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        32.8k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        02:23
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%88%AB%E6%8A%8A-max_concurrency-%E5%BD%93%E6%88%90%E7%A0%94%E7%A9%B6%E5%91%98%E5%B9%B6%E5%8F%91%E6%95%B0langgraph-%E5%B9%B6%E5%8F%91%E4%B8%8E%E5%A4%B1%E8%B4%A5%E5%B7%A5%E7%A8%8B%E7%AC%94%E8%AE%B0"><span class="toc-text"> 别把 max_concurrency 当成研究员并发数：LangGraph 并发与失败工程笔记</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%99%E5%9C%A8%E5%89%8D%E9%9D%A2"><span class="toc-text"> 写在前面</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80-max_concurrency-%E4%B8%8D%E6%98%AF%E7%A0%94%E7%A9%B6%E5%91%98%E5%B9%B6%E5%8F%91%E6%95%B0"><span class="toc-text"> 一、max_concurrency 不是“研究员并发数”</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C"><span class="toc-text"> 实验</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BA%90%E7%A0%81%E9%87%8C%E6%98%AF%E4%BB%80%E4%B9%88"><span class="toc-text"> 源码里是什么</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%92%8C%E4%B8%8A%E6%B8%B8%E7%9A%84-max_concurrent_research_units-%E4%B8%8D%E6%98%AF%E4%B8%80%E5%9B%9E%E4%BA%8B"><span class="toc-text"> 和上游的 max_concurrent_research_units 不是一回事</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C-%E9%87%8D%E8%AF%95%E4%BC%9A%E5%8D%A0%E7%9D%80%E5%B9%B6%E5%8F%91%E5%90%8D%E9%A2%9D"><span class="toc-text"> 二、重试会占着并发名额</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E9%87%8D%E8%AF%95%E6%9C%9F%E9%97%B4%E4%BB%8D%E5%8D%A0%E5%B9%B6%E5%8F%91%E5%90%8D%E9%A2%9D"><span class="toc-text"> 1. 重试期间仍占并发名额</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%89%AF%E4%BD%9C%E7%94%A8%E5%BF%85%E9%A1%BB%E5%B9%82%E7%AD%89"><span class="toc-text"> 2. 副作用必须幂等</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E5%AE%A2%E6%88%B7%E7%AB%AF%E9%87%8D%E8%AF%95%E5%92%8C%E8%8A%82%E7%82%B9%E9%87%8D%E8%AF%95%E4%BC%9A%E7%9B%B8%E4%B9%98"><span class="toc-text"> 3. 客户端重试和节点重试会相乘</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%93%AA%E4%BA%9B%E5%BC%82%E5%B8%B8%E4%BC%9A%E9%87%8D%E8%AF%95"><span class="toc-text"> 哪些异常会重试</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89-error_handler-%E8%BF%94%E5%9B%9E-dict%E5%88%86%E6%94%AF%E5%B0%B1%E7%BB%93%E6%9D%9F%E4%BA%86"><span class="toc-text"> 三、error_handler 返回 dict，分支就结束了</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B-timeout-%E5%8F%AA%E5%AF%B9%E5%BC%82%E6%AD%A5%E8%8A%82%E7%82%B9%E6%9C%89%E6%95%88"><span class="toc-text"> 四、timeout 只对异步节点有效</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94-%E4%B8%80%E4%B8%AA%E6%9B%B4%E9%9A%90%E8%94%BD%E7%9A%84-bugcontent-%E4%B8%8D%E4%B8%80%E5%AE%9A%E6%98%AF-text-%E5%9D%97"><span class="toc-text"> 五、一个更隐蔽的 bug：content 不一定是 text 块</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BF%AE%E6%B3%95"><span class="toc-text"> 修法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BF%AE%E5%A4%8D%E5%89%8D%E5%90%8E%E7%9A%84%E6%95%B0%E5%AD%97"><span class="toc-text"> 修复前后的数字</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD-%E7%94%A8-astream_events-%E7%9C%8B%E6%B8%85%E4%B8%80%E6%AC%A1%E8%BF%90%E8%A1%8C"><span class="toc-text"> 六、用 astream_events 看清一次运行</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%80%E5%90%8E%E7%9A%84%E4%B8%89%E4%B8%AA%E7%BB%93%E8%AE%BA"><span class="toc-text"> 最后的三个结论</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%8B%E4%B8%80%E6%AD%A5"><span class="toc-text"> 下一步</span></a></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/XS-Blog/avatar/avatar.webp" data-sizes="auto" alt="羡笙" class="lazyload">
+  <div class="sidebar-author-name">羡笙</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">15</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">4</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/EnvySage itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/XS-Blog/images/reimu.png" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/XS-Blog/js/script.js"></script>
+
+
+  
+<script src="/XS-Blog/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/XS-Blog/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/XS-Blog/js/generator_search.js" defer></script>
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+  
+<script src="https://npm.webcache.cn/theme-shokax-pjax@0.0.3/dist/index.umd.js" integrity="sha384-xneY1WY8hOfUzswrE4CrYq35N4BdVcxqxwHPr9zawE&#x2F;jMSCxD+jAPU55x&#x2F;jj3wlf" crossorigin="anonymous"></script>
+
+  
+<script src="/XS-Blog/js/pjax.js"></script>
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "羡笙",
+          title: "别把 max_concurrency 当成研究员并发数：LangGraph 并发与失败工程笔记",
+          url: "https://envysage.github.io/XS-Blog/2026/10/19/langgraph-concurrency-and-failure-engineering/",
+          excerpt: "",
+          description: "",
+          stripContent: " 别把 max_concurrency 当成研究员并发数：LangGraph 并发与失败工程笔记  学习日期：2026年10月19日 项目：deepsearch（从零重建 open_deep_research） 环境：LangGraph 1.2.15 / Python 3.11   写在前面 前一阵子把 open_deep_research 的核心架构从零重建了一遍：StateGraph、ReAct 循环、supervisor 拆题、并行研究员、配置系统、checkpointer 与 inter",
+          date: "Mon Oct 19 2026 20:00:00 GMT+0800",
+          updated: "Mon Oct 19 2026 18:25:10 GMT+0800",
+          cover: "/XS-Blog/images/banner.webp",
+        };
+      </script>
+        
+<script src="/XS-Blog/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/XS-Blog/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+    <script>
+    var setupAPlayer = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        if (window.matchMedia('(max-width: 959px)').matches) {
+          const aplayer = _$('#aplayer');
+          if (aplayer) {
+            const aside = aplayer.parentNode?.parentNode;
+            if (aside?.tagName === 'ASIDE') {
+              aplayer.removeAttribute('data-aos');
+              aplayer.parentNode.removeChild(aplayer);
+              document.body.appendChild(aplayer);
+            }
+          }
+        }
+        new APlayer({
+          theme: "var(--color-link)",
+          container: document.getElementById('aplayer'),
+          audio: [{"name":"忆夏思乡","artist":"MoreanP","url":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/music/MoreanP%20-%20%E5%BF%86%E5%A4%8F%E6%80%9D%E4%B9%A1.mp3","cover":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/cover/MoreanP%20-%20%E5%BF%86%E5%A4%8F%E6%80%9D%E4%B9%A1.jpeg"},{"name":"かくれんぼ","artist":"AliA","url":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/music/AliA%20-%20%E3%81%8B%E3%81%8F%E3%82%8C%E3%82%93%E3%81%BC.mp3","cover":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/cover/AliA%20-%20%E3%81%8B%E3%81%8F%E3%82%8C%E3%82%93%E3%81%BC.jpeg","lrc":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/lyric/%E3%81%8B%E3%81%8F%E3%82%8C%E3%82%93%E3%81%BC%20-%20AliA.lrc"}] || [],
+          fixed: isMobile ? true : (false || false),
+          autoplay: false || false,
+          loop: 'all' || 'all',
+          order: 'list' || 'list',
+          preload: 'auto' || 'auto',
+          volume: 0.4 || 0.7,
+          mutex: true || true,
+          listFolded: false || false,
+          lrcType: 0 || 0,
+        });
+      }
+    }
+    </script>
+  
+<script src="https://npm.webcache.cn/aplayer@1.10.1/dist/APlayer.min.js" integrity="sha384-gdGYZwHnfJM54evoZhpO0s6ZF5BQiybkiyW7VXr+h5UfruuRL&#x2F;aORyw+5+HZoU6e" crossorigin="anonymous" defer onload="setupAPlayer()"></script>
+
+
+
+  </body>
+  </html>
