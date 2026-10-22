@@ -1,0 +1,766 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+    <script async src="https://hm.baidu.com/hm.js?true"></script>
+  <script data-pjax>
+    var _hmt = _hmt || [];
+    _hmt.push(["_trackPageview", location.pathname]);
+  </script>
+
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_a0oqhord1y';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://envysage.github.io/XS-Blog';window.REIMU_CONFIG.relative = '/XS-Blog/';</script>
+  <title>
+    拆服务不是拆表：聊天室微服务化的第一步 | 羡笙の窝
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_a0oqhord1y.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/XS-Blog/css/loader.css">
+
+    <meta name="description" content="拆服务不是拆表：聊天室微服务化的第一步  学习日期：2026年10月21日 项目：Muchat-Back → muchat-cloud 环境：Java 21 &#x2F; Spring Boot 3.3.5 &#x2F; Spring Cloud 2023.0.5 &#x2F; Spring Cloud Alibaba 2023.0.3.3   起因 Muchat-Back 是一个能跑的聊天室单体：用户、群聊、消息、通知、文">
+<meta property="og:type" content="article">
+<meta property="og:title" content="拆服务不是拆表：聊天室微服务化的第一步">
+<meta property="og:url" content="https://envysage.github.io/XS-Blog/2026/10/21/2026-10-21-monolith-to-microservices-day1/index.html">
+<meta property="og:site_name" content="羡笙の窝">
+<meta property="og:description" content="拆服务不是拆表：聊天室微服务化的第一步  学习日期：2026年10月21日 项目：Muchat-Back → muchat-cloud 环境：Java 21 &#x2F; Spring Boot 3.3.5 &#x2F; Spring Cloud 2023.0.5 &#x2F; Spring Cloud Alibaba 2023.0.3.3   起因 Muchat-Back 是一个能跑的聊天室单体：用户、群聊、消息、通知、文">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-10-21T12:00:00.000Z">
+<meta property="article:modified_time" content="2026-10-22T02:03:15.240Z">
+<meta property="article:author" content="羡笙">
+<meta name="twitter:card" content="summary">
+    <link rel="alternate" href="/XS-Blog/atom.xml" title="羡笙の窝" type="application/atom+xml">
+    <link rel="shortcut icon" href="/XS-Blog/images/favicon.ico">
+  
+<link rel="stylesheet" href="/XS-Blog/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+      <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/katex@0.16.24/dist/katex.min.css" integrity="sha384-tTgKLjMYmJr94v8qu2PE5MUGSMbyN2xiH266JUB3gpm8vnnJywd1dWSOEfrFz+YI" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+    <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/aplayer@1.10.1/dist/APlayer.min.css" integrity="sha384-tLMkTWh2pfXNWGFlUS0w1TFtRG5xZ9lPWFOooj+vDDLIL+xBGQU/voDBY5XE2lVh" crossorigin="anonymous">
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/XS-Blog/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/XS-Blog/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/XS-Blog/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/XS-Blog/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/XS-Blog/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/XS-Blog/images/banner.webp" alt="拆服务不是拆表：聊天室微服务化的第一步">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">拆服务不是拆表：聊天室微服务化的第一步</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content" class="sidebar-left"  >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+      <div id="aplayer" theme="var(--color-link)" data-aos="fade-up"></div>
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%8B%86%E6%9C%8D%E5%8A%A1%E4%B8%8D%E6%98%AF%E6%8B%86%E8%A1%A8%E8%81%8A%E5%A4%A9%E5%AE%A4%E5%BE%AE%E6%9C%8D%E5%8A%A1%E5%8C%96%E7%9A%84%E7%AC%AC%E4%B8%80%E6%AD%A5"><span class="toc-text"> 拆服务不是拆表：聊天室微服务化的第一步</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B5%B7%E5%9B%A0"><span class="toc-text"> 起因</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80-%E5%85%88%E8%AF%81%E6%98%8E%E6%97%A7%E7%9A%84%E8%BF%98%E8%83%BD%E8%B7%91"><span class="toc-text"> 一、先证明旧的还能跑</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C-%E6%8B%86%E6%9C%8D%E5%8A%A1%E7%9A%84%E4%BE%9D%E6%8D%AE%E6%98%AF%E4%B8%9A%E5%8A%A1%E5%9F%9F%E4%B8%8D%E6%98%AF%E8%A1%A8"><span class="toc-text"> 二、拆服务的依据是业务域，不是表</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89-%E6%8B%86%E5%BA%93%E7%9A%84%E6%9C%AC%E8%B4%A8%E6%98%AF%E9%87%8D%E6%96%B0%E5%88%92%E5%88%86%E5%86%99%E8%B4%9F%E8%B4%A3%E4%BA%BA"><span class="toc-text"> 三、拆库的本质是重新划分写负责人</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B-nacos-%E6%98%AF%E5%9C%B0%E5%9D%80%E7%B0%BF%E4%B8%8D%E6%98%AF%E8%B0%83%E7%94%A8%E8%80%85"><span class="toc-text"> 四、Nacos 是地址簿，不是调用者</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94-%E7%BD%91%E5%85%B3%E5%8F%AA%E5%81%9A%E5%85%A5%E5%8F%A3%E8%AF%A5%E5%81%9A%E7%9A%84%E4%BA%8B"><span class="toc-text"> 五、网关只做入口该做的事</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD-%E8%B7%A8%E6%9C%8D%E5%8A%A1%E5%A5%91%E7%BA%A6%E5%85%88%E7%BB%9F%E4%B8%80%E5%91%BD%E5%90%8D"><span class="toc-text"> 六、跨服务契约先统一命名</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%8A%E5%A4%A9%E8%B8%A9%E7%9A%84%E5%9D%91"><span class="toc-text"> 今天踩的坑</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%8A%E5%A4%A9%E6%9C%80%E5%80%BC%E9%92%B1%E7%9A%84%E4%B8%89%E6%9D%A1"><span class="toc-text"> 今天最值钱的三条</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%95%99%E7%BB%99%E8%87%AA%E5%B7%B1%E7%9A%84%E5%85%AD%E4%B8%AA%E9%97%AE%E9%A2%98"><span class="toc-text"> 留给自己的六个问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%8B%E4%B8%80%E6%AD%A5"><span class="toc-text"> 下一步</span></a></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/XS-Blog/avatar/avatar.webp" data-sizes="auto" alt="羡笙" class="lazyload">
+  <div class="sidebar-author-name">羡笙</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">18</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">4</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/EnvySage itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-2026-10-21-monolith-to-microservices-day1" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-10-21T12:00:00.000Z" itemprop="datePublished">2026-10-21</time>
+    <time style="display: none;" id="post-update-time">2026-10-22</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="拆服务不是拆表聊天室微服务化的第一步"><a class="markdownIt-Anchor" href="#拆服务不是拆表聊天室微服务化的第一步"></a> 拆服务不是拆表：聊天室微服务化的第一步</h1>
+<blockquote>
+<p>学习日期：2026年10月21日<br />
+项目：Muchat-Back → muchat-cloud<br />
+环境：Java 21 / Spring Boot 3.3.5 / Spring Cloud 2023.0.5 / Spring Cloud Alibaba 2023.0.3.3</p>
+</blockquote>
+<h2 id="起因"><a class="markdownIt-Anchor" href="#起因"></a> 起因</h2>
+<p>Muchat-Back 是一个能跑的聊天室单体：用户、群聊、消息、通知、文件，全在一个进程、一个数据库里。</p>
+<p>它没有坏。但所有东西都长在了一起：改一个通知模板要重新发布整个应用，消息表里掺着用户表的字段，一次本地事务横跨五个业务域。</p>
+<p>我决定把它拆成微服务。第一天的目标不是&quot;拆完&quot;，而是先立四块地基：</p>
+<ol>
+<li>基础设施能起来</li>
+<li>工程骨架能编译、能测试</li>
+<li>数据库边界先划清楚</li>
+<li>所有流量有唯一入口</li>
+</ol>
+<p>拆之前先留退路：原单体整体移进 <code>legacy/</code>，不参与 Maven 构建，随时能跑起来做对照。</p>
+<p><strong>微服务化的第一步不是拆代码，是保证你随时能回到拆之前。</strong></p>
+<h2 id="一-先证明旧的还能跑"><a class="markdownIt-Anchor" href="#一-先证明旧的还能跑"></a> 一、先证明旧的还能跑</h2>
+<p>很多人一上来就新建模块。我先做的事是：让原来的单体在 Java 21 下完整构建，并调通验证码接口，确认返回 <code>200 image/png</code>。</p>
+<p>这个动作看起来浪费时间，但它给整次重构定了一个基线：<strong>如果新架构出了问题，我能分清是&quot;迁移引入的&quot;还是&quot;本来就有&quot;。</strong></p>
+<p>基础设施同理。Nacos、MySQL、Redis、Kafka、Sentinel 用 Docker Compose 一次拉起，先确认每个组件都能连上，再写业务代码。</p>
+<p>顺序是反的会怎样？你会同时怀疑三件事：代码写错了、配置写错了、中间件没起来。排查成本不是相加，是相乘。</p>
+<h2 id="二-拆服务的依据是业务域不是表"><a class="markdownIt-Anchor" href="#二-拆服务的依据是业务域不是表"></a> 二、拆服务的依据是业务域，不是表</h2>
+<p>最容易犯的错，是看着数据库表拆服务：<code>users</code> 一个服务，<code>user_contacts</code> 一个服务，<code>chat_room</code> 一个服务。</p>
+<p>这样拆出来的不是微服务，是&quot;分布式单体&quot;的零件。</p>
+<p>真正的判断依据是这几条：</p>
+<ul>
+<li>事务边界：哪些表经常在同一个本地事务里改</li>
+<li>数据归属：哪张表只有一个明确的写负责人</li>
+<li>访问模式：哪些数据总是一起查</li>
+<li>负载特征：哪些接口的 QPS 和延迟要求差一个数量级</li>
+<li>变更频率：哪些功能总是一起改</li>
+<li>团队边界：谁负责改、谁负责背锅</li>
+</ul>
+<p>所以最后的划分是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">muchat-user     users, user_contacts</span><br><span class="line">muchat-chat     chat_room, chat_room_member</span><br><span class="line">muchat-message  message</span><br><span class="line">muchat-notice   system_notice</span><br></pre></td></tr></table></figure>
+<p><code>users</code> 和 <code>user_contacts</code> 放一起，因为它们围绕同一个用户，经常一起查、一起改。</p>
+<p><code>chat_room</code> 和 <code>chat_room_member</code> 放一起，因为它们经常需要在同一个本地事务里修改：建群时同时写房间和成员，加人时同时更新成员和房间元数据。</p>
+<p><code>message</code> 单独拆出去，因为它的写模式和别的表完全不同：高频追加、几乎不更新、按 roomId 和时间范围查、需要独立的扩容策略，还需要一个专门的幂等键。</p>
+<p>一句话：<strong>拆的是&quot;谁负责写、谁负责改、谁负责扛量&quot;，不是表。</strong></p>
+<h2 id="三-拆库的本质是重新划分写负责人"><a class="markdownIt-Anchor" href="#三-拆库的本质是重新划分写负责人"></a> 三、拆库的本质是重新划分写负责人</h2>
+<p>表结构其实大部分可以原样保留。真正变的是规则。</p>
+<p>原来一个库里有跨表外键，有触发器，有跨业务域的 JOIN。拆成四个 schema 之后：</p>
+<ul>
+<li>删除所有跨 schema 外键</li>
+<li>删除 <code>trg_chat_room_member_set_room_name</code> 触发器</li>
+<li>跨服务引用改成软引用，靠内部 API 校验</li>
+<li>跨服务查询改成 API 组合、缓存或读模型</li>
+<li>强一致降级为最终一致</li>
+</ul>
+<p>那个触发器很典型：它原来负责在插入成员时自动填 <code>room_name</code>。拆库之后它跨了两个服务的数据，只能删掉，改由应用层写入。</p>
+<p><strong>触发器、外键、跨库 JOIN，本质上都是&quot;假设大家在一个库里&quot;的产物。拆库就是把这类假设一条条找出来。</strong></p>
+<p>另外两个和数据边界直接相关的改动：</p>
+<p><strong><code>message.id</code> 改为非自增。</strong> 消息的主键由 ws-service 用 Snowflake 生成，不再依赖数据库自增。这样消息在落库之前就已经有全局唯一 ID，可以安全地做重试、幂等和跨实例排序。</p>
+<p><strong>增加 <code>client_msg_id</code> 和 <code>(sender_id, client_msg_id)</code> 唯一索引。</strong> 客户端断线重发时，同一条消息可能被投递多次。Kafka 只能保证至少一次，所以消费端必须能识别重复。唯一索引是最后一道兜底。</p>
+<p>迁移完成后用合成数据验证：5 张业务表数据条数全部 1/1，跨库外键 0 个，触发器 0 个。</p>
+<p>数字比&quot;我觉得应该没问题&quot;可靠。</p>
+<h2 id="四-nacos-是地址簿不是调用者"><a class="markdownIt-Anchor" href="#四-nacos-是地址簿不是调用者"></a> 四、Nacos 是地址簿，不是调用者</h2>
+<p>服务拆开之后，第一个问题就是：A 怎么找到 B？</p>
+<p>我用了三种通信方式，各管一件事：</p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>方案</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>同步查询</td>
+<td>OpenFeign + LoadBalancer + Nacos</td>
+<td>实时、有返回值、会失败</td>
+</tr>
+<tr>
+<td>异步可靠处理</td>
+<td>Kafka</td>
+<td>持久化、可重放、至少一次</td>
+</tr>
+<tr>
+<td>实时广播</td>
+<td>Redis Pub/Sub</td>
+<td>低延迟、不持久、发完即忘</td>
+</tr>
+</tbody>
+</table>
+<p>这里最容易混淆的是 Nacos 和 Feign 的分工：</p>
+<p><strong>Nacos 是地址簿，负责&quot;B 现在在哪几个 IP 上&quot;；Feign 是打电话的人，负责&quot;发起这次调用&quot;。</strong></p>
+<p>Nacos 不知道你要调什么接口，也不替你重试。它只解决服务发现。</p>
+<p>另一个常被问的问题是：Kafka 和 Redis Pub/Sub 能不能互换？</p>
+<p>不能，因为它们保证的东西不一样。</p>
+<ul>
+<li>Kafka 把消息写盘，消费者可以按 offset 重放。消息必须先可靠落库，再谈推送。</li>
+<li>Redis Pub/Sub 不存消息，订阅者掉线就错过。它只适合&quot;现在在线的人，立刻收到&quot;。</li>
+</ul>
+<p>所以消息链路是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ws-service -&gt; Kafka -&gt; message-service（幂等落库） -&gt; Redis Pub/Sub -&gt; 所有 ws 实例</span><br></pre></td></tr></table></figure>
+<p>Kafka 负责&quot;不能丢&quot;，Redis Pub/Sub 负责&quot;足够快&quot;。把两件事交给一个组件，最后一定有一头不达标。</p>
+<p>还有一条底线：<strong>不共享数据库表。</strong> 共享表看起来最省事，实际上是把两个服务的发布节奏重新绑死，等于白拆。</p>
+<h2 id="五-网关只做入口该做的事"><a class="markdownIt-Anchor" href="#五-网关只做入口该做的事"></a> 五、网关只做入口该做的事</h2>
+<p>网关不是业务服务。它不查用户、不拼消息，只做入口该做的事：</p>
+<ul>
+<li>统一入口和路由</li>
+<li>JWT 鉴权</li>
+<li>清洗客户端伪造的身份头</li>
+<li>注入可信的 <code>X-User-Id</code></li>
+<li>CORS</li>
+<li>后续的登录限流</li>
+</ul>
+<p>路由按业务域划分：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">/api/account/**  -&gt; muchat-user</span><br><span class="line">/api/user/**     -&gt; muchat-user</span><br><span class="line">/api/contacts/** -&gt; muchat-user</span><br><span class="line">/api/chatRoom/** -&gt; muchat-chat</span><br><span class="line">/api/msg/**      -&gt; muchat-message</span><br><span class="line">/api/notice/**   -&gt; muchat-notice</span><br><span class="line">/api/oss/**      -&gt; muchat-file</span><br><span class="line">/ws              -&gt; muchat-ws</span><br></pre></td></tr></table></figure>
+<p><code>JwtGlobalFilter</code> 里有一个动作容易被忽略，但它是整个信任模型的根：</p>
+<p><strong>删除客户端传来的 <code>X-User-Id</code> 和 <code>X-Internal-Token</code>，只注入网关自己解析出来的值。</strong></p>
+<p>如果不删，客户端可以随便带一个 <code>X-User-Id: 1</code>，下游服务又信任这个头，等于任何人可以直接冒充管理员。</p>
+<p>信任链必须只有一个入口：客户端 → 网关 → 下游。下游不再解析 JWT，只信任网关注入的身份。</p>
+<p>运行时验证最能说明问题：</p>
+<ul>
+<li>Nacos 注册成功</li>
+<li>健康检查 <code>UP</code></li>
+<li>不带 Token 请求 → <code>401</code></li>
+<li>带合法 Token 请求 → 因为 user-service 还没启动，返回 <code>503</code></li>
+</ul>
+<p><code>503</code> 不是失败，反而是证据：<strong>鉴权已经通过，路由也已经生效，只差下游服务。</strong> 如果返回的是 <code>401</code>，说明 token 没过；如果返回 <code>404</code>，说明路由没匹配上。错误码本身就是链路的路标。</p>
+<h2 id="六-跨服务契约先统一命名"><a class="markdownIt-Anchor" href="#六-跨服务契约先统一命名"></a> 六、跨服务契约先统一命名</h2>
+<p>拆服务之前，原项目把跨服务传输的对象也叫 VO。拆开之后这套命名会直接制造混乱。</p>
+<p>我统一成四类：</p>
+<table>
+<thead>
+<tr>
+<th>后缀</th>
+<th>用途</th>
+<th>放在哪</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DTO</code></td>
+<td>服务之间传输的数据</td>
+<td><code>muchat-api</code></td>
+</tr>
+<tr>
+<td><code>VO</code></td>
+<td>返回给前端的展示对象</td>
+<td>各服务内部</td>
+</tr>
+<tr>
+<td><code>DO</code></td>
+<td>数据库持久化对象</td>
+<td>各服务内部</td>
+</tr>
+<tr>
+<td><code>Event</code></td>
+<td>Kafka / Redis 异步事件</td>
+<td><code>muchat-api</code></td>
+</tr>
+</tbody>
+</table>
+<p>规则很简单：<strong><code>DTO</code> 是跨服务契约，<code>VO</code> 是前端视图，<code>DO</code> 是数据库形状，<code>Event</code> 是异步消息。</strong> 四者混用，最后一定会出现&quot;这个字段到底该不该给前端&quot;的争论。</p>
+<h2 id="今天踩的坑"><a class="markdownIt-Anchor" href="#今天踩的坑"></a> 今天踩的坑</h2>
+<ol>
+<li><strong>Maven 下载失败。</strong> Maven Central 和阿里云镜像都出现 TLS handshake 失败，配置镜像并固定 TLS 1.2 后恢复。</li>
+<li><strong>Windows 提交内存耗尽。</strong> Maven 测试 JVM 连 128MB 都申请不到，原因是 Docker/WSL、IDE、浏览器一起占满了 commit。处理办法是停掉不用的容器、降低测试堆，并给 WSL 加内存上限。</li>
+<li><strong>8080 被占用。</strong> 占用者是 Windows 的 <code>svchost.exe</code>。没有去动系统服务，网关改用 9080。</li>
+<li><strong>Nacos 创建 namespace 返回 false。</strong> 不是失败，是它已经存在。用 GET 接口确认 <code>muchat-dev</code> 在，就够了。</li>
+<li><strong>VO/DTO 命名混淆。</strong> 原项目把跨服务对象也叫 VO，迁移时统一改成 DTO。</li>
+</ol>
+<p>前四个坑有一个共同点：<strong>报错信息指向的地方，往往不是问题所在。</strong> TLS 失败看起来像网络，实际是协议版本；memory 失败看起来像代码，实际是整机资源；namespace 返回 false 看起来像创建失败，实际是幂等。</p>
+<h2 id="今天最值钱的三条"><a class="markdownIt-Anchor" href="#今天最值钱的三条"></a> 今天最值钱的三条</h2>
+<ol>
+<li><strong>拆服务的单位是业务域，不是数据库表。</strong> 先问&quot;谁负责写、谁负责改、谁负责扛量&quot;，再决定表怎么放。</li>
+<li><strong>拆库的核心是删除&quot;大家在一个库里&quot;的假设。</strong> 跨库外键、触发器、JOIN，一条条找出来，换成软引用、API 组合和最终一致。</li>
+<li><strong>信任链只能有一个入口。</strong> 网关校验 JWT、清洗身份头、注入可信用户 ID；下游无条件信任网关。少一步，就是越权漏洞。</li>
+</ol>
+<h2 id="留给自己的六个问题"><a class="markdownIt-Anchor" href="#留给自己的六个问题"></a> 留给自己的六个问题</h2>
+<ol>
+<li>为什么 <code>users</code> 和 <code>user_contacts</code> 不拆成两个服务？</li>
+<li>为什么 <code>message</code> 要独立成服务？</li>
+<li>删除外键后，如何保证消息的 <code>sender_id</code> 仍然有意义？</li>
+<li>网关为什么要删除客户端传来的 <code>X-User-Id</code>？</li>
+<li>为什么 Nacos 不能替代 Feign？</li>
+<li>Kafka 和 Redis Pub/Sub 各自负责什么，为什么不能互换？</li>
+</ol>
+<h2 id="下一步"><a class="markdownIt-Anchor" href="#下一步"></a> 下一步</h2>
+<p>Task 5：抽取 <code>user-service</code>。</p>
+<p>重点是把账号、资料、联系人接口迁出去，注册到 Nacos，并且把验证码从本地 <code>HttpSession</code> 改成 Spring Session + Redis——服务多实例之后，本地 session 就不再是&quot;会话&quot;，而是&quot;某个实例碰巧记得你&quot;。</p>
+
+    </div>
+    <footer class="article-footer">
+        <blockquote class="article-copyright">
+    <p><strong><span class="icon-user icon"></span>本文作者：</strong>羡笙</p>
+    <p><strong><span class="icon-link icon"></span>本文链接：</strong><a href="https://envysage.github.io/XS-Blog/2026/10/21/2026-10-21-monolith-to-microservices-day1/">https://envysage.github.io/XS-Blog/2026/10/21/2026-10-21-monolith-to-microservices-day1/</a></p>
+    <p><strong><span class="icon-pencil icon"></span>本文标题：</strong>「拆服务不是拆表：聊天室微服务化的第一步」</p>
+    <p><strong><span class="icon-calendar icon"></span>本文发布时间：</strong>2026-10-21 20:00:00</p>
+    
+    <p><strong><span class="icon-copyright icon"></span>本文版权：</strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener nofollow noreferrer" target="_blank"><span class="icon-creative-commons"></span>BY-NC-SA</a> 许可协议。转载请注明出处！</p>
+    <span class="icon-creative-commons article-copyright-bg"></span>
+  </blockquote>
+        <div class="share-wrapper">
+    <a href="https://connect.qq.com/widget/shareqq/index.html?url=https%3A%2F%2Fenvysage.github.io%2FXS-Blog%2F2026%2F10%2F21%2F2026-10-21-monolith-to-microservices-day1%2F&amp;title=%E6%8B%86%E6%9C%8D%E5%8A%A1%E4%B8%8D%E6%98%AF%E6%8B%86%E8%A1%A8%EF%BC%9A%E8%81%8A%E5%A4%A9%E5%AE%A4%E5%BE%AE%E6%9C%8D%E5%8A%A1%E5%8C%96%E7%9A%84%E7%AC%AC%E4%B8%80%E6%AD%A5&amp;desc=%E6%8B%86%E6%9C%8D%E5%8A%A1%E4%B8%8D%E6%98%AF%E6%8B%86%E8%A1%A8%EF%BC%9A%E8%81%8A%E5%A4%A9%E5%AE%A4%E5%BE%AE%E6%9C%8D%E5%8A%A1%E5%8C%96%E7%9A%84%E7%AC%AC%E4%B8%80%E6%AD%A5&amp;source=https%3A%2F%2Fenvysage.github.io%2FXS-Blog" target="_blank" rel="noopener noreferrer" title="拆服务不是拆表：聊天室微服务化的第一步">
+      <div class="share-icon icon icon-qq">
+      </div>
+    </a>
+</div>
+        <a class="article-category-link" href="/XS-Blog/categories/%E6%8A%80%E6%9C%AF/" title="技术" data-aos="zoom-in">技术</a>
+
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+    <div class="article-nav-link-wrap right">
+          <img data-src="https://envysage.github.io/XS-Blog/images/covers/bg3.webp" data-sizes="auto" alt="别把 max_concurrency 当成研究员并发数：LangGraph 并发与失败工程笔记" class="lazyload">
+      <a href="/XS-Blog/2026/10/19/langgraph-concurrency-and-failure-engineering/" aria-label="后一篇: 别把 max_concurrency 当成研究员并发数：LangGraph 并发与失败工程笔记"  title="后一篇: 别把 max_concurrency 当成研究员并发数：LangGraph 并发与失败工程笔记"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          别把 max_concurrency 当成研究员并发数：LangGraph 并发与失败工程笔记
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2026
+        <span class="footer-info-sep rotate"></span>
+      羡笙
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        38k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        02:43
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%8B%86%E6%9C%8D%E5%8A%A1%E4%B8%8D%E6%98%AF%E6%8B%86%E8%A1%A8%E8%81%8A%E5%A4%A9%E5%AE%A4%E5%BE%AE%E6%9C%8D%E5%8A%A1%E5%8C%96%E7%9A%84%E7%AC%AC%E4%B8%80%E6%AD%A5"><span class="toc-text"> 拆服务不是拆表：聊天室微服务化的第一步</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B5%B7%E5%9B%A0"><span class="toc-text"> 起因</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80-%E5%85%88%E8%AF%81%E6%98%8E%E6%97%A7%E7%9A%84%E8%BF%98%E8%83%BD%E8%B7%91"><span class="toc-text"> 一、先证明旧的还能跑</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C-%E6%8B%86%E6%9C%8D%E5%8A%A1%E7%9A%84%E4%BE%9D%E6%8D%AE%E6%98%AF%E4%B8%9A%E5%8A%A1%E5%9F%9F%E4%B8%8D%E6%98%AF%E8%A1%A8"><span class="toc-text"> 二、拆服务的依据是业务域，不是表</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89-%E6%8B%86%E5%BA%93%E7%9A%84%E6%9C%AC%E8%B4%A8%E6%98%AF%E9%87%8D%E6%96%B0%E5%88%92%E5%88%86%E5%86%99%E8%B4%9F%E8%B4%A3%E4%BA%BA"><span class="toc-text"> 三、拆库的本质是重新划分写负责人</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B-nacos-%E6%98%AF%E5%9C%B0%E5%9D%80%E7%B0%BF%E4%B8%8D%E6%98%AF%E8%B0%83%E7%94%A8%E8%80%85"><span class="toc-text"> 四、Nacos 是地址簿，不是调用者</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94-%E7%BD%91%E5%85%B3%E5%8F%AA%E5%81%9A%E5%85%A5%E5%8F%A3%E8%AF%A5%E5%81%9A%E7%9A%84%E4%BA%8B"><span class="toc-text"> 五、网关只做入口该做的事</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD-%E8%B7%A8%E6%9C%8D%E5%8A%A1%E5%A5%91%E7%BA%A6%E5%85%88%E7%BB%9F%E4%B8%80%E5%91%BD%E5%90%8D"><span class="toc-text"> 六、跨服务契约先统一命名</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%8A%E5%A4%A9%E8%B8%A9%E7%9A%84%E5%9D%91"><span class="toc-text"> 今天踩的坑</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%8A%E5%A4%A9%E6%9C%80%E5%80%BC%E9%92%B1%E7%9A%84%E4%B8%89%E6%9D%A1"><span class="toc-text"> 今天最值钱的三条</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%95%99%E7%BB%99%E8%87%AA%E5%B7%B1%E7%9A%84%E5%85%AD%E4%B8%AA%E9%97%AE%E9%A2%98"><span class="toc-text"> 留给自己的六个问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%8B%E4%B8%80%E6%AD%A5"><span class="toc-text"> 下一步</span></a></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/XS-Blog/avatar/avatar.webp" data-sizes="auto" alt="羡笙" class="lazyload">
+  <div class="sidebar-author-name">羡笙</div>
+  <div class="sidebar-description"></div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">18</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">4</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/EnvySage itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/XS-Blog/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/XS-Blog/images/reimu.png" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/XS-Blog/js/script.js"></script>
+
+
+  
+<script src="/XS-Blog/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/XS-Blog/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/XS-Blog/js/generator_search.js" defer></script>
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+  
+<script src="https://npm.webcache.cn/theme-shokax-pjax@0.0.3/dist/index.umd.js" integrity="sha384-xneY1WY8hOfUzswrE4CrYq35N4BdVcxqxwHPr9zawE&#x2F;jMSCxD+jAPU55x&#x2F;jj3wlf" crossorigin="anonymous"></script>
+
+  
+<script src="/XS-Blog/js/pjax.js"></script>
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "羡笙",
+          title: "拆服务不是拆表：聊天室微服务化的第一步",
+          url: "https://envysage.github.io/XS-Blog/2026/10/21/2026-10-21-monolith-to-microservices-day1/",
+          excerpt: "",
+          description: "",
+          stripContent: " 拆服务不是拆表：聊天室微服务化的第一步  学习日期：2026年10月21日 项目：Muchat-Back → muchat-cloud 环境：Java 21 / Spring Boot 3.3.5 / Spring Cloud 2023.0.5 / Spring Cloud Alibaba 2023.0.3.3   起因 Muchat-Back 是一个能跑的聊天室单体：用户、群聊、消息、通知、文件，全在一个进程、一个数据库里。 它没有坏。但所有东西都长在了一起：改一个通知模板要重新发布整个应用",
+          date: "Wed Oct 21 2026 20:00:00 GMT+0800",
+          updated: "Thu Oct 22 2026 10:03:15 GMT+0800",
+          cover: "/XS-Blog/images/banner.webp",
+        };
+      </script>
+        
+<script src="/XS-Blog/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/XS-Blog/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+    <script>
+    var setupAPlayer = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        if (window.matchMedia('(max-width: 959px)').matches) {
+          const aplayer = _$('#aplayer');
+          if (aplayer) {
+            const aside = aplayer.parentNode?.parentNode;
+            if (aside?.tagName === 'ASIDE') {
+              aplayer.removeAttribute('data-aos');
+              aplayer.parentNode.removeChild(aplayer);
+              document.body.appendChild(aplayer);
+            }
+          }
+        }
+        new APlayer({
+          theme: "var(--color-link)",
+          container: document.getElementById('aplayer'),
+          audio: [{"name":"忆夏思乡","artist":"MoreanP","url":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/music/MoreanP%20-%20%E5%BF%86%E5%A4%8F%E6%80%9D%E4%B9%A1.mp3","cover":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/cover/MoreanP%20-%20%E5%BF%86%E5%A4%8F%E6%80%9D%E4%B9%A1.jpeg"},{"name":"かくれんぼ","artist":"AliA","url":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/music/AliA%20-%20%E3%81%8B%E3%81%8F%E3%82%8C%E3%82%93%E3%81%BC.mp3","cover":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/cover/AliA%20-%20%E3%81%8B%E3%81%8F%E3%82%8C%E3%82%93%E3%81%BC.jpeg","lrc":"https://xs-blog.oss-cn-shenzhen.aliyuncs.com/lyric/%E3%81%8B%E3%81%8F%E3%82%8C%E3%82%93%E3%81%BC%20-%20AliA.lrc"}] || [],
+          fixed: isMobile ? true : (false || false),
+          autoplay: false || false,
+          loop: 'all' || 'all',
+          order: 'list' || 'list',
+          preload: 'auto' || 'auto',
+          volume: 0.4 || 0.7,
+          mutex: true || true,
+          listFolded: false || false,
+          lrcType: 0 || 0,
+        });
+      }
+    }
+    </script>
+  
+<script src="https://npm.webcache.cn/aplayer@1.10.1/dist/APlayer.min.js" integrity="sha384-gdGYZwHnfJM54evoZhpO0s6ZF5BQiybkiyW7VXr+h5UfruuRL&#x2F;aORyw+5+HZoU6e" crossorigin="anonymous" defer onload="setupAPlayer()"></script>
+
+
+
+  </body>
+  </html>
